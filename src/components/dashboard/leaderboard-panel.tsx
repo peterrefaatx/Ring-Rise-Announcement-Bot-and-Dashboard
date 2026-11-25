@@ -18,6 +18,7 @@ interface LeaderboardPanelProps {
   businessDateEst: string;
   businessMonthEst: string;
   dailyOnly?: boolean;
+  hideTitle?: boolean;
 }
 
 export function LeaderboardPanel({
@@ -28,21 +29,24 @@ export function LeaderboardPanel({
   businessDateEst,
   businessMonthEst,
   dailyOnly = false,
+  hideTitle = false,
 }: LeaderboardPanelProps) {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Trophy className="h-4 w-4 text-amber-500" />
-            {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
-          </CardTitle>
-          <span className="text-xs text-muted-foreground">
-            Tie-break: earliest achievement
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent>
+      {!hideTitle && (
+        <CardHeader className="pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Trophy className="h-4 w-4 text-amber-500" />
+              {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
+            </CardTitle>
+            <span className="text-xs text-muted-foreground">
+              Tie-break: earliest achievement
+            </span>
+          </div>
+        </CardHeader>
+      )}
+      <CardContent className={cn(hideTitle && "pt-5")}>
         {dailyOnly ? (
           <LeaderboardList entries={daily} currentUserId={currentUserId} />
         ) : (

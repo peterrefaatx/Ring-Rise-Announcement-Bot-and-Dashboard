@@ -91,14 +91,9 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           </Card>
         </div>
 
-        {/* Main Workspace Grid: Active Campaign Targets on Left, Rank of the Day on Right */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-6">
-            <CampaignProgressPanel campaigns={snapshot.campaigns} />
-            <ActivityFeedPanel items={snapshot.activityFeed} />
-          </div>
-
-          <div className="lg:col-span-6">
+        {/* Main Workspace: 60% Left (Today's Leaderboard) | 30% Right (Active Campaign Targets) */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="w-full space-y-6 lg:w-[60%]">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
               monthly={snapshot.leaderboards.monthly}
@@ -107,7 +102,13 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               businessDateEst={snapshot.businessDateEst}
               businessMonthEst={snapshot.businessMonthEst}
               dailyOnly
+              hideTitle
             />
+            <ActivityFeedPanel items={snapshot.activityFeed} />
+          </div>
+
+          <div className="w-full lg:w-[30%]">
+            <CampaignProgressPanel campaigns={snapshot.campaigns} hideTitle />
           </div>
         </div>
       </div>

@@ -9,18 +9,22 @@ import { cn } from "@/lib/utils";
 
 export function CampaignProgressPanel({
   campaigns,
+  hideTitle = false,
 }: {
   campaigns: CampaignProgressItem[];
+  hideTitle?: boolean;
 }) {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Target className="h-4 w-4 text-primary" />
-          Active Campaign Targets
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+      {!hideTitle && (
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Target className="h-4 w-4 text-primary" />
+            Active Campaign Targets
+          </CardTitle>
+        </CardHeader>
+      )}
+      <CardContent className={cn(hideTitle && "pt-5")}>
         {campaigns.length === 0 ? (
           <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
             No active campaigns right now.
