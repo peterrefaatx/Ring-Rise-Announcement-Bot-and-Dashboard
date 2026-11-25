@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CALLER
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVATED
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum NotificationStatus {
+  PENDING
+  PROCESSING
+  SENT
+  RETRYING
+  FAILED
+}
+
+enum ActivityEventType {
+  LEAD_ANNOUNCED
+  CAMPAIGN_CHANGED
+  CALLER_CHANGED
+  SETTINGS_CHANGED
+}
+
+model User {
+  id                   String     @id @default(cuid())
+  fullName             String
+  username             String     @unique
+  email                String?    @unique
+  passwordHash         String
+  role                 UserRole   @default(CALLER)
+  status               UserStatus @default(ACTIVE)
+  deletedAt            DateTime?
+  announcementName     String
+  announcementTemplate String     @default("{name} got a lead in {campaign}, lets shout out to him!")
+  tokenVersion         Int        @default(1)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  sessions              Session[]
+  leadAnnouncements     LeadAnnouncement[]
+  auditLogs             AuditLog[]              @relation("AuditActor")
+  campaignTargetChanges CampaignTargetHistory[] @relation("TargetChangedBy")
+
+  @@index([role, status])
+  @@index([deletedAt])
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+  userAgent  String?
+  ipAddress  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  name        String         @unique
+  description String?
+  dailyTarget Int
+  status      CampaignStatus @default(ACTIVE)
+  deletedAt   DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  leadAnnouncements LeadAnnouncement[]
+  targetHistory     CampaignTargetHistory[]
+
+  @@index([status, deletedAt])
+}
+
+model CampaignTargetHistory {
+  id               String   @id @default(cuid())
+  campaignId       String
+  dailyTarget      Int
+  effectiveFrom    DateTime @default(now())
+  effectiveDateEst String
+  changedById      String?
+  createdAt        DateTime @default(now())
+
+  campaign  Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  changedBy User?    @relation("TargetChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([campaignId, effectiveFrom])
+  @@index([campaignId, effectiveDateEst])
+}
+
+model LeadAnnouncement {
+  id                   String   @id @default(cuid())
+  seq                  Int      @unique @default(autoincrement())
+  userId               String
+  campaignId           String
+  idempotencyKey       String
+  callerNameSnapshot   String
+  campaignNameSnapshot String
+  renderedMessage      String
+  businessDateEst      String
+  businessMonthEst     String
+  createdAt            DateTime @default(now())
+
+  user            User                     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  campaign        Campaign                 @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  telegramJob     TelegramNotificationJob?
+
+  @@unique([userId, idempotencyKey])
+  @@index([businessDateEst, userId, createdAt])
+  @@index([businessMonthEst, userId, createdAt])
+  @@index([campaignId, businessDateEst])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model TelegramNotificationJob {
+  id                String             @id @default(cuid())
+  announcementId    String             @unique
+  chatId            String
+  messageText       String
+  status            NotificationStatus @default(PENDING)
+  attempts          Int                @default(0)
+  maxAttempts       Int                @default(6)
+  nextRetryAt       DateTime           @default(now())
+  lastError         String?
+  telegramMessageId String?
+  lockedAt          DateTime?
+  sentAt            DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  announcement LeadAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRetryAt])
+}
+
+model ActivityEvent {
+  id        String            @id @default(cuid())
+  seq       Int               @unique @default(autoincrement())
+  type      ActivityEventType
+  payload   Json
+  createdAt DateTime          @default(now())
+
+  @@index([createdAt])
+}
+
+model SystemSettings {
+  id                        String   @id @default("default")
+  brandName                 String   @default("Sales Performance Hub")
+  brandTagline              String   @default("Real-Time Lead & Campaign Tracker")
+  brandPrimaryColor         String   @default("#1D4ED8")
+  brandLogoUrl              String?
+  telegramBotTokenEncrypted String?
+  telegramChatId            String?
+  telegramEnabled           Boolean  @default(true)
+  timezoneLabel             String   @default("EST (UTC-5 Fixed)")
+  updatedAt                 DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  action      String
+  targetType  String
+  targetId    String?
+  details     Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+}
