@@ -26,8 +26,10 @@ export async function GET(request: NextRequest) {
 
   const headerLastId = request.headers.get("last-event-id");
   const queryLastId = request.nextUrl.searchParams.get("lastEventId");
-  const parsedLastSeq = Number.parseInt(headerLastId || queryLastId || "0", 10);
-  const sinceSeq = Number.isFinite(parsedLastSeq) && parsedLastSeq > 0 ? parsedLastSeq : 0;
+  const rawLastId = headerLastId ?? queryLastId;
+  const parsedLastSeq = rawLastId !== null ? Number.parseInt(rawLastId, 10) : NaN;
+  const sinceSeq =
+    Number.isFinite(parsedLastSeq) && parsedLastSeq >= 0 ? parsedLastSeq : null;
 
   const encoder = new TextEncoder();
   let unsubscribe: (() => void) | null = null;
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      let lastDeliveredSeq = sinceSeq;
+      let lastDeliveredSeq = sinceSeq ?? 0;
       let currentBusinessDateEst = getBusinessDateEst(new Date());
 
       const safeEnqueue = (chunk: string) => {
@@ -97,12 +99,12 @@ export async function GET(request: NextRequest) {
           })
         );
 
-        if (!missed.resyncRequired) {
+        if (sinceSeq === null || missed.resyncRequired) {
+          lastDeliveredSeq = missed.latestSeq;
+        } else {
           for (const evt of missed.events) {
             deliverEvent(evt);
           }
-        } else {
-          lastDeliveredSeq = missed.latestSeq;
         }
 
         catchupComplete = true;

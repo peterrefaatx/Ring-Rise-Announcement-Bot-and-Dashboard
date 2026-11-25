@@ -151,7 +151,7 @@ export async function emitActivityEvent(
   return event;
 }
 
-export async function getMissedActivityEvents(sinceSeq: number): Promise<{
+export async function getMissedActivityEvents(sinceSeq: number | null): Promise<{
   resyncRequired: boolean;
   events: RealtimeBroadcastEvent[];
   latestSeq: number;
@@ -162,7 +162,7 @@ export async function getMissedActivityEvents(sinceSeq: number): Promise<{
   });
   const latestSeq = latest?.seq ?? 0;
 
-  if (sinceSeq <= 0 || latestSeq <= sinceSeq) {
+  if (sinceSeq === null || sinceSeq < 0 || latestSeq <= sinceSeq) {
     return { resyncRequired: false, events: [], latestSeq };
   }
 
