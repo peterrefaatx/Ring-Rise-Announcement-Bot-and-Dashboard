@@ -10,7 +10,13 @@ import { Label } from "@/components/ui/label";
 import { BrandLogo } from "@/components/brand-logo";
 import type { BrandSettingsPublic } from "@/lib/dashboard";
 
-export function LoginForm({ brand }: { brand: BrandSettingsPublic }) {
+export function LoginForm({
+  brand,
+  setupWarning = null,
+}: {
+  brand: BrandSettingsPublic;
+  setupWarning?: string | null;
+}) {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -75,6 +81,11 @@ export function LoginForm({ brand }: { brand: BrandSettingsPublic }) {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {setupWarning && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
+                  {setupWarning}
+                </div>
+              )}
               <div className="space-y-1.5">
                 <Label htmlFor="username" className="text-xs font-medium text-[#425466]">
                   Username

@@ -96,62 +96,67 @@ export async function getCurrentSession(): Promise<{
   sessionId: string;
   user: AuthenticatedUser;
 } | null> {
-  const cookieStore = await cookies();
-  const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (!rawToken) {
-    return null;
-  }
+  try {
+    const cookieStore = await cookies();
+    const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    if (!rawToken) {
+      return null;
+    }
 
-  const tokenHash = hashSessionToken(rawToken);
-  const session = await prisma.session.findUnique({
-    where: { tokenHash },
-    include: {
-      user: {
-        select: {
-          id: true,
-          fullName: true,
-          username: true,
-          email: true,
-          role: true,
-          status: true,
-          deletedAt: true,
-          announcementName: true,
-          announcementTemplate: true,
-          tokenVersion: true,
-          createdAt: true,
+    const tokenHash = hashSessionToken(rawToken);
+    const session = await prisma.session.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            username: true,
+            email: true,
+            role: true,
+            status: true,
+            deletedAt: true,
+            announcementName: true,
+            announcementTemplate: true,
+            tokenVersion: true,
+            createdAt: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!session) {
+    if (!session) {
+      return null;
+    }
+
+    if (session.expiresAt <= new Date()) {
+      await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
+      return null;
+    }
+
+    if (session.user.deletedAt !== null || session.user.status !== "ACTIVE") {
+      return null;
+    }
+
+    return {
+      sessionId: session.id,
+      user: {
+        id: session.user.id,
+        fullName: session.user.fullName,
+        username: session.user.username,
+        email: session.user.email,
+        role: session.user.role,
+        status: session.user.status,
+        announcementName: session.user.announcementName,
+        announcementTemplate: session.user.announcementTemplate,
+        tokenVersion: session.user.tokenVersion,
+        createdAt: session.user.createdAt,
+      },
+    };
+  } catch (err) {
+    console.error("getCurrentSession failed:", err);
     return null;
   }
-
-  if (session.expiresAt <= new Date()) {
-    await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
-    return null;
-  }
-
-  if (session.user.deletedAt !== null || session.user.status !== "ACTIVE") {
-    return null;
-  }
-
-  return {
-    sessionId: session.id,
-    user: {
-      id: session.user.id,
-      fullName: session.user.fullName,
-      username: session.user.username,
-      email: session.user.email,
-      role: session.user.role,
-      status: session.user.status,
-      announcementName: session.user.announcementName,
-      announcementTemplate: session.user.announcementTemplate,
-      tokenVersion: session.user.tokenVersion,
-      createdAt: session.user.createdAt,
-    },
-  };
 }
 
 export async function revokeCurrentSession(): Promise<void> {

@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
   const encoder = new TextEncoder();
   let unsubscribe: (() => void) | null = null;
   let heartbeatTimer: NodeJS.Timeout | null = null;
+  let pollTimer: NodeJS.Timeout | null = null;
   let closed = false;
 
   const stream = new ReadableStream<Uint8Array>({
@@ -62,6 +63,10 @@ export async function GET(request: NextRequest) {
         if (heartbeatTimer) {
           clearInterval(heartbeatTimer);
           heartbeatTimer = null;
+        }
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
         }
         if (unsubscribe) {
           unsubscribe();
@@ -124,6 +129,19 @@ export async function GET(request: NextRequest) {
         catchupComplete = true;
       }
 
+      // Fallback poll every 2s ensures real-time delivery across serverless isolates (e.g. Vercel)
+      pollTimer = setInterval(() => {
+        if (closed) return;
+        void getMissedActivityEvents(lastDeliveredSeq)
+          .then((res) => {
+            if (closed) return;
+            for (const evt of res.events) {
+              deliverEvent(evt);
+            }
+          })
+          .catch(() => {});
+      }, 2000);
+
       heartbeatTimer = setInterval(() => {
         const nowDate = getBusinessDateEst(new Date());
         if (nowDate !== currentBusinessDateEst) {
@@ -147,6 +165,7 @@ export async function GET(request: NextRequest) {
     cancel() {
       closed = true;
       if (heartbeatTimer) clearInterval(heartbeatTimer);
+      if (pollTimer) clearInterval(pollTimer);
       if (unsubscribe) unsubscribe();
     },
   });

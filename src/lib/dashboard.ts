@@ -73,9 +73,22 @@ export interface DashboardSnapshot {
 }
 
 export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
-  const settings = await prisma.systemSettings.findUnique({
-    where: { id: "default" },
-  });
+  let settings: {
+    brandName: string;
+    brandTagline: string;
+    brandPrimaryColor: string;
+    brandLogoUrl: string | null;
+    timezoneLabel: string;
+  } | null = null;
+
+  try {
+    settings = await prisma.systemSettings.findUnique({
+      where: { id: "default" },
+    });
+  } catch (err) {
+    console.error("getPublicBrandSettings fallback (DB unavailable):", err);
+  }
+
   return {
     brandName: settings?.brandName || process.env.BRAND_NAME || "Daily Dashboard",
     brandTagline:

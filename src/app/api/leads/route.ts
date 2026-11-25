@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/auth";
 import { announceLead, AnnouncementError } from "@/lib/announcements";
 import { announceLeadSchema } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { processTelegramJob } from "@/lib/telegram";
 
 export async function POST(request: NextRequest) {
   const auth = await requireApiAuth();
@@ -27,11 +28,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await announceLead({
-      userId: auth.user.id,
-      campaignId: parsed.data.campaignId,
-      idempotencyKey: parsed.data.idempotencyKey,
-    });
+    const result = await announceLead(
+      {
+        userId: auth.user.id,
+        campaignId: parsed.data.campaignId,
+        idempotencyKey: parsed.data.idempotencyKey,
+      },
+      { deferTelegramDispatch: true }
+    );
+
+    if (result.telegramJobId && !result.deduplicated) {
+      const jobId = result.telegramJobId;
+      after(async () => {
+        await processTelegramJob(jobId).catch((err) => {
+          console.error("Background Telegram dispatch failed:", err);
+        });
+      });
+    }
 
     return NextResponse.json(result, {
       status: result.deduplicated ? 200 : 201,

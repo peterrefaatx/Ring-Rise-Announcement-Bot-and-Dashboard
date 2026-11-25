@@ -1,7 +1,7 @@
 import { EventEmitter } from "node:events";
 import { Client } from "pg";
 import type { ActivityEventType, Prisma } from "@prisma/client";
-import { prisma } from "./db";
+import { getDatabaseUrl, prisma } from "./db";
 
 export const PG_REALTIME_CHANNEL = "ringrise_events";
 
@@ -31,9 +31,10 @@ class RealtimeBroker {
   }
 
   private async connectPgListener(): Promise<void> {
-    if (!process.env.DATABASE_URL) return;
+    const dbUrl = getDatabaseUrl();
+    if (!dbUrl) return;
     try {
-      const client = new Client({ connectionString: process.env.DATABASE_URL });
+      const client = new Client({ connectionString: dbUrl });
       client.on("error", (err) => {
         console.error("[RealtimeBroker] PG listener error:", err.message);
         this.scheduleReconnect();
