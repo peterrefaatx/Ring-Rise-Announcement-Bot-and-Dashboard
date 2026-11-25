@@ -3,7 +3,6 @@
 import React from "react";
 import { Target, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { CampaignProgressItem } from "@/lib/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -15,67 +14,65 @@ export function CampaignProgressPanel({
   hideTitle?: boolean;
 }) {
   return (
-    <Card>
+    <Card className="overflow-hidden">
       {!hideTitle && (
-        <CardHeader className="pb-3">
+        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Target className="h-4 w-4 text-primary" />
+            <Target className="h-4 w-4 text-[#0077B6]" />
             Active Campaign Targets
           </CardTitle>
         </CardHeader>
       )}
-      <CardContent className={cn(hideTitle && "pt-5")}>
+      <CardContent className="p-0">
         {campaigns.length === 0 ? (
-          <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+          <div className="p-8 text-center text-sm text-[#64748B]">
             No active campaigns right now.
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="divide-y divide-[#E3E8EE]">
             {campaigns.map((campaign) => (
-              <div
-                key={campaign.id}
-                className="rounded-lg border bg-slate-50/50 p-4 space-y-2.5"
-              >
-                <div className="flex items-center justify-between gap-2">
+              <div key={campaign.id} className="p-5 space-y-3 transition-colors hover:bg-[#FAFBFD]">
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h4 className="truncate text-sm font-semibold uppercase tracking-wide text-slate-900">
+                    <h4 className="truncate text-sm font-semibold tracking-[-0.01em] text-[#0A2540]">
                       {campaign.name}
                     </h4>
                     {campaign.description && (
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="mt-0.5 truncate text-xs text-[#64748B]">
                         {campaign.description}
                       </p>
                     )}
                   </div>
                   {campaign.targetReached ? (
-                    <Badge variant="success" className="shrink-0">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
                       <CheckCircle2 className="h-3 w-3" />
-                      Target Reached
-                    </Badge>
+                      100%
+                    </span>
                   ) : (
-                    <span className="text-xs font-medium text-slate-600 shrink-0">
-                      {campaign.progressPercent}% Completed
+                    <span className="shrink-0 rounded-full bg-[#0077B6]/10 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-[#0077B6]">
+                      {campaign.progressPercent}%
                     </span>
                   )}
                 </div>
 
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
                   <div
                     className={cn(
-                      "h-full rounded-full transition-all duration-300",
-                      campaign.targetReached ? "bg-emerald-600" : "bg-primary"
+                      "h-full rounded-full transition-all duration-300 ease-out",
+                      campaign.targetReached ? "bg-emerald-600" : "bg-[#0077B6]"
                     )}
                     style={{ width: `${campaign.progressPercent}%` }}
                   />
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold tabular-nums text-slate-800">
-                    {campaign.leadsToday} / {campaign.dailyTarget} LEADS
+                  <span className="font-semibold tabular-nums text-[#0A2540]">
+                    {campaign.leadsToday} / {campaign.dailyTarget}{" "}
+                    <span className="font-normal text-[#64748B]">leads</span>
                   </span>
-                  <span className="text-slate-500">
+                  <span className="text-[#64748B] tabular-nums">
                     {campaign.targetReached
-                      ? `+${campaign.leadsToday - campaign.dailyTarget} above daily target`
+                      ? `+${campaign.leadsToday - campaign.dailyTarget} over target`
                       : `${campaign.dailyTarget - campaign.leadsToday} remaining`}
                   </span>
                 </div>

@@ -43,7 +43,7 @@ TELEGRAM_BOT_TOKEN=""
 TELEGRAM_CHAT_ID=""
 BRAND_NAME="Daily Dashboard"
 BRAND_TAGLINE="Real-Time Lead & Campaign Tracker"
-BRAND_PRIMARY_COLOR="#1D4ED8"
+BRAND_PRIMARY_COLOR="#0077B6"
 PORT="3000"
 "@
   [System.IO.File]::WriteAllText((Join-Path $PSScriptRoot ".env"), $envContent)

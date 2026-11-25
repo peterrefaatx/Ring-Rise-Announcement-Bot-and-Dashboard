@@ -4,7 +4,6 @@ import React from "react";
 import { Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { CrownBadge } from "@/components/crown-badge";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
 import { formatEstTime } from "@/lib/timezone";
@@ -32,23 +31,27 @@ export function LeaderboardPanel({
   hideTitle = false,
 }: LeaderboardPanelProps) {
   return (
-    <Card>
+    <Card className="overflow-hidden">
       {!hideTitle && (
-        <CardHeader className="pb-3">
+        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <Trophy className="h-4 w-4 text-amber-500" />
               {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
             </CardTitle>
-            <span className="text-xs text-muted-foreground">
-              Tie-break: earliest achievement
+            <span className="text-xs text-[#64748B]">
+              Earliest achievement breaks ties
             </span>
           </div>
         </CardHeader>
       )}
-      <CardContent className={cn(hideTitle && "pt-5")}>
+      <CardContent className={cn("p-0", !hideTitle && "pt-4 px-5 pb-5")}>
         {dailyOnly ? (
-          <LeaderboardList entries={daily} currentUserId={currentUserId} />
+          <LeaderboardList
+            entries={daily}
+            currentUserId={currentUserId}
+            flush={hideTitle}
+          />
         ) : (
           <Tabs defaultValue="daily">
             <TabsList className="grid w-full grid-cols-3">
@@ -58,21 +61,21 @@ export function LeaderboardPanel({
             </TabsList>
 
             <TabsContent value="daily">
-              <p className="mb-3 text-xs text-muted-foreground">
+              <p className="mb-3 text-xs text-[#64748B]">
                 Daily window: <span className="font-mono">{businessDateEst}</span>
               </p>
               <LeaderboardList entries={daily} currentUserId={currentUserId} />
             </TabsContent>
 
             <TabsContent value="monthly">
-              <p className="mb-3 text-xs text-muted-foreground">
+              <p className="mb-3 text-xs text-[#64748B]">
                 Monthly window: <span className="font-mono">{businessMonthEst}</span>
               </p>
               <LeaderboardList entries={monthly} currentUserId={currentUserId} />
             </TabsContent>
 
             <TabsContent value="all-time">
-              <p className="mb-3 text-xs text-muted-foreground">
+              <p className="mb-3 text-xs text-[#64748B]">
                 Cumulative lifetime rankings
               </p>
               <LeaderboardList entries={allTime} currentUserId={currentUserId} />
@@ -87,109 +90,84 @@ export function LeaderboardPanel({
 export function LeaderboardList({
   entries,
   currentUserId,
+  flush = false,
 }: {
   entries: LeaderboardEntry[];
   currentUserId?: string;
+  flush?: boolean;
 }) {
   if (entries.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-        No callers ranked yet for this period.
+      <div className="p-8 text-center text-sm text-[#64748B]">
+        No callers ranked yet for this period. Announce a lead to take #1.
       </div>
     );
   }
 
-  const topThree = entries.slice(0, 3);
-  const rest = entries.slice(3);
-
   return (
-    <div className="space-y-3">
-      {/* Top 3 Podium Cards */}
-      <div className="space-y-2">
-        {topThree.map((entry) => {
-          const isMe = entry.userId === currentUserId;
-          const podiumStyle =
-            entry.rank === 1
-              ? "border-amber-200 bg-amber-50/40"
-              : entry.rank === 2
-              ? "border-slate-300 bg-slate-50/80"
-              : "border-orange-200 bg-orange-50/35";
+    <div
+      className={cn(
+        "divide-y divide-[#E3E8EE]",
+        !flush && "rounded-lg border border-[#E3E8EE] overflow-hidden"
+      )}
+    >
+      {entries.map((entry) => {
+        const isMe = entry.userId === currentUserId;
+        const isTop1 = entry.rank === 1 && entry.leadCount > 0;
+        const isTop3 = entry.rank <= 3 && entry.leadCount > 0;
 
-          return (
-            <div
-              key={entry.userId}
-              className={cn(
-                "flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 transition-colors",
-                podiumStyle,
-                isMe && "ring-1 ring-primary"
-              )}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <CrownBadge rank={entry.rank} />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-semibold text-slate-900">
-                      {entry.announcementName}
+        return (
+          <div
+            key={entry.userId}
+            className={cn(
+              "flex items-center justify-between gap-4 px-5 py-3.5 transition-colors",
+              isTop1 && "bg-amber-50/45",
+              !isTop1 && isMe && "bg-[#0077B6]/[0.04]",
+              !isTop1 && !isMe && "hover:bg-[#F8FAFC]"
+            )}
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <CrownBadge rank={entry.rank} />
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "truncate text-sm text-[#0A2540]",
+                      isTop3 ? "font-semibold" : "font-medium"
+                    )}
+                  >
+                    {entry.announcementName}
+                  </span>
+                  {isMe && (
+                    <span className="inline-flex items-center rounded-full bg-[#0077B6]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0077B6]">
+                      You
                     </span>
-                    {isMe && <Badge variant="default">You</Badge>}
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    {entry.achievedAt
-                      ? `Reached at ${formatEstTime(entry.achievedAt)} EST`
-                      : "No leads yet"}
-                  </p>
+                  )}
                 </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-base font-bold tabular-nums text-slate-900">
-                  {entry.leadCount}
-                </span>
-                <span className="ml-1 text-xs text-slate-500">
-                  {entry.leadCount === 1 ? "lead" : "leads"}
-                </span>
+                <p className="mt-0.5 text-xs text-[#64748B]">
+                  {entry.achievedAt
+                    ? `Reached at ${formatEstTime(entry.achievedAt)}`
+                    : "No leads yet"}
+                </p>
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Remaining Rankings */}
-      {rest.length > 0 && (
-        <div className="divide-y rounded-lg border bg-white">
-          {rest.map((entry) => {
-            const isMe = entry.userId === currentUserId;
-            return (
-              <div
-                key={entry.userId}
+            <div className="flex items-baseline gap-1.5 shrink-0">
+              <span
                 className={cn(
-                  "flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm",
-                  isMe && "bg-blue-50/60"
+                  "tabular-nums tracking-tight text-[#0A2540]",
+                  isTop3 ? "text-xl font-bold" : "text-base font-semibold"
                 )}
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <CrownBadge rank={entry.rank} />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium text-slate-900">
-                        {entry.announcementName}
-                      </span>
-                      {isMe && <Badge variant="outline">You</Badge>}
-                    </div>
-                    {entry.achievedAt && (
-                      <p className="text-xs text-slate-500">
-                        Last at {formatEstTime(entry.achievedAt)} EST
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <span className="font-semibold tabular-nums text-slate-800 shrink-0">
-                  {entry.leadCount}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                {entry.leadCount}
+              </span>
+              <span className="text-xs font-medium text-[#64748B]">
+                {entry.leadCount === 1 ? "lead" : "leads"}
+              </span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

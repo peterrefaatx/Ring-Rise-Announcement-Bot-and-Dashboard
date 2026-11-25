@@ -170,7 +170,7 @@ model SystemSettings {
   id                        String   @id @default("default")
   brandName                 String   @default("Daily Dashboard")
   brandTagline              String   @default("Real-Time Lead & Campaign Tracker")
-  brandPrimaryColor         String   @default("#1D4ED8")
+  brandPrimaryColor         String   @default("#0077B6")
   brandLogoUrl              String?  @default("/logo.png")
   telegramBotTokenEncrypted String?
   telegramChatId            String?

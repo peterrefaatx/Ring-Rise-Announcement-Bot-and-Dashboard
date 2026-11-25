@@ -83,7 +83,7 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
       process.env.BRAND_TAGLINE ||
       "Real-Time Lead & Campaign Tracker",
     brandPrimaryColor:
-      settings?.brandPrimaryColor || process.env.BRAND_PRIMARY_COLOR || "#1D4ED8",
+      settings?.brandPrimaryColor || process.env.BRAND_PRIMARY_COLOR || "#0077B6",
     brandLogoUrl: settings?.brandLogoUrl || "/logo.png",
     timezoneLabel: settings?.timezoneLabel || EST_TIMEZONE_LABEL,
   };

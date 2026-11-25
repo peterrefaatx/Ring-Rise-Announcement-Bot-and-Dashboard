@@ -17,7 +17,7 @@ async function main() {
       id: "default",
       brandName: process.env.BRAND_NAME || "Daily Dashboard",
       brandTagline: process.env.BRAND_TAGLINE || "Real-Time Lead & Campaign Tracker",
-      brandPrimaryColor: process.env.BRAND_PRIMARY_COLOR || "#1D4ED8",
+      brandPrimaryColor: process.env.BRAND_PRIMARY_COLOR || "#0077B6",
       brandLogoUrl: "/logo.png",
       timezoneLabel: EST_TIMEZONE_LABEL,
       telegramEnabled: true,

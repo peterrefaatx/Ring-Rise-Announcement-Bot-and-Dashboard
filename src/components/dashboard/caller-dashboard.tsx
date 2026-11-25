@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Megaphone, Award, Flame, Users } from "lucide-react";
+import { Megaphone } from "lucide-react";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
 import type { DashboardSnapshot } from "@/lib/dashboard";
@@ -11,6 +10,7 @@ import { AnnounceLeadDialog } from "./announce-lead-dialog";
 import { LeaderboardPanel } from "./leaderboard-panel";
 import { CampaignProgressPanel } from "./campaign-progress-panel";
 import { ActivityFeedPanel } from "./activity-feed-panel";
+import { CrownBadge } from "@/components/crown-badge";
 
 interface CallerDashboardProps {
   initialSnapshot: DashboardSnapshot;
@@ -38,60 +38,69 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       onManualRefresh={refreshNow}
     >
       <div className="space-y-6">
-        {/* Daily KPI Strip */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                <span>MY LEADS TODAY</span>
-                <Flame className="h-4 w-4 text-primary" />
+        {/* Unified Executive Daily Metric Strip */}
+        <section className="rounded-xl border border-[#E3E8EE] bg-white shadow-[0_1px_2px_rgba(10,37,64,0.04),0_4px_12px_rgba(10,37,64,0.03)]">
+          <div className="grid grid-cols-1 divide-y divide-[#E3E8EE] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            <div className="p-5">
+              <p className="text-xs font-medium text-[#64748B]">My Leads Today</p>
+              <div className="mt-1.5 flex items-baseline gap-2.5">
+                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  {snapshot.personal.leadsToday}
+                </span>
+                <span className="text-xs text-[#64748B]">
+                  {snapshot.personal.dailyRank === 1 && snapshot.personal.leadsToday > 0
+                    ? "Leading today"
+                    : gapToFirst > 0
+                    ? `${gapToFirst} behind ${leaderToday?.announcementName}`
+                    : "Ready to score"}
+                </span>
               </div>
-              <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900">
-                {snapshot.personal.leadsToday}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                {snapshot.personal.dailyRank === 1 && snapshot.personal.leadsToday > 0
-                  ? "Currently #1 on today's board"
-                  : gapToFirst > 0
-                  ? `${gapToFirst} behind #1 (${leaderToday?.announcementName})`
-                  : "Announce a lead to climb the board"}
-              </p>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                <span>DAILY RANKING</span>
-                <Award className="h-4 w-4 text-amber-500" />
+            <div className="p-5">
+              <p className="text-xs font-medium text-[#64748B]">Daily Rank</p>
+              <div className="mt-1.5 flex items-center gap-2.5">
+                {snapshot.personal.dailyRank &&
+                  snapshot.personal.dailyRank <= 3 &&
+                  snapshot.personal.leadsToday > 0 && (
+                    <CrownBadge rank={snapshot.personal.dailyRank} />
+                  )}
+                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  {snapshot.personal.dailyRank ? `#${snapshot.personal.dailyRank}` : "—"}
+                </span>
+                <span className="text-xs text-[#64748B]">
+                  of {snapshot.personal.totalCallersRankedToday} callers
+                </span>
               </div>
-              <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900">
-                {snapshot.personal.dailyRank ? `#${snapshot.personal.dailyRank}` : "—"}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Out of {snapshot.personal.totalCallersRankedToday} ranked callers
-              </p>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                <span>TEAM DAILY PROGRESS</span>
-                <Users className="h-4 w-4 text-emerald-600" />
+            <div className="p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-[#64748B]">Team Daily Progress</p>
+                <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
+                  {snapshot.totals.overallDailyProgressPercent}%
+                </span>
               </div>
-              <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900">
-                {snapshot.totals.overallDailyProgressPercent}%
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                {snapshot.totals.leadsToday} / {snapshot.totals.overallDailyTarget} across{" "}
-                {snapshot.totals.activeCampaigns} active campaigns
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  {snapshot.totals.leadsToday}
+                </span>
+                <span className="text-xs tabular-nums text-[#64748B]">
+                  / {snapshot.totals.overallDailyTarget} target across{" "}
+                  {snapshot.totals.activeCampaigns} campaigns
+                </span>
+              </div>
+              <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
+                <div
+                  className="h-full rounded-full bg-[#0077B6] transition-all duration-300 ease-out"
+                  style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Main Workspace: 60% Left (Today's Leaderboard) | 30% Right (Active Campaign Targets) */}
+        {/* Main Workspace: 60% Left (Daily Leaderboard) | 30% Right (Active Campaign Targets) */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="w-full space-y-6 lg:w-[60%]">
             <LeaderboardPanel
@@ -117,7 +126,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
         <Button
           size="lg"
-          className="h-12 rounded-full px-7 font-semibold shadow-lg hover:shadow-xl transition-all"
+          className="h-12 rounded-full bg-[#0077B6] px-8 text-sm font-semibold tracking-wide text-white shadow-[0_12px_28px_-6px_rgba(0,119,182,0.5)] ring-4 ring-white/90 transition-all duration-150 hover:bg-[#005A8D] hover:shadow-[0_16px_32px_-6px_rgba(0,119,182,0.55)] active:scale-[0.98]"
           onClick={() => setAnnounceOpen(true)}
         >
           <Megaphone className="h-4 w-4" />
