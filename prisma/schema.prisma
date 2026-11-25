@@ -168,10 +168,10 @@ model ActivityEvent {
 
 model SystemSettings {
   id                        String   @id @default("default")
-  brandName                 String   @default("Sales Performance Hub")
+  brandName                 String   @default("Daily Dashboard")
   brandTagline              String   @default("Real-Time Lead & Campaign Tracker")
   brandPrimaryColor         String   @default("#1D4ED8")
-  brandLogoUrl              String?
+  brandLogoUrl              String?  @default("/logo.png")
   telegramBotTokenEncrypted String?
   telegramChatId            String?
   telegramEnabled           Boolean  @default(true)

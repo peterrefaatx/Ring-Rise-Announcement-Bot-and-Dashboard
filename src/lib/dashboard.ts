@@ -77,14 +77,14 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
     where: { id: "default" },
   });
   return {
-    brandName: settings?.brandName || process.env.BRAND_NAME || "Sales Performance Hub",
+    brandName: settings?.brandName || process.env.BRAND_NAME || "Daily Dashboard",
     brandTagline:
       settings?.brandTagline ||
       process.env.BRAND_TAGLINE ||
       "Real-Time Lead & Campaign Tracker",
     brandPrimaryColor:
       settings?.brandPrimaryColor || process.env.BRAND_PRIMARY_COLOR || "#1D4ED8",
-    brandLogoUrl: settings?.brandLogoUrl || null,
+    brandLogoUrl: settings?.brandLogoUrl || "/logo.png",
     timezoneLabel: settings?.timezoneLabel || EST_TIMEZONE_LABEL,
   };
 }

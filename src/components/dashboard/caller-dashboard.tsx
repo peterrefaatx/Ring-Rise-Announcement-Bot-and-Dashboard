@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Megaphone, Award, CalendarDays, Flame, Users } from "lucide-react";
+import { Megaphone, Award, Flame, Users } from "lucide-react";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,36 +38,8 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       onManualRefresh={refreshNow}
     >
       <div className="space-y-6">
-        {/* Top Action Bar */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-xl border bg-white p-5 shadow-sm">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-              Performance Dashboard
-            </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Announcing as{" "}
-              <span className="font-medium text-slate-800">{user.announcementName}</span> ·
-              Team total today:{" "}
-              <span className="font-semibold text-slate-900">
-                {snapshot.totals.leadsToday}
-              </span>
-              {snapshot.totals.overallDailyTarget > 0 && (
-                <span> / {snapshot.totals.overallDailyTarget} target leads</span>
-              )}
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="w-full sm:w-auto font-semibold shadow-sm"
-            onClick={() => setAnnounceOpen(true)}
-          >
-            <Megaphone className="h-4 w-4" />
-            ANNOUNCE LEAD
-          </Button>
-        </div>
-
-        {/* Personal & Team KPI Strip */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* Daily KPI Strip */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between text-xs font-medium text-slate-500">
@@ -105,23 +77,6 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                <span>MY MONTHLY LEADS</span>
-                <CalendarDays className="h-4 w-4 text-slate-400" />
-              </div>
-              <p className="mt-2 text-3xl font-bold tabular-nums text-slate-900">
-                {snapshot.personal.leadsThisMonth}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Monthly rank:{" "}
-                {snapshot.personal.monthlyRank ? `#${snapshot.personal.monthlyRank}` : "—"} ·
-                All-time: {snapshot.personal.leadsAllTime}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-500">
                 <span>TEAM DAILY PROGRESS</span>
                 <Users className="h-4 w-4 text-emerald-600" />
               </div>
@@ -136,14 +91,14 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           </Card>
         </div>
 
-        {/* Main Workspace Grid */}
+        {/* Main Workspace Grid: Active Campaign Targets on Left, Rank of the Day on Right */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7">
+          <div className="space-y-6 lg:col-span-6">
             <CampaignProgressPanel campaigns={snapshot.campaigns} />
             <ActivityFeedPanel items={snapshot.activityFeed} />
           </div>
 
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-6">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
               monthly={snapshot.leaderboards.monthly}
@@ -151,9 +106,22 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               currentUserId={user.id}
               businessDateEst={snapshot.businessDateEst}
               businessMonthEst={snapshot.businessMonthEst}
+              dailyOnly
             />
           </div>
         </div>
+      </div>
+
+      {/* Floating Bottom-Center Announce Button */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+        <Button
+          size="lg"
+          className="h-12 rounded-full px-7 font-semibold shadow-lg hover:shadow-xl transition-all"
+          onClick={() => setAnnounceOpen(true)}
+        >
+          <Megaphone className="h-4 w-4" />
+          ANNOUNCE LEAD
+        </Button>
       </div>
 
       <AnnounceLeadDialog

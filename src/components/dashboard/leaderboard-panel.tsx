@@ -17,6 +17,7 @@ interface LeaderboardPanelProps {
   currentUserId: string;
   businessDateEst: string;
   businessMonthEst: string;
+  dailyOnly?: boolean;
 }
 
 export function LeaderboardPanel({
@@ -26,6 +27,7 @@ export function LeaderboardPanel({
   currentUserId,
   businessDateEst,
   businessMonthEst,
+  dailyOnly = false,
 }: LeaderboardPanelProps) {
   return (
     <Card>
@@ -33,7 +35,7 @@ export function LeaderboardPanel({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Trophy className="h-4 w-4 text-amber-500" />
-            Team Leaderboards
+            {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
           </CardTitle>
           <span className="text-xs text-muted-foreground">
             Tie-break: earliest achievement
@@ -41,34 +43,38 @@ export function LeaderboardPanel({
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="daily">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="daily">Daily</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-            <TabsTrigger value="all-time">All-Time</TabsTrigger>
-          </TabsList>
+        {dailyOnly ? (
+          <LeaderboardList entries={daily} currentUserId={currentUserId} />
+        ) : (
+          <Tabs defaultValue="daily">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="daily">Daily</TabsTrigger>
+              <TabsTrigger value="monthly">Monthly</TabsTrigger>
+              <TabsTrigger value="all-time">All-Time</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="daily">
-            <p className="mb-3 text-xs text-muted-foreground">
-              Daily window: <span className="font-mono">{businessDateEst}</span> (resets 00:00 EST)
-            </p>
-            <LeaderboardList entries={daily} currentUserId={currentUserId} />
-          </TabsContent>
+            <TabsContent value="daily">
+              <p className="mb-3 text-xs text-muted-foreground">
+                Daily window: <span className="font-mono">{businessDateEst}</span>
+              </p>
+              <LeaderboardList entries={daily} currentUserId={currentUserId} />
+            </TabsContent>
 
-          <TabsContent value="monthly">
-            <p className="mb-3 text-xs text-muted-foreground">
-              Monthly window: <span className="font-mono">{businessMonthEst}</span> (EST)
-            </p>
-            <LeaderboardList entries={monthly} currentUserId={currentUserId} />
-          </TabsContent>
+            <TabsContent value="monthly">
+              <p className="mb-3 text-xs text-muted-foreground">
+                Monthly window: <span className="font-mono">{businessMonthEst}</span>
+              </p>
+              <LeaderboardList entries={monthly} currentUserId={currentUserId} />
+            </TabsContent>
 
-          <TabsContent value="all-time">
-            <p className="mb-3 text-xs text-muted-foreground">
-              Cumulative lifetime rankings
-            </p>
-            <LeaderboardList entries={allTime} currentUserId={currentUserId} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="all-time">
+              <p className="mb-3 text-xs text-muted-foreground">
+                Cumulative lifetime rankings
+              </p>
+              <LeaderboardList entries={allTime} currentUserId={currentUserId} />
+            </TabsContent>
+          </Tabs>
+        )}
       </CardContent>
     </Card>
   );

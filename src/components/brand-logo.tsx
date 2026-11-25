@@ -18,12 +18,14 @@ export function BrandLogo({
   brandLogoUrl,
   compact = false,
 }: BrandLogoProps) {
+  const effectiveLogo = brandLogoUrl || "/logo.png";
+
   return (
     <div className="flex items-center gap-3 min-w-0">
-      {brandLogoUrl ? (
+      {effectiveLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={brandLogoUrl}
+          src={effectiveLogo}
           alt={brandName}
           className="h-9 w-9 shrink-0 rounded-lg border object-contain bg-white p-0.5"
         />

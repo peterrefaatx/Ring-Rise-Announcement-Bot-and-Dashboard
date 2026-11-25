@@ -35,7 +35,7 @@ services:
       INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-ChangeMeImmediately123!}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
-      BRAND_NAME: ${BRAND_NAME:-Sales Performance Hub}
+      BRAND_NAME: ${BRAND_NAME:-Daily Dashboard}
       BRAND_TAGLINE: ${BRAND_TAGLINE:-Real-Time Lead & Campaign Tracker}
       BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-#1D4ED8}
       RUN_SEED_ON_BOOT: ${RUN_SEED_ON_BOOT:-true}

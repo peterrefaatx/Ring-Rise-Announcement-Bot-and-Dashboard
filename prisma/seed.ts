@@ -15,9 +15,10 @@ async function main() {
     update: {},
     create: {
       id: "default",
-      brandName: process.env.BRAND_NAME || "Sales Performance Hub",
+      brandName: process.env.BRAND_NAME || "Daily Dashboard",
       brandTagline: process.env.BRAND_TAGLINE || "Real-Time Lead & Campaign Tracker",
       brandPrimaryColor: process.env.BRAND_PRIMARY_COLOR || "#1D4ED8",
+      brandLogoUrl: "/logo.png",
       timezoneLabel: EST_TIMEZONE_LABEL,
       telegramEnabled: true,
     },

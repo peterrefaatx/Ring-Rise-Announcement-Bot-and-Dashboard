@@ -14,8 +14,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sales Performance Hub",
+  title: "Ring&Rise Leaderboard",
   description: "Real-time cold calling performance, campaign targets, and leaderboard platform",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
