@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUp, Trophy } from "lucide-react";
+import { ArrowUp, Clock, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
+import { formatEstTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
 
 interface LeaderboardPanelProps {
@@ -17,6 +18,7 @@ interface LeaderboardPanelProps {
   businessMonthEst: string;
   dailyOnly?: boolean;
   hideTitle?: boolean;
+  showTiebreaker?: boolean;
 }
 
 export function LeaderboardPanel({
@@ -26,6 +28,7 @@ export function LeaderboardPanel({
   currentUserId,
   dailyOnly = false,
   hideTitle = false,
+  showTiebreaker = true,
 }: LeaderboardPanelProps) {
   return (
     <Card className="overflow-hidden">
@@ -66,6 +69,14 @@ export function LeaderboardPanel({
           </Tabs>
         )}
       </CardContent>
+      {showTiebreaker && (
+        <div className="flex items-center gap-2 border-t border-[#E3E8EE] bg-[#FAFBFD] px-4 py-2.5 text-xs text-[#64748B] sm:px-5">
+          <Clock className="h-3.5 w-3.5 shrink-0 text-primary" />
+          <span>
+            <span className="font-semibold text-[#0A2540]">Tiebreaker:</span> Earliest time to reach the lead count ranks first
+          </span>
+        </div>
+      )}
     </Card>
   );
 }
@@ -151,6 +162,13 @@ export function LeaderboardList({
     );
   }
 
+  const countFrequency = new Map<number, number>();
+  for (const entry of entries) {
+    if (entry.leadCount > 0) {
+      countFrequency.set(entry.leadCount, (countFrequency.get(entry.leadCount) ?? 0) + 1);
+    }
+  }
+
   return (
     <div
       className={cn(
@@ -163,6 +181,7 @@ export function LeaderboardList({
         const isTop1 = entry.rank === 1 && entry.leadCount > 0;
         const isTop3 = entry.rank <= 3 && entry.leadCount > 0;
         const rankDelta = climbedIds[entry.userId] ?? 0;
+        const isTied = entry.leadCount > 0 && (countFrequency.get(entry.leadCount) ?? 0) > 1;
 
         return (
           <div
@@ -209,6 +228,15 @@ export function LeaderboardList({
                     <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                       <ArrowUp className="h-2.5 w-2.5" />
                       {rankDelta}
+                    </span>
+                  )}
+                  {isTied && entry.achievedAt && (
+                    <span
+                      title="Tiebreaker timestamp (EST)"
+                      className="inline-flex items-center gap-1 rounded-full border border-[#E3E8EE] bg-[#FAFBFD] px-2 py-0.5 text-[11px] font-medium tabular-nums text-[#64748B] shrink-0"
+                    >
+                      <Clock className="h-3 w-3" />
+                      {formatEstTime(entry.achievedAt)}
                     </span>
                   )}
                 </div>
