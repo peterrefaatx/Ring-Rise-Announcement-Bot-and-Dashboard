@@ -95,7 +95,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     <ThemeContext.Provider value={value}>
       {children}
       <Toaster
-        position="top-right"
+        position="bottom-right"
         richColors
         closeButton
         duration={5000}
