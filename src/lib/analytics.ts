@@ -291,17 +291,18 @@ export async function getMonthlyDetailAnalytics(
       },
       _count: { id: true },
     }),
-    prisma.$queryRaw<Array<{ businessDateEst: string; totalLeads: number }>>`
-      SELECT "businessDateEst", COUNT(*)::int AS "totalLeads"
-      FROM "LeadAnnouncement"
-      WHERE "createdAt" >= ${range.startUtc} AND "createdAt" < ${range.endUtc}
-      GROUP BY "businessDateEst"
-      ORDER BY "businessDateEst" ASC
-    `,
+    prisma.leadAnnouncement.groupBy({
+      by: ["businessDateEst"],
+      where: {
+        createdAt: { gte: range.startUtc, lt: range.endUtc },
+      },
+      _count: { id: true },
+      orderBy: { businessDateEst: "asc" },
+    }),
   ]);
 
   const countMap = new Map(groupedByCampaign.map((g) => [g.campaignId, g._count.id]));
-  const totalLeads = dailyBreakdown.reduce((sum, d) => sum + Number(d.totalLeads), 0);
+  const totalLeads = dailyBreakdown.reduce((sum, d) => sum + d._count.id, 0);
 
   return {
     businessMonthEst,
@@ -317,7 +318,7 @@ export async function getMonthlyDetailAnalytics(
       })),
     dailyBreakdown: dailyBreakdown.map((d) => ({
       businessDateEst: d.businessDateEst,
-      totalLeads: Number(d.totalLeads),
+      totalLeads: d._count.id,
     })),
   };
 }
