@@ -136,7 +136,7 @@ export function LeaderboardList({
                       isTop3 ? "font-semibold" : "font-medium"
                     )}
                   >
-                    {entry.announcementName}
+                    {entry.fullName}
                   </span>
                   {isMe && (
                     <span className="inline-flex items-center rounded-full bg-[#0077B6]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0077B6]">

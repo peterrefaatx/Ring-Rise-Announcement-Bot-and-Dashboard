@@ -1,4 +1,7 @@
+"use client";
+
 import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Input = React.forwardRef<
@@ -18,6 +21,36 @@ export const Input = React.forwardRef<
   );
 });
 Input.displayName = "Input";
+
+export const PasswordInput = React.forwardRef<
+  HTMLInputElement,
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, "type">
+>(({ className, disabled, ...props }, ref) => {
+  const [visible, setVisible] = React.useState(false);
+
+  return (
+    <div className="relative">
+      <Input
+        ref={ref}
+        type={visible ? "text" : "password"}
+        disabled={disabled}
+        className={cn("pr-10", className)}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((prev) => !prev)}
+        disabled={disabled}
+        aria-label={visible ? "Hide password" : "Show password"}
+        title={visible ? "Hide password" : "Show password"}
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:text-[#0077B6] disabled:opacity-50"
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+});
+PasswordInput.displayName = "PasswordInput";
 
 export const Textarea = React.forwardRef<
   HTMLTextAreaElement,

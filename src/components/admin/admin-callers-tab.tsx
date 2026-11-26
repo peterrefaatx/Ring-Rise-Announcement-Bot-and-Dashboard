@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input, Textarea } from "@/components/ui/input";
+import { Input, PasswordInput, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -308,9 +308,6 @@ export function AdminCallersTab({
                     </td>
                     <td className="px-4 py-3">
                       <span className="font-medium text-slate-800">{c.announcementName}</span>
-                      <p className="max-w-xs truncate text-xs text-slate-500" title={c.announcementTemplate}>
-                        {c.announcementTemplate}
-                      </p>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
@@ -427,8 +424,7 @@ export function AdminCallersTab({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label>Initial Password</Label>
-                <Input
-                  type="password"
+                <PasswordInput
                   minLength={8}
                   value={formState.password}
                   onChange={(e) => setFormState({ ...formState, password: e.target.value })}
@@ -555,8 +551,7 @@ export function AdminCallersTab({
           <form onSubmit={handleResetPassword} className="mt-3 space-y-3">
             <div className="space-y-1">
               <Label>New Password (min 8 characters)</Label>
-              <Input
-                type="password"
+              <PasswordInput
                 minLength={8}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}

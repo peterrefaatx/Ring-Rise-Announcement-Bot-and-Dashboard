@@ -24,10 +24,12 @@ import { GET as getAdminCallers, POST as createAdminCaller } from "@/app/api/adm
 import { GET as getAdminSettings, PATCH as patchAdminSettings } from "@/app/api/admin/settings/route";
 import { POST as postAdminCampaign } from "@/app/api/admin/campaigns/route";
 import { POST as postLead } from "@/app/api/leads/route";
+import { POST as postTelegramSummary } from "@/app/api/telegram/summary/route";
 import {
   announceLeadSchema,
   createCallerSchema,
   createCampaignSchema,
+  loginSchema,
   updateProfileSchema,
 } from "@/lib/validation";
 
@@ -50,6 +52,14 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
       })
     );
     expect(leadRes.status).toBe(401);
+
+    const summaryRes = await postTelegramSummary(
+      new NextRequest("http://localhost/api/telegram/summary", {
+        method: "POST",
+        body: JSON.stringify({ type: "campaigns" }),
+      })
+    );
+    expect(summaryRes.status).toBe(401);
   });
 
   it("blocks deactivated accounts even with an active session cookie", async () => {
@@ -79,6 +89,14 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
       })
     );
     expect(leadRes.status).toBe(401);
+
+    const summaryRes = await postTelegramSummary(
+      new NextRequest("http://localhost/api/telegram/summary", {
+        method: "POST",
+        body: JSON.stringify({ type: "campaigns" }),
+      })
+    );
+    expect(summaryRes.status).toBe(401);
   });
 
   it("blocks CALLER role from all ADMIN endpoints with 403 Forbidden", async () => {
@@ -161,5 +179,13 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
         idempotencyKey: "12345678",
       }).success
     ).toBe(false);
+
+    expect(
+      loginSchema.parse({ username: "admin", password: "secret" }).rememberMe
+    ).toBe(false);
+    expect(
+      loginSchema.parse({ username: "admin", password: "secret", rememberMe: true })
+        .rememberMe
+    ).toBe(true);
   });
 });

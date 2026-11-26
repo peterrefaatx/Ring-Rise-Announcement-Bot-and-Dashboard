@@ -50,7 +50,7 @@ export function compareLeaderboardRows(a: RawLeaderboardRow, b: RawLeaderboardRo
       return aSeq - bSeq;
     }
   } else {
-    const nameOrder = a.announcementName.localeCompare(b.announcementName);
+    const nameOrder = a.fullName.localeCompare(b.fullName);
     if (nameOrder !== 0) {
       return nameOrder;
     }

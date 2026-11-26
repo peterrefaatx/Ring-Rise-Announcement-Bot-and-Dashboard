@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Target, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CampaignProgressItem } from "@/lib/dashboard";
 import { cn } from "@/lib/utils";
@@ -17,8 +17,7 @@ export function CampaignProgressPanel({
     <Card className="overflow-hidden">
       {!hideTitle && (
         <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Target className="h-4 w-4 text-[#0077B6]" />
+          <CardTitle className="text-base">
             Active Campaign Targets
           </CardTitle>
         </CardHeader>

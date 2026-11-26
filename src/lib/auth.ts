@@ -47,11 +47,13 @@ export async function shouldUseSecureCookie(): Promise<boolean> {
 export async function createSession(
   userId: string,
   userAgent?: string | null,
-  ipAddress?: string | null
+  ipAddress?: string | null,
+  rememberMe = true
 ): Promise<{ rawToken: string; expiresAt: Date }> {
   const rawToken = generateSessionToken();
   const tokenHash = hashSessionToken(rawToken);
-  const expiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000);
+  const ttlDays = rememberMe ? 30 : 1;
+  const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
 
   await prisma.session.create({
     data: {
@@ -69,7 +71,8 @@ export async function createSession(
 export async function setSessionCookie(
   response: NextResponse,
   rawToken: string,
-  expiresAt: Date
+  expiresAt: Date,
+  rememberMe = true
 ): Promise<void> {
   const secure = await shouldUseSecureCookie();
   response.cookies.set(SESSION_COOKIE_NAME, rawToken, {
@@ -77,7 +80,7 @@ export async function setSessionCookie(
     sameSite: "lax",
     secure,
     path: "/",
-    expires: expiresAt,
+    ...(rememberMe ? { expires: expiresAt } : {}),
   });
 }
 

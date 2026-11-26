@@ -5,7 +5,7 @@ import { Save, Send, RefreshCw, Bot, Palette, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +54,6 @@ export function AdminSettingsTab({
 }) {
   const [brandName, setBrandName] = useState("");
   const [brandTagline, setBrandTagline] = useState("");
-  const [brandPrimaryColor, setBrandPrimaryColor] = useState("#1D4ED8");
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
   const [timezoneLabel, setTimezoneLabel] = useState("EST (UTC-5 Fixed)");
 
@@ -79,7 +78,6 @@ export function AdminSettingsTab({
       const data = (await sRes.json()) as AdminSettingsResponse;
       setBrandName(data.settings.brandName);
       setBrandTagline(data.settings.brandTagline);
-      setBrandPrimaryColor(data.settings.brandPrimaryColor);
       setBrandLogoUrl(data.settings.brandLogoUrl);
       setTimezoneLabel(data.settings.timezoneLabel);
       setTelegramEnabled(data.settings.telegramEnabled);
@@ -107,7 +105,6 @@ export function AdminSettingsTab({
         body: JSON.stringify({
           brandName,
           brandTagline,
-          brandPrimaryColor,
           brandLogoUrl,
           telegramEnabled,
           telegramChatId,
@@ -183,7 +180,7 @@ export function AdminSettingsTab({
               Branding & System Timezone
             </CardTitle>
             <CardDescription>
-              Configure company identity, logo URL, and accent color.
+              Configure company identity and logo URL.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -202,31 +199,13 @@ export function AdminSettingsTab({
                 onChange={(e) => setBrandTagline(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label>Primary Accent Color</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={brandPrimaryColor}
-                    onChange={(e) => setBrandPrimaryColor(e.target.value)}
-                    className="h-9 w-12 rounded border cursor-pointer"
-                  />
-                  <Input
-                    value={brandPrimaryColor}
-                    onChange={(e) => setBrandPrimaryColor(e.target.value)}
-                    className="font-mono"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Logo URL (optional)</Label>
-                <Input
-                  value={brandLogoUrl}
-                  onChange={(e) => setBrandLogoUrl(e.target.value)}
-                  placeholder="/logo.svg or https://..."
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label>Logo URL (optional)</Label>
+              <Input
+                value={brandLogoUrl}
+                onChange={(e) => setBrandLogoUrl(e.target.value)}
+                placeholder="/logo.png or https://..."
+              />
             </div>
 
             <div className="rounded-lg border bg-slate-50 p-3.5 flex items-center justify-between">
@@ -279,8 +258,7 @@ export function AdminSettingsTab({
                   </span>
                 )}
               </Label>
-              <Input
-                type="password"
+              <PasswordInput
                 value={newBotToken}
                 onChange={(e) => setNewBotToken(e.target.value)}
                 placeholder={

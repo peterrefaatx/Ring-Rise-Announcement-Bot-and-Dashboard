@@ -165,7 +165,7 @@ export async function getDailySummaryList(limit = 30): Promise<DailySummaryRow[]
     summaries.push({
       businessDateEst: row.businessDateEst,
       totalLeads: Number(row.totalLeads),
-      topCallerName: top?.announcementName ?? null,
+      topCallerName: top?.fullName ?? null,
       topCallerLeads: top?.leadCount ?? 0,
     });
   }
@@ -266,7 +266,7 @@ export async function getMonthlySummaryList(limit = 24): Promise<MonthlySummaryR
     summaries.push({
       businessMonthEst: row.businessMonthEst,
       totalLeads: Number(row.totalLeads),
-      winnerName: winner?.announcementName ?? null,
+      winnerName: winner?.fullName ?? null,
       winnerLeads: winner?.leadCount ?? 0,
     });
   }

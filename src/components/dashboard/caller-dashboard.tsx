@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Megaphone } from "lucide-react";
+import { Megaphone, Send, BarChart2, Users } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
@@ -22,12 +23,41 @@ interface CallerDashboardProps {
 export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps) {
   const { snapshot, connectionState, refreshNow } = useRealtimeDashboard(initialSnapshot);
   const [announceOpen, setAnnounceOpen] = useState(false);
+  const [sendingSummary, setSendingSummary] = useState<"campaigns" | "callers" | null>(
+    null
+  );
 
   const leaderToday = snapshot.leaderboards.daily[0];
   const gapToFirst =
     leaderToday && snapshot.personal.dailyRank && snapshot.personal.dailyRank > 1
       ? Math.max(0, leaderToday.leadCount - snapshot.personal.leadsToday)
       : 0;
+
+  async function handleSendTelegramSummary(type: "campaigns" | "callers") {
+    if (sendingSummary) return;
+    setSendingSummary(type);
+    try {
+      const res = await fetch("/api/telegram/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      if (!res.ok) {
+        toast.error(data?.error || "Failed to send Telegram summary.");
+        return;
+      }
+      toast.success(
+        type === "campaigns"
+          ? "Campaigns progress sent to Telegram group!"
+          : "Callers progress sent to Telegram group!"
+      );
+    } catch {
+      toast.error("Network error while sending Telegram summary.");
+    } finally {
+      setSendingSummary(null);
+    }
+  }
 
   return (
     <AppShell
@@ -51,7 +81,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                   {snapshot.personal.dailyRank === 1 && snapshot.personal.leadsToday > 0
                     ? "Leading today"
                     : gapToFirst > 0
-                    ? `${gapToFirst} behind ${leaderToday?.announcementName}`
+                    ? `${gapToFirst} behind ${leaderToday?.fullName}`
                     : "Ready to score"}
                 </span>
               </div>
@@ -100,7 +130,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           </div>
         </section>
 
-        {/* Main Workspace: 60% Left (Daily Leaderboard) | 30% Right (Active Campaign Targets) */}
+        {/* Main Workspace: 60% Left (Daily Leaderboard) | 30% Right (Telegram Summary Buttons + Active Campaign Targets) */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="w-full space-y-6 lg:w-[60%]">
             <LeaderboardPanel
@@ -116,7 +146,41 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
             <ActivityFeedPanel items={snapshot.activityFeed} />
           </div>
 
-          <div className="w-full lg:w-[30%]">
+          <div className="w-full space-y-3 lg:w-[30%]">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-4 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                disabled={sendingSummary !== null}
+                onClick={() => handleSendTelegramSummary("campaigns")}
+              >
+                <span className="flex items-center gap-2">
+                  <BarChart2 className="h-4 w-4 text-[#0077B6]" />
+                  {sendingSummary === "campaigns"
+                    ? "Sending Campaigns Progress..."
+                    : "Send Campaigns Progress"}
+                </span>
+                <Send className="h-3.5 w-3.5 text-[#64748B]" />
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-4 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                disabled={sendingSummary !== null}
+                onClick={() => handleSendTelegramSummary("callers")}
+              >
+                <span className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-[#0077B6]" />
+                  {sendingSummary === "callers"
+                    ? "Sending Callers Progress..."
+                    : "Send Callers Progress"}
+                </span>
+                <Send className="h-3.5 w-3.5 text-[#64748B]" />
+              </Button>
+            </div>
+
             <CampaignProgressPanel campaigns={snapshot.campaigns} hideTitle />
           </div>
         </div>

@@ -50,7 +50,13 @@ export async function POST(request: NextRequest) {
     clearRateLimit(rateKey);
 
     const userAgent = request.headers.get("user-agent");
-    const { rawToken, expiresAt } = await createSession(user.id, userAgent, ip);
+    const rememberMe = Boolean(parsed.data.rememberMe);
+    const { rawToken, expiresAt } = await createSession(
+      user.id,
+      userAgent,
+      ip,
+      rememberMe
+    );
 
     await recordAuditLog({
       actorUserId: user.id,
@@ -72,7 +78,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await setSessionCookie(response, rawToken, expiresAt);
+    await setSessionCookie(response, rawToken, expiresAt, rememberMe);
     return response;
   } catch (err) {
     console.error("Login error:", err);

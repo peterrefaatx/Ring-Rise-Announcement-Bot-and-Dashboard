@@ -7,6 +7,7 @@ import {
 export const loginSchema = z.object({
   username: z.string().trim().min(1, "Username is required").max(80),
   password: z.string().min(1, "Password is required").max(200),
+  rememberMe: z.boolean().optional().default(false),
 });
 
 export const createCallerSchema = z.object({

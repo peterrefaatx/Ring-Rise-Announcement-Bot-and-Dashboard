@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BrandLogo } from "@/components/brand-logo";
 import type { BrandSettingsPublic } from "@/lib/dashboard";
@@ -20,6 +20,7 @@ export function LoginForm({
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,7 @@ export function LoginForm({
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, rememberMe }),
       });
 
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -108,10 +109,9 @@ export function LoginForm({
                 <Label htmlFor="password" className="text-xs font-medium text-[#425466]">
                   Password
                 </Label>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   value={password}
@@ -121,6 +121,17 @@ export function LoginForm({
                   className="h-10 border-[#D5DCE4] focus-visible:ring-[#0077B6]"
                 />
               </div>
+
+              <label className="flex items-center gap-2 text-sm text-[#425466] select-none cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  disabled={submitting}
+                  className="h-4 w-4 rounded border-[#D5DCE4] text-[#0077B6] accent-[#0077B6] focus:ring-[#0077B6]"
+                />
+                <span>Remember me</span>
+              </label>
 
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
