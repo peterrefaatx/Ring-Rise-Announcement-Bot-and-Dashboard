@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { UserRole, UserStatus } from "@prisma/client";
 import { prisma } from "./db";
 import { generateSessionToken, hashSessionToken } from "./crypto";
+import { cached, invalidateCacheKey } from "./cache";
 
 export const SESSION_COOKIE_NAME = "rr_session";
 const SESSION_TTL_DAYS = 14;
@@ -107,37 +108,42 @@ export async function getCurrentSession(): Promise<{
     }
 
     const tokenHash = hashSessionToken(rawToken);
-    const session = await prisma.session.findUnique({
-      where: { tokenHash },
-      include: {
-        user: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-            email: true,
-            role: true,
-            status: true,
-            deletedAt: true,
-            announcementName: true,
-            announcementTemplate: true,
-            tokenVersion: true,
-            createdAt: true,
+    const session = await cached(`session:${tokenHash}`, 15000, async () => {
+      return prisma.session.findUnique({
+        where: { tokenHash },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+              role: true,
+              status: true,
+              deletedAt: true,
+              announcementName: true,
+              announcementTemplate: true,
+              tokenVersion: true,
+              createdAt: true,
+            },
           },
         },
-      },
+      });
     });
 
     if (!session) {
+      invalidateCacheKey(`session:${tokenHash}`);
       return null;
     }
 
     if (session.expiresAt <= new Date()) {
+      invalidateCacheKey(`session:${tokenHash}`);
       await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
       return null;
     }
 
     if (session.user.deletedAt !== null || session.user.status !== "ACTIVE") {
+      invalidateCacheKey(`session:${tokenHash}`);
       return null;
     }
 
@@ -167,6 +173,7 @@ export async function revokeCurrentSession(): Promise<void> {
   const rawToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!rawToken) return;
   const tokenHash = hashSessionToken(rawToken);
+  invalidateCacheKey(`session:${tokenHash}`);
   await prisma.session.deleteMany({ where: { tokenHash } });
 }
 

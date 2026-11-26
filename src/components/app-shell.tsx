@@ -60,6 +60,14 @@ export function AppShell({ user, brand, children }: AppShellProps) {
       : []),
   ];
 
+  React.useEffect(() => {
+    router.prefetch("/");
+    router.prefetch("/profile");
+    if (user.role === "ADMIN") {
+      router.prefetch("/admin");
+    }
+  }, [router, user.role]);
+
   async function handleLogout() {
     setLoggingOut(true);
     try {

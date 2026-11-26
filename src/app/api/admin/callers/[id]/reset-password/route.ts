@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/crypto";
 import { resetPasswordSchema } from "@/lib/validation";
 import { recordAuditLog } from "@/lib/audit";
+import { invalidateCachePrefix } from "@/lib/cache";
 
 export async function POST(
   request: NextRequest,
@@ -37,6 +38,8 @@ export async function POST(
     });
     await tx.session.deleteMany({ where: { userId: id } });
   });
+
+  invalidateCachePrefix("session:");
 
   const ip = await getRequestIp();
   await recordAuditLog({

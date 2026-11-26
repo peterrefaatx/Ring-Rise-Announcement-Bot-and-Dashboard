@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import { Client } from "pg";
 import type { ActivityEventType, Prisma } from "@prisma/client";
 import { getDatabaseUrl, prisma } from "./db";
+import { invalidateCachePrefix } from "./cache";
 
 export const PG_REALTIME_CHANNEL = "ringrise_events";
 
@@ -85,6 +86,17 @@ class RealtimeBroker {
         this.recentSeqs.delete(oldest);
       }
     }
+
+    // Immediately invalidate server caches so subsequent reads reflect fresh DB state
+    invalidateCachePrefix("dashboard:");
+    invalidateCachePrefix("analytics:");
+    if (event.type === "SETTINGS_CHANGED") {
+      invalidateCachePrefix("brand:");
+    }
+    if (event.type === "CALLER_CHANGED") {
+      invalidateCachePrefix("session:");
+    }
+
     this.emitter.emit("event", event);
   }
 

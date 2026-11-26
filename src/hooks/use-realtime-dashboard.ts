@@ -23,6 +23,17 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
   const syncQueuedRef = useRef<boolean>(false);
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        `rr_dash_${snapshot.businessDateEst}`,
+        JSON.stringify(snapshot)
+      );
+    } catch {
+      // ignore quota/private mode errors
+    }
+  }, [snapshot]);
+
   const fetchAuthoritativeSnapshot = useCallback(async () => {
     if (syncInFlightRef.current) {
       syncQueuedRef.current = true;

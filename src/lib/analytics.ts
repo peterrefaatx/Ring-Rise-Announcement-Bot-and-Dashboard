@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { getLeaderboardForRange, type LeaderboardEntry } from "./leaderboard";
+import { cached } from "./cache";
 import {
   getBusinessDateEst,
   getBusinessMonthEst,
@@ -143,6 +144,12 @@ async function resolveEffectiveCampaignTargetForDate(
 }
 
 export async function getDailySummaryList(limit = 30): Promise<DailySummaryRow[]> {
+  return cached(`analytics:daily-list:${limit}:${getBusinessDateEst()}`, 45000, () =>
+    computeDailySummaryList(limit)
+  );
+}
+
+async function computeDailySummaryList(limit = 30): Promise<DailySummaryRow[]> {
   const rows = await prisma.$queryRaw<
     Array<{ businessDateEst: string; totalLeads: number }>
   >`
@@ -173,6 +180,17 @@ export async function getDailySummaryList(limit = 30): Promise<DailySummaryRow[]
 }
 
 export async function getDailyDetailAnalytics(
+  businessDateEst: string
+): Promise<DailyDetailAnalytics> {
+  const isToday = businessDateEst === getBusinessDateEst();
+  return cached(
+    `analytics:daily-detail:${businessDateEst}`,
+    isToday ? 30000 : 300000,
+    () => computeDailyDetailAnalytics(businessDateEst)
+  );
+}
+
+async function computeDailyDetailAnalytics(
   businessDateEst: string
 ): Promise<DailyDetailAnalytics> {
   const range = getEstDayRangeUtc(businessDateEst);
@@ -244,6 +262,12 @@ export async function getDailyDetailAnalytics(
 }
 
 export async function getMonthlySummaryList(limit = 24): Promise<MonthlySummaryRow[]> {
+  return cached(`analytics:monthly-list:${limit}:${getBusinessMonthEst()}`, 60000, () =>
+    computeMonthlySummaryList(limit)
+  );
+}
+
+async function computeMonthlySummaryList(limit = 24): Promise<MonthlySummaryRow[]> {
   const rows = await prisma.$queryRaw<
     Array<{ businessMonthEst: string; totalLeads: number }>
   >`
@@ -276,6 +300,17 @@ export async function getMonthlySummaryList(limit = 24): Promise<MonthlySummaryR
 export async function getMonthlyDetailAnalytics(
   businessMonthEst: string
 ): Promise<MonthlyDetailAnalytics> {
+  const isCurrentMonth = businessMonthEst === getBusinessMonthEst();
+  return cached(
+    `analytics:monthly-detail:${businessMonthEst}`,
+    isCurrentMonth ? 30000 : 300000,
+    () => computeMonthlyDetailAnalytics(businessMonthEst)
+  );
+}
+
+async function computeMonthlyDetailAnalytics(
+  businessMonthEst: string
+): Promise<MonthlyDetailAnalytics> {
   const range = getEstMonthRangeUtc(businessMonthEst);
   const [leaderboard, campaigns, groupedByCampaign, dailyBreakdown] = await Promise.all([
     getLeaderboardForRange({
@@ -291,17 +326,18 @@ export async function getMonthlyDetailAnalytics(
       },
       _count: { id: true },
     }),
-    prisma.$queryRaw<Array<{ businessDateEst: string; totalLeads: number }>>`
-      SELECT "businessDateEst", COUNT(*)::int AS "totalLeads"
-      FROM "LeadAnnouncement"
-      WHERE "createdAt" >= ${range.startUtc} AND "createdAt" < ${range.endUtc}
-      GROUP BY "businessDateEst"
-      ORDER BY "businessDateEst" ASC
-    `,
+    prisma.leadAnnouncement.groupBy({
+      by: ["businessDateEst"],
+      where: {
+        createdAt: { gte: range.startUtc, lt: range.endUtc },
+      },
+      _count: { id: true },
+      orderBy: { businessDateEst: "asc" },
+    }),
   ]);
 
   const countMap = new Map(groupedByCampaign.map((g) => [g.campaignId, g._count.id]));
-  const totalLeads = dailyBreakdown.reduce((sum, d) => sum + Number(d.totalLeads), 0);
+  const totalLeads = dailyBreakdown.reduce((sum, d) => sum + d._count.id, 0);
 
   return {
     businessMonthEst,
@@ -317,12 +353,22 @@ export async function getMonthlyDetailAnalytics(
       })),
     dailyBreakdown: dailyBreakdown.map((d) => ({
       businessDateEst: d.businessDateEst,
-      totalLeads: Number(d.totalLeads),
+      totalLeads: d._count.id,
     })),
   };
 }
 
 export async function getCallerHistoryAnalytics(
+  userId: string
+): Promise<CallerHistoryAnalytics | null> {
+  return cached(
+    `analytics:caller:${userId}:${getBusinessDateEst()}`,
+    30000,
+    () => computeCallerHistoryAnalytics(userId)
+  );
+}
+
+async function computeCallerHistoryAnalytics(
   userId: string
 ): Promise<CallerHistoryAnalytics | null> {
   const caller = await prisma.user.findUnique({
@@ -428,6 +474,16 @@ export async function getCallerHistoryAnalytics(
 }
 
 export async function getCampaignHistoryAnalytics(
+  campaignId: string
+): Promise<CampaignHistoryAnalytics | null> {
+  return cached(
+    `analytics:campaign:${campaignId}:${getBusinessDateEst()}`,
+    30000,
+    () => computeCampaignHistoryAnalytics(campaignId)
+  );
+}
+
+async function computeCampaignHistoryAnalytics(
   campaignId: string
 ): Promise<CampaignHistoryAnalytics | null> {
   const campaign = await prisma.campaign.findUnique({

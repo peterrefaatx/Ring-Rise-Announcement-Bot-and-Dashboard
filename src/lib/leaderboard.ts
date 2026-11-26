@@ -107,6 +107,47 @@ async function queryPeriodAggregates(
   `;
 }
 
+interface UserSummaryRow {
+  id: string;
+  fullName: string;
+  announcementName: string;
+  role: string;
+  status: string;
+  deletedAt: Date | null;
+}
+
+function buildRankedLeaderboard(
+  aggregates: AggregatedLeadRow[],
+  users: UserSummaryRow[],
+  includeZeroLeadActiveCallers?: boolean
+): LeaderboardEntry[] {
+  const aggMap = new Map(aggregates.map((row) => [row.userId, row]));
+  const rawRows: RawLeaderboardRow[] = [];
+
+  for (const user of users) {
+    if (user.role !== "CALLER") {
+      continue;
+    }
+    const agg = aggMap.get(user.id);
+    const hasLeads = agg && agg.leadCount > 0;
+    const isActiveCaller = user.status === "ACTIVE" && user.deletedAt === null;
+
+    if (hasLeads || (includeZeroLeadActiveCallers && isActiveCaller)) {
+      rawRows.push({
+        userId: user.id,
+        announcementName: user.announcementName,
+        fullName: user.fullName,
+        status: user.deletedAt ? "DELETED" : user.status,
+        leadCount: agg ? Number(agg.leadCount) : 0,
+        achievedAtMs: agg ? new Date(agg.achievedAt).getTime() : null,
+        achievedSeq: agg ? Number(agg.achievedSeq) : null,
+      });
+    }
+  }
+
+  return rankLeaderboardRows(rawRows);
+}
+
 export async function getLeaderboardForRange(options: {
   startUtc?: Date;
   endUtc?: Date;
@@ -126,32 +167,11 @@ export async function getLeaderboardForRange(options: {
     }),
   ]);
 
-  const aggMap = new Map(aggregates.map((row) => [row.userId, row]));
-  const rawRows: RawLeaderboardRow[] = [];
-
-  for (const user of users) {
-    if (user.role !== "CALLER") {
-      continue;
-    }
-    const agg = aggMap.get(user.id);
-    const hasLeads = agg && agg.leadCount > 0;
-    const isActiveCaller =
-      user.status === "ACTIVE" && user.deletedAt === null;
-
-    if (hasLeads || (options.includeZeroLeadActiveCallers && isActiveCaller)) {
-      rawRows.push({
-        userId: user.id,
-        announcementName: user.announcementName,
-        fullName: user.fullName,
-        status: user.deletedAt ? "DELETED" : user.status,
-        leadCount: agg ? Number(agg.leadCount) : 0,
-        achievedAtMs: agg ? new Date(agg.achievedAt).getTime() : null,
-        achievedSeq: agg ? Number(agg.achievedSeq) : null,
-      });
-    }
-  }
-
-  return rankLeaderboardRows(rawRows);
+  return buildRankedLeaderboard(
+    aggregates,
+    users,
+    options.includeZeroLeadActiveCallers
+  );
 }
 
 export async function getCurrentLeaderboards(now: Date = new Date()): Promise<{
@@ -166,27 +186,29 @@ export async function getCurrentLeaderboards(now: Date = new Date()): Promise<{
   const dayRange = getEstDayRangeUtc(businessDateEst);
   const monthRange = getEstMonthRangeUtc(businessMonthEst);
 
-  const [daily, monthly, allTime] = await Promise.all([
-    getLeaderboardForRange({
-      startUtc: dayRange.startUtc,
-      endUtc: dayRange.endUtc,
-      includeZeroLeadActiveCallers: true,
+  // Fetch users once instead of 3 times
+  const [users, dailyAgg, monthlyAgg, allTimeAgg] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: "CALLER" },
+      select: {
+        id: true,
+        fullName: true,
+        announcementName: true,
+        role: true,
+        status: true,
+        deletedAt: true,
+      },
     }),
-    getLeaderboardForRange({
-      startUtc: monthRange.startUtc,
-      endUtc: monthRange.endUtc,
-      includeZeroLeadActiveCallers: true,
-    }),
-    getLeaderboardForRange({
-      includeZeroLeadActiveCallers: true,
-    }),
+    queryPeriodAggregates(dayRange.startUtc, dayRange.endUtc),
+    queryPeriodAggregates(monthRange.startUtc, monthRange.endUtc),
+    queryPeriodAggregates(),
   ]);
 
   return {
     businessDateEst,
     businessMonthEst,
-    daily,
-    monthly,
-    allTime,
+    daily: buildRankedLeaderboard(dailyAgg, users, true),
+    monthly: buildRankedLeaderboard(monthlyAgg, users, true),
+    allTime: buildRankedLeaderboard(allTimeAgg, users, true),
   };
 }
