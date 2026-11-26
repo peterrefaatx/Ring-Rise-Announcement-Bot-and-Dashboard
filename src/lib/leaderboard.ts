@@ -83,26 +83,28 @@ async function queryPeriodAggregates(
   startUtc?: Date,
   endUtc?: Date
 ): Promise<AggregatedLeadRow[]> {
-  const groups = await prisma.leadAnnouncement.groupBy({
-    by: ["userId"],
-    where:
-      startUtc && endUtc
-        ? {
-            createdAt: { gte: startUtc, lt: endUtc },
-          }
-        : undefined,
-    _count: { id: true },
-    _max: { createdAt: true, seq: true },
-  });
+  if (startUtc && endUtc) {
+    return prisma.$queryRaw<AggregatedLeadRow[]>`
+      SELECT
+        "userId",
+        COUNT(*)::int AS "leadCount",
+        MAX("createdAt") AS "achievedAt",
+        MAX("seq")::int AS "achievedSeq"
+      FROM "LeadAnnouncement"
+      WHERE "createdAt" >= ${startUtc} AND "createdAt" < ${endUtc}
+      GROUP BY "userId"
+    `;
+  }
 
-  return groups
-    .filter((g) => g._max.createdAt !== null && g._max.seq !== null)
-    .map((g) => ({
-      userId: g.userId,
-      leadCount: g._count.id,
-      achievedAt: g._max.createdAt as Date,
-      achievedSeq: g._max.seq as number,
-    }));
+  return prisma.$queryRaw<AggregatedLeadRow[]>`
+    SELECT
+      "userId",
+      COUNT(*)::int AS "leadCount",
+      MAX("createdAt") AS "achievedAt",
+      MAX("seq")::int AS "achievedSeq"
+    FROM "LeadAnnouncement"
+    GROUP BY "userId"
+  `;
 }
 
 export async function getLeaderboardForRange(options: {

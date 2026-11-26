@@ -8,6 +8,7 @@ RUN npm ci
 
 FROM base AS builder
 RUN apk add --no-cache openssl
+ENV DOCKER_BUILD=true
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate

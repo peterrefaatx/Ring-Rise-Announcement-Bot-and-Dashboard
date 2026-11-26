@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
         catchupComplete = true;
       }
 
-      // Fallback poll every 2s ensures real-time delivery across serverless isolates (e.g. Vercel)
+      // Fallback poll every 2s ensures real-time delivery across multi-instance deployments
       pollTimer = setInterval(() => {
         if (closed) return;
         void getMissedActivityEvents(lastDeliveredSeq)
