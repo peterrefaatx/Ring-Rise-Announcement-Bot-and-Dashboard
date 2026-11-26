@@ -6,9 +6,6 @@ import {
   Target,
   CalendarDays,
   Flame,
-  LayoutGrid,
-  BarChart3,
-  Settings,
 } from "lucide-react";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,13 +25,12 @@ type AdminSection = "overview" | "callers" | "campaigns" | "analytics" | "settin
 const ADMIN_NAV_ITEMS: Array<{
   id: AdminSection;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
 }> = [
-  { id: "overview", label: "Overview", icon: LayoutGrid },
-  { id: "callers", label: "Callers", icon: Users },
-  { id: "campaigns", label: "Campaigns", icon: Target },
-  { id: "analytics", label: "Analytics & Exports", icon: BarChart3 },
-  { id: "settings", label: "Telegram & Settings", icon: Settings },
+  { id: "overview", label: "Overview" },
+  { id: "callers", label: "Callers" },
+  { id: "campaigns", label: "Campaigns" },
+  { id: "analytics", label: "Analytics & Exports" },
+  { id: "settings", label: "Telegram & Settings" },
 ];
 
 export function AdminPortal({
@@ -76,7 +72,6 @@ export function AdminPortal({
               className="flex flex-wrap gap-1.5 lg:flex-col lg:gap-1"
             >
               {ADMIN_NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
                 const active = activeSection === item.id;
                 return (
                   <button
@@ -84,13 +79,12 @@ export function AdminPortal({
                     type="button"
                     onClick={() => setActiveSection(item.id)}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                      "flex items-center rounded-lg px-3 py-2 text-sm transition-colors text-left",
                       active
                         ? "bg-[#0077B6]/10 font-semibold text-[#0077B6]"
                         : "font-medium text-[#425466] hover:bg-white/70 hover:text-[#0A2540]"
                     )}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
                     <span>{item.label}</span>
                   </button>
                 );
