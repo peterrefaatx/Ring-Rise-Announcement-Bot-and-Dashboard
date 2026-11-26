@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import { DEFAULT_THEME_ID, THEME_STORAGE_KEY } from "@/lib/themes";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,16 +22,42 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInitScript = `
+(function() {
+  try {
+    var key = ${JSON.stringify(THEME_STORAGE_KEY)};
+    var saved = window.localStorage.getItem(key) || ${JSON.stringify(DEFAULT_THEME_ID)};
+    var valid = ["classic", "dark", "music", "gaming", "space", "nature"];
+    var id = valid.indexOf(saved) !== -1 ? saved : "classic";
+    var isDark = id === "dark" || id === "music" || id === "gaming" || id === "space";
+    var root = document.documentElement;
+    root.dataset.theme = id;
+    root.dataset.themeMode = isDark ? "dark" : "light";
+    if (isDark) root.classList.add("dark");
+    else root.classList.remove("dark");
+    root.style.colorScheme = isDark ? "dark" : "light";
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      data-theme="classic"
+      data-theme-mode="light"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable}`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-screen font-sans">
-        {children}
-        <Toaster position="top-right" richColors closeButton />
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

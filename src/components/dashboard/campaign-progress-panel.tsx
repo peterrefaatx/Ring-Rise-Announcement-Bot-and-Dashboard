@@ -54,11 +54,11 @@ export function CampaignProgressPanel({
                   )}
                 </div>
 
-                <div className="h-2 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
+                <div className="theme-track h-2 w-full overflow-hidden rounded-full">
                   <div
                     className={cn(
                       "h-full rounded-full transition-all duration-300 ease-out",
-                      campaign.targetReached ? "bg-emerald-600" : "bg-[#0077B6]"
+                      campaign.targetReached ? "bg-emerald-500" : "theme-progress-fill"
                     )}
                     style={{ width: `${campaign.progressPercent}%` }}
                   />

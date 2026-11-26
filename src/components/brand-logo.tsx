@@ -37,13 +37,13 @@ export function BrandLogo({
           <TrendingUp className="h-4 w-4" />
         </div>
       )}
-      <div className="hidden sm:block h-5 w-px bg-[#E3E8EE] shrink-0" />
+      <div className="hidden sm:block h-5 w-px bg-border shrink-0" />
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold tracking-[-0.01em] text-[#0A2540]">
+        <p className="truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
           {brandName}
         </p>
         {!compact && brandTagline && (
-          <p className="hidden md:block truncate text-[11px] text-slate-500">
+          <p className="hidden md:block truncate text-[11px] text-muted-foreground">
             {brandTagline}
           </p>
         )}

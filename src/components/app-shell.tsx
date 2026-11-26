@@ -11,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { BrandLogo } from "./brand-logo";
+import { ThemeSwitcher } from "./theme-switcher";
 import { Badge } from "./ui/badge";
 import {
   DropdownMenu,
@@ -85,12 +86,12 @@ export function AppShell({ user, brand, children }: AppShellProps) {
 
   return (
     <div
-      className="min-h-screen bg-[#F6F9FC] text-[#0A2540] flex flex-col"
+      className="theme-canvas min-h-screen flex flex-col transition-colors duration-200"
       style={{ "--brand-accent": brand.brandPrimaryColor } as React.CSSProperties}
     >
       {/* Top Bar */}
-      <header className="sticky top-0 z-30 border-b border-[#E3E8EE] bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+      <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
           <Link href="/" className="min-w-0 hover:opacity-90 transition-opacity">
             <BrandLogo
               brandName={brand.brandName}
@@ -100,64 +101,68 @@ export function AppShell({ user, brand, children }: AppShellProps) {
             />
           </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2.5 rounded-full border border-[#E3E8EE] bg-white py-1.5 pl-1.5 pr-3 text-sm font-medium text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] transition-all duration-150 hover:border-[#CBD5E1] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0077B6]"
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0077B6]/10 text-xs font-semibold text-[#0077B6]">
-                  {initials}
-                </span>
-                <span className="max-w-[130px] truncate">{user.announcementName}</span>
-                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 border-[#E3E8EE] p-1.5 shadow-lg">
-              <div className="rounded-md bg-[#F6F9FC] px-3 py-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-[#0A2540]">
-                    {user.fullName}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <ThemeSwitcher />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-1.5 pl-1.5 pr-3 text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                    {initials}
+                  </span>
+                  <span className="max-w-[130px] truncate">{user.announcementName}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64 p-1.5 shadow-lg">
+                <div className="rounded-md bg-muted/70 px-3 py-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {user.fullName}
+                    </p>
+                    <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
+                      {user.role}
+                    </Badge>
+                  </div>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    @{user.username}
+                    {user.role !== "ADMIN" ? ` · Display: ${user.announcementName}` : ""}
                   </p>
-                  <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
-                    {user.role}
-                  </Badge>
                 </div>
-                <p className="mt-0.5 truncate text-xs text-slate-500">
-                  @{user.username}
-                  {user.role !== "ADMIN" ? ` · Display: ${user.announcementName}` : ""}
-                </p>
-              </div>
-              <DropdownMenuSeparator />
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const active =
-                  item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-                return (
-                  <DropdownMenuItem
-                    key={item.href}
-                    onSelect={() => router.push(item.href)}
-                    className={cn(
-                      "rounded-md px-3 py-2 text-sm text-[#425466]",
-                      active && "bg-[#0077B6]/10 font-semibold text-[#0077B6]"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </DropdownMenuItem>
-                );
-              })}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={handleLogout}
-                disabled={loggingOut}
-                className="rounded-md px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-700"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>{loggingOut ? "Signing out..." : "Sign out"}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator />
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const active =
+                    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                  return (
+                    <DropdownMenuItem
+                      key={item.href}
+                      onSelect={() => router.push(item.href)}
+                      className={cn(
+                        "rounded-md px-3 py-2 text-sm text-muted-foreground",
+                        active && "bg-primary/15 font-semibold text-primary"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </DropdownMenuItem>
+                  );
+                })}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={handleLogout}
+                  disabled={loggingOut}
+                  className="rounded-md px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-700"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>{loggingOut ? "Signing out..." : "Sign out"}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
 

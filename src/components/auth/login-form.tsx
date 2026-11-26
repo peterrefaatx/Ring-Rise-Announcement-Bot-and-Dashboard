@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BrandLogo } from "@/components/brand-logo";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import type { BrandSettingsPublic } from "@/lib/dashboard";
 
 export function LoginForm({
@@ -53,13 +54,10 @@ export function LoginForm({
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-[#F6F9FC] p-4"
-      style={{
-        backgroundImage:
-          "radial-gradient(ellipse 80% 45% at 50% 0%, rgba(0, 119, 182, 0.08), transparent)",
-      }}
-    >
+    <div className="theme-canvas relative min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+      <div className="fixed top-4 right-4 z-20">
+        <ThemeSwitcher />
+      </div>
       <div className="w-full max-w-md space-y-7">
         <div className="flex justify-center">
           <BrandLogo
@@ -138,7 +136,7 @@ export function LoginForm({
 
               <Button
                 type="submit"
-                className="h-10 w-full rounded-lg bg-[#0077B6] font-semibold text-white hover:bg-[#005A8D]"
+                className="h-10 w-full rounded-lg bg-primary font-semibold text-primary-foreground hover:opacity-90"
                 disabled={submitting}
               >
                 {submitting ? "Signing in..." : "Continue"}

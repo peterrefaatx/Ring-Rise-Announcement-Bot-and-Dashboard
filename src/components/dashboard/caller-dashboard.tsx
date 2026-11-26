@@ -69,8 +69,8 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
     >
       <div className="space-y-6">
         {/* Unified Executive Daily Metric Strip */}
-        <section className="rounded-xl border border-[#E3E8EE] bg-white shadow-[0_1px_2px_rgba(10,37,64,0.04),0_4px_12px_rgba(10,37,64,0.03)]">
-          <div className="grid grid-cols-1 divide-y divide-[#E3E8EE] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <section className="theme-surface rounded-xl border transition-colors duration-200">
+          <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {isAdmin ? (
               <>
                 <div className="p-5">
@@ -101,9 +101,9 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                       {snapshot.totals.leadsToday} / {snapshot.totals.overallDailyTarget} total target
                     </span>
                   </div>
-                  <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
+                  <div className="theme-track mt-2.5 h-1.5 w-full overflow-hidden rounded-full">
                     <div
-                      className="h-full rounded-full bg-[#0077B6] transition-all duration-300 ease-out"
+                      className="theme-progress-fill h-full rounded-full transition-all duration-300 ease-out"
                       style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
                     />
                   </div>
@@ -162,9 +162,9 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                   {snapshot.totals.activeCampaigns} campaigns
                 </span>
               </div>
-              <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
+              <div className="theme-track mt-2.5 h-1.5 w-full overflow-hidden rounded-full">
                 <div
-                  className="h-full rounded-full bg-[#0077B6] transition-all duration-300 ease-out"
+                  className="theme-progress-fill h-full rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
                 />
               </div>
@@ -233,7 +233,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
             <Button
               size="lg"
-              className="h-12 rounded-full bg-[#0077B6] px-8 text-sm font-semibold tracking-wide text-white shadow-[0_12px_28px_-6px_rgba(0,119,182,0.5)] ring-4 ring-white/90 transition-all duration-150 hover:bg-[#005A8D] hover:shadow-[0_16px_32px_-6px_rgba(0,119,182,0.55)] active:scale-[0.98]"
+              className="h-12 rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
               onClick={() => setAnnounceOpen(true)}
             >
               <Megaphone className="h-4 w-4" />

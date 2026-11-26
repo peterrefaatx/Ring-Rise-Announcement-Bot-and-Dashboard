@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+html[data-theme="classic"] {
   --background: 210 43% 98%;
   --foreground: 209 73% 15%;
   --card: 0 0% 100%;
@@ -23,6 +24,250 @@
   --input: 213 24% 87%;
   --ring: 201 100% 36%;
   --radius: 0.625rem;
+
+  --theme-canvas: #F6F9FC;
+  --theme-canvas-image: none;
+  --theme-surface: #FFFFFF;
+  --theme-surface-muted: #FAFBFD;
+  --theme-surface-track: #EEF2F6;
+  --theme-header: rgba(255, 255, 255, 0.94);
+  --theme-border: #E3E8EE;
+  --theme-ink: #0A2540;
+  --theme-ink-secondary: #425466;
+  --theme-ink-muted: #64748B;
+  --theme-accent: #0077B6;
+  --theme-accent-hover: #005A8D;
+  --theme-accent-soft: rgba(0, 119, 182, 0.1);
+  --theme-accent-subtle: rgba(0, 119, 182, 0.045);
+  --theme-progress-fill: linear-gradient(90deg, #0077B6 0%, #0096C7 100%);
+  --theme-top1-row: rgba(254, 243, 199, 0.55);
+  --theme-card-shadow: 0 1px 2px rgba(10, 37, 64, 0.04), 0 4px 12px rgba(10, 37, 64, 0.03);
+  --theme-scrollbar: #CBD5E1;
+  --theme-scrollbar-hover: #94A3B8;
+}
+
+/* 1. Midnight Dark (Dark category) */
+html[data-theme="dark"] {
+  --background: 222 47% 7%;
+  --foreground: 210 40% 96%;
+  --card: 222 40% 11%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 40% 12%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 199 89% 60%;
+  --primary-foreground: 222 47% 7%;
+  --secondary: 217 33% 16%;
+  --secondary-foreground: 210 40% 96%;
+  --muted: 217 33% 16%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 217 33% 19%;
+  --accent-foreground: 199 89% 70%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 217 28% 20%;
+  --input: 217 28% 22%;
+  --ring: 199 89% 60%;
+
+  --theme-canvas: #090E1A;
+  --theme-canvas-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(56, 189, 248, 0.12), transparent);
+  --theme-surface: #111827;
+  --theme-surface-muted: #162033;
+  --theme-surface-track: #1E293B;
+  --theme-header: rgba(17, 24, 39, 0.88);
+  --theme-border: #233044;
+  --theme-ink: #F1F5F9;
+  --theme-ink-secondary: #CBD5E1;
+  --theme-ink-muted: #94A3B8;
+  --theme-accent: #38BDF8;
+  --theme-accent-hover: #0EA5E9;
+  --theme-accent-soft: rgba(56, 189, 248, 0.16);
+  --theme-accent-subtle: rgba(56, 189, 248, 0.08);
+  --theme-progress-fill: linear-gradient(90deg, #38BDF8 0%, #6366F1 100%);
+  --theme-top1-row: rgba(245, 158, 11, 0.1);
+  --theme-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --theme-scrollbar: #334155;
+  --theme-scrollbar-hover: #475569;
+}
+
+/* 2. Vinyl Studio (Music category) */
+html[data-theme="music"] {
+  --background: 261 45% 7%;
+  --foreground: 270 30% 96%;
+  --card: 258 37% 11%;
+  --card-foreground: 270 30% 96%;
+  --popover: 258 37% 13%;
+  --popover-foreground: 270 30% 96%;
+  --primary: 330 81% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 260 32% 17%;
+  --secondary-foreground: 270 30% 96%;
+  --muted: 260 30% 16%;
+  --muted-foreground: 264 22% 69%;
+  --accent: 275 40% 20%;
+  --accent-foreground: 330 85% 75%;
+  --destructive: 0 75% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 264 30% 21%;
+  --input: 264 30% 24%;
+  --ring: 330 81% 60%;
+
+  --theme-canvas: #0E0918;
+  --theme-canvas-image:
+    radial-gradient(ellipse 65% 42% at 15% 0%, rgba(236, 72, 153, 0.16), transparent),
+    radial-gradient(ellipse 60% 42% at 85% 0%, rgba(139, 92, 246, 0.18), transparent);
+  --theme-surface: #171126;
+  --theme-surface-muted: #1E1733;
+  --theme-surface-track: #261E3F;
+  --theme-header: rgba(20, 14, 34, 0.88);
+  --theme-border: #2D234A;
+  --theme-ink: #FAF5FF;
+  --theme-ink-secondary: #DDD6FE;
+  --theme-ink-muted: #A78BFA;
+  --theme-accent: #EC4899;
+  --theme-accent-hover: #DB2777;
+  --theme-accent-soft: rgba(236, 72, 153, 0.18);
+  --theme-accent-subtle: rgba(168, 85, 247, 0.11);
+  --theme-progress-fill: linear-gradient(90deg, #EC4899 0%, #A855F7 55%, #6366F1 100%);
+  --theme-top1-row: rgba(236, 72, 153, 0.12);
+  --theme-card-shadow: 0 6px 24px rgba(8, 3, 20, 0.45), inset 0 1px 0 rgba(236, 72, 153, 0.08);
+  --theme-scrollbar: #4C1D95;
+  --theme-scrollbar-hover: #7C3AED;
+}
+
+/* 3. Cyber Arcade (Gaming category) */
+html[data-theme="gaming"] {
+  --background: 218 44% 5%;
+  --foreground: 180 30% 96%;
+  --card: 217 41% 10%;
+  --card-foreground: 180 30% 96%;
+  --popover: 217 41% 12%;
+  --popover-foreground: 180 30% 96%;
+  --primary: 160 100% 45%;
+  --primary-foreground: 218 44% 5%;
+  --secondary: 214 34% 16%;
+  --secondary-foreground: 180 30% 96%;
+  --muted: 214 34% 15%;
+  --muted-foreground: 205 22% 65%;
+  --accent: 175 45% 17%;
+  --accent-foreground: 160 100% 60%;
+  --destructive: 0 78% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 212 32% 19%;
+  --input: 212 32% 22%;
+  --ring: 160 100% 45%;
+
+  --theme-canvas: #070B12;
+  --theme-canvas-image:
+    radial-gradient(ellipse 70% 40% at 50% -5%, rgba(0, 229, 153, 0.14), transparent),
+    linear-gradient(to right, rgba(6, 182, 212, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(6, 182, 212, 0.04) 1px, transparent 1px);
+  --theme-canvas-size: auto, 28px 28px, 28px 28px;
+  --theme-surface: #0F1724;
+  --theme-surface-muted: #141F30;
+  --theme-surface-track: #1B2A40;
+  --theme-header: rgba(11, 17, 28, 0.9);
+  --theme-border: #1F3147;
+  --theme-ink: #ECFDF5;
+  --theme-ink-secondary: #BAE6FD;
+  --theme-ink-muted: #7DD3FC;
+  --theme-accent: #00E599;
+  --theme-accent-hover: #00C482;
+  --theme-accent-soft: rgba(0, 229, 153, 0.16);
+  --theme-accent-subtle: rgba(6, 182, 212, 0.09);
+  --theme-progress-fill: linear-gradient(90deg, #00E599 0%, #06B6D4 100%);
+  --theme-top1-row: rgba(0, 229, 153, 0.1);
+  --theme-card-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(0, 229, 153, 0.09);
+  --theme-scrollbar: #155E75;
+  --theme-scrollbar-hover: #00E599;
+}
+
+/* 4. Cosmic Nebula (Space category) */
+html[data-theme="space"] {
+  --background: 229 56% 6%;
+  --foreground: 226 45% 96%;
+  --card: 230 48% 12%;
+  --card-foreground: 226 45% 96%;
+  --popover: 230 48% 14%;
+  --popover-foreground: 226 45% 96%;
+  --primary: 239 84% 74%;
+  --primary-foreground: 229 56% 8%;
+  --secondary: 232 38% 18%;
+  --secondary-foreground: 226 45% 96%;
+  --muted: 232 36% 17%;
+  --muted-foreground: 228 28% 70%;
+  --accent: 236 45% 22%;
+  --accent-foreground: 43 96% 70%;
+  --destructive: 0 75% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 233 36% 22%;
+  --input: 233 36% 25%;
+  --ring: 239 84% 74%;
+
+  --theme-canvas: #070A19;
+  --theme-canvas-image:
+    radial-gradient(ellipse 65% 45% at 75% 0%, rgba(129, 140, 248, 0.18), transparent),
+    radial-gradient(ellipse 50% 35% at 20% 10%, rgba(245, 158, 11, 0.11), transparent);
+  --theme-surface: #111631;
+  --theme-surface-muted: #171D3F;
+  --theme-surface-track: #212A54;
+  --theme-header: rgba(13, 17, 40, 0.88);
+  --theme-border: #262F5B;
+  --theme-ink: #EEF2FF;
+  --theme-ink-secondary: #C7D2FE;
+  --theme-ink-muted: #94A3F5;
+  --theme-accent: #818CF8;
+  --theme-accent-hover: #6366F1;
+  --theme-accent-soft: rgba(129, 140, 248, 0.18);
+  --theme-accent-subtle: rgba(245, 158, 11, 0.08);
+  --theme-progress-fill: linear-gradient(90deg, #818CF8 0%, #C084FC 55%, #F59E0B 100%);
+  --theme-top1-row: rgba(245, 158, 11, 0.12);
+  --theme-card-shadow: 0 8px 26px rgba(3, 5, 18, 0.5), inset 0 1px 0 rgba(199, 210, 254, 0.08);
+  --theme-scrollbar: #3730A3;
+  --theme-scrollbar-hover: #818CF8;
+}
+
+/* 5. Botanical Zen (Nature category) */
+html[data-theme="nature"] {
+  --background: 110 24% 95%;
+  --foreground: 156 48% 12%;
+  --card: 108 45% 98%;
+  --card-foreground: 156 48% 12%;
+  --popover: 108 45% 99%;
+  --popover-foreground: 156 48% 12%;
+  --primary: 142 71% 29%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 128 22% 91%;
+  --secondary-foreground: 156 48% 12%;
+  --muted: 128 20% 92%;
+  --muted-foreground: 150 15% 42%;
+  --accent: 142 42% 91%;
+  --accent-foreground: 142 71% 24%;
+  --destructive: 0 74% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 132 20% 85%;
+  --input: 132 20% 82%;
+  --ring: 142 71% 29%;
+
+  --theme-canvas: #F2F6F1;
+  --theme-canvas-image:
+    radial-gradient(ellipse 75% 40% at 50% 0%, rgba(16, 185, 129, 0.09), transparent);
+  --theme-surface: #FAFDF9;
+  --theme-surface-muted: #F1F6EF;
+  --theme-surface-track: #E1ECE2;
+  --theme-header: rgba(250, 253, 249, 0.92);
+  --theme-border: #D5E3D6;
+  --theme-ink: #0F2E22;
+  --theme-ink-secondary: #335547;
+  --theme-ink-muted: #587868;
+  --theme-accent: #15803D;
+  --theme-accent-hover: #166534;
+  --theme-accent-soft: rgba(21, 128, 61, 0.11);
+  --theme-accent-subtle: rgba(16, 185, 129, 0.07);
+  --theme-progress-fill: linear-gradient(90deg, #15803D 0%, #10B981 100%);
+  --theme-top1-row: rgba(254, 243, 199, 0.65);
+  --theme-card-shadow: 0 1px 2px rgba(15, 46, 34, 0.04), 0 6px 16px rgba(21, 128, 61, 0.05);
+  --theme-scrollbar: #B7D0BC;
+  --theme-scrollbar-hover: #6DA37A;
 }
 
 @layer base {
@@ -37,12 +282,12 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    caret-color: #0077b6;
+    caret-color: var(--theme-accent);
   }
 
   ::selection {
-    background-color: rgba(0, 119, 182, 0.14);
-    color: #0a2540;
+    background-color: var(--theme-accent-soft);
+    color: var(--theme-ink);
   }
 
   /* Subtle themed scrollbars */
@@ -54,10 +299,165 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--theme-scrollbar);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: var(--theme-scrollbar-hover);
+  }
+}
+
+@layer components {
+  .theme-canvas {
+    background-color: var(--theme-canvas);
+    background-image: var(--theme-canvas-image, none);
+    background-size: var(--theme-canvas-size, auto);
+    color: var(--theme-ink);
+  }
+
+  .theme-header {
+    background-color: var(--theme-header);
+    border-color: var(--theme-border);
+  }
+
+  .theme-surface {
+    background-color: var(--theme-surface);
+    border-color: var(--theme-border);
+    box-shadow: var(--theme-card-shadow);
+  }
+
+  .theme-surface-muted {
+    background-color: var(--theme-surface-muted);
+    border-color: var(--theme-border);
+  }
+
+  .theme-track {
+    background-color: var(--theme-surface-track);
+  }
+
+  .theme-progress-fill {
+    background: var(--theme-progress-fill);
+  }
+}
+
+/* Harmonize dark-mode & custom-palette utilities across inner admin/profile/dialog tabs */
+@layer utilities {
+  html[data-theme-mode="dark"] .bg-white,
+  html[data-theme="nature"] .bg-white {
+    background-color: var(--theme-surface);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#F6F9FC\],
+  html[data-theme="nature"] .bg-\[\#F6F9FC\] {
+    background-color: var(--theme-canvas);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#FAFBFD\],
+  html[data-theme-mode="dark"] .bg-\[\#F8FAFC\],
+  html[data-theme-mode="dark"] .bg-slate-50,
+  html[data-theme-mode="dark"] .bg-slate-50\/70,
+  html[data-theme="nature"] .bg-\[\#FAFBFD\] {
+    background-color: var(--theme-surface-muted);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#EEF2F6\],
+  html[data-theme-mode="dark"] .bg-\[\#F1F5F9\],
+  html[data-theme-mode="dark"] .bg-slate-100 {
+    background-color: var(--theme-surface-track);
+  }
+
+  html[data-theme-mode="dark"] .hover\:bg-\[\#FAFBFD\]:hover,
+  html[data-theme-mode="dark"] .hover\:bg-\[\#F8FAFC\]:hover,
+  html[data-theme-mode="dark"] .hover\:bg-slate-50:hover,
+  html[data-theme-mode="dark"] .hover\:bg-white\/70:hover,
+  html[data-theme="nature"] .hover\:bg-\[\#FAFBFD\]:hover {
+    background-color: var(--theme-surface-muted);
+  }
+
+  html[data-theme-mode="dark"] .text-\[\#0A2540\],
+  html[data-theme-mode="dark"] .text-slate-900,
+  html[data-theme-mode="dark"] .text-slate-800,
+  html[data-theme="nature"] .text-\[\#0A2540\],
+  html[data-theme="nature"] .text-slate-900 {
+    color: var(--theme-ink);
+  }
+
+  html[data-theme-mode="dark"] .text-\[\#425466\],
+  html[data-theme-mode="dark"] .text-slate-700,
+  html[data-theme-mode="dark"] .text-slate-600 {
+    color: var(--theme-ink-secondary);
+  }
+
+  html[data-theme-mode="dark"] .text-\[\#64748B\],
+  html[data-theme-mode="dark"] .text-slate-500,
+  html[data-theme-mode="dark"] .text-slate-400 {
+    color: var(--theme-ink-muted);
+  }
+
+  html[data-theme-mode="dark"] .border-\[\#E3E8EE\],
+  html[data-theme-mode="dark"] .border-slate-200,
+  html[data-theme-mode="dark"] .border-slate-100,
+  html[data-theme-mode="dark"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
+  html[data-theme="nature"] .border-\[\#E3E8EE\],
+  html[data-theme="nature"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--theme-border);
+  }
+
+  html[data-theme-mode="dark"] .text-\[\#0077B6\],
+  html[data-theme="nature"] .text-\[\#0077B6\] {
+    color: var(--theme-accent);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#0077B6\],
+  html[data-theme="nature"] .bg-\[\#0077B6\] {
+    background-color: var(--theme-accent);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/10,
+  html[data-theme="nature"] .bg-\[\#0077B6\]\/10 {
+    background-color: var(--theme-accent-soft);
+  }
+
+  html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/\[0\.04\],
+  html[data-theme="nature"] .bg-\[\#0077B6\]\/\[0\.04\] {
+    background-color: var(--theme-accent-subtle);
+  }
+
+  html[data-theme-mode="dark"] .hover\:bg-\[\#005A8D\]:hover,
+  html[data-theme="nature"] .hover\:bg-\[\#005A8D\]:hover {
+    background-color: var(--theme-accent-hover);
+  }
+
+  html[data-theme-mode="dark"] .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.14);
+  }
+  html[data-theme-mode="dark"] .border-emerald-200 {
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  html[data-theme-mode="dark"] .text-emerald-700 {
+    color: #34D399;
+  }
+
+  html[data-theme-mode="dark"] .bg-amber-50,
+  html[data-theme-mode="dark"] .bg-amber-50\/45 {
+    background-color: var(--theme-top1-row);
+  }
+  html[data-theme-mode="dark"] .border-amber-200 {
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+  html[data-theme-mode="dark"] .text-amber-700,
+  html[data-theme-mode="dark"] .text-amber-800 {
+    color: #FCD34D;
+  }
+
+  html[data-theme-mode="dark"] .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.14);
+  }
+  html[data-theme-mode="dark"] .border-red-200 {
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+  html[data-theme-mode="dark"] .text-red-600,
+  html[data-theme-mode="dark"] .text-red-700 {
+    color: #FCA5A5;
   }
 }
