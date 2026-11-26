@@ -168,25 +168,25 @@ export function ProfileClient({
                     placeholder={DEFAULT_ANNOUNCEMENT_TEMPLATE}
                     required
                   />
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span>Required placeholders:</span>
-                    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-slate-800">
+                    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
                       {"{name}"}
                     </code>
-                    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-slate-800">
+                    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
                       {"{campaign}"}
                     </code>
                   </div>
                   {!templateCheck.valid && (
-                    <p className="text-xs font-medium text-red-600">{templateCheck.error}</p>
+                    <p className="text-xs font-medium text-destructive">{templateCheck.error}</p>
                   )}
                 </div>
 
-                <div className="rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 space-y-1">
-                  <p className="text-xs font-medium uppercase tracking-wide text-blue-700">
+                <div className="rounded-lg border border-primary/25 bg-primary/10 p-3.5 space-y-1">
+                  <p className="text-xs font-medium uppercase tracking-wide text-primary">
                     Live Telegram Preview (sample campaign: Digital Nomad)
                   </p>
-                  <p className="text-sm font-medium text-slate-900">{livePreview}</p>
+                  <p className="text-sm font-medium text-foreground">{livePreview}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 pt-1">

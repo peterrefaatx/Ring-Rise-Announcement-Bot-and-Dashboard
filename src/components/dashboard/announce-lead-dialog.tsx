@@ -183,11 +183,11 @@ export function AnnounceLeadDialog({
               </p>
             </div>
 
-            <div className="rounded-lg border border-blue-100 bg-blue-50/50 p-4 space-y-1.5">
-              <p className="text-xs font-medium uppercase tracking-wide text-blue-700">
+            <div className="rounded-lg border border-primary/25 bg-primary/10 p-4 space-y-1.5">
+              <p className="text-xs font-medium uppercase tracking-wide text-primary">
                 Telegram Message Preview
               </p>
-              <p className="text-sm text-slate-900 font-medium">{previewText}</p>
+              <p className="text-sm font-medium text-foreground">{previewText}</p>
             </div>
 
             {errorMessage && (
