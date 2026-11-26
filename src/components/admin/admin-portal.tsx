@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  ShieldCheck,
   Users,
   Target,
   CalendarDays,
@@ -69,13 +68,6 @@ export function AdminPortal({
       onManualRefresh={refreshNow}
     >
       <div className="space-y-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-[#0A2540]">
-            <ShieldCheck className="h-5 w-5 text-[#0077B6]" />
-            Administration Console
-          </h1>
-        </div>
-
         <div className="flex flex-col gap-6 lg:block">
           {/* Fixed In-Page Sidebar Navigation (No Container) */}
           <aside className="w-full lg:fixed lg:left-6 lg:top-24 lg:z-20 lg:w-56">
