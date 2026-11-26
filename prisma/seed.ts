@@ -1,7 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/crypto";
-import { DEFAULT_ANNOUNCEMENT_TEMPLATE } from "../src/lib/template";
-import { EST_TIMEZONE_LABEL, getBusinessDateEst } from "../src/lib/timezone";
+import {
+  DEFAULT_ANNOUNCEMENT_TEMPLATE,
+  renderAnnouncementMessage,
+} from "../src/lib/template";
+import {
+  EST_TIMEZONE_LABEL,
+  getBusinessDateEst,
+  getBusinessMonthEst,
+  getEstDayRangeUtc,
+} from "../src/lib/timezone";
 
 const prisma = new PrismaClient();
 
@@ -71,6 +79,107 @@ async function main() {
       }
     }
     console.log("Sample campaigns seeded.");
+
+    const existingCallers = await prisma.user.count({ where: { role: "CALLER" } });
+    if (existingCallers === 0) {
+      const callerPasswordHash = hashPassword("CallerPassword123!");
+      const sampleCallers = [
+        {
+          fullName: "Ahmed Mohamed",
+          username: "ahmed",
+          announcementName: "Ahmed",
+          announcementTemplate: DEFAULT_ANNOUNCEMENT_TEMPLATE,
+          leads: [
+            { campaign: "Digital Nomad", count: 8 },
+            { campaign: "Study in Spain", count: 4 },
+          ],
+        },
+        {
+          fullName: "Sara Hassan",
+          username: "sara",
+          announcementName: "Sara",
+          announcementTemplate:
+            "{name} just closed a new lead in {campaign}! Keep it rolling!",
+          leads: [
+            { campaign: "Digital Nomad", count: 6 },
+            { campaign: "Study in Spain", count: 4 },
+          ],
+        },
+        {
+          fullName: "Mohamed Ali",
+          username: "mohamed",
+          announcementName: "Mohamed",
+          announcementTemplate: DEFAULT_ANNOUNCEMENT_TEMPLATE,
+          leads: [
+            { campaign: "Digital Nomad", count: 5 },
+            { campaign: "Study in Spain", count: 3 },
+          ],
+        },
+        {
+          fullName: "Peter Refaat",
+          username: "peter",
+          announcementName: "Peter",
+          announcementTemplate:
+            "{name} just secured a new lead for {campaign}! Great work!",
+          leads: [
+            { campaign: "Digital Nomad", count: 4 },
+            { campaign: "Study in Spain", count: 2 },
+          ],
+        },
+      ];
+
+      const campaigns = await prisma.campaign.findMany({
+        where: { status: "ACTIVE", deletedAt: null },
+      });
+      const campByName = new Map(campaigns.map((c) => [c.name, c]));
+      const now = new Date();
+      const { startUtc } = getEstDayRangeUtc(todayEst);
+      const monthEst = getBusinessMonthEst(now);
+      let minuteOffset = 15;
+
+      for (const sc of sampleCallers) {
+        const caller = await prisma.user.create({
+          data: {
+            fullName: sc.fullName,
+            username: sc.username,
+            passwordHash: callerPasswordHash,
+            role: "CALLER",
+            status: "ACTIVE",
+            announcementName: sc.announcementName,
+            announcementTemplate: sc.announcementTemplate,
+          },
+        });
+
+        for (const item of sc.leads) {
+          const camp = campByName.get(item.campaign);
+          if (!camp) continue;
+          for (let i = 0; i < item.count; i++) {
+            const ts = new Date(
+              Math.min(now.getTime() - 60000, startUtc.getTime() + minuteOffset * 60000)
+            );
+            minuteOffset += 3;
+            await prisma.leadAnnouncement.create({
+              data: {
+                userId: caller.id,
+                campaignId: camp.id,
+                idempotencyKey: `seed-${sc.username}-${camp.id}-${i}`,
+                callerNameSnapshot: caller.announcementName,
+                campaignNameSnapshot: camp.name,
+                renderedMessage: renderAnnouncementMessage(
+                  caller.announcementTemplate,
+                  caller.announcementName,
+                  camp.name
+                ),
+                businessDateEst: todayEst,
+                businessMonthEst: monthEst,
+                createdAt: ts,
+              },
+            });
+          }
+        }
+      }
+      console.log("Sample callers and today's sample leads seeded.");
+    }
   }
 }
 
