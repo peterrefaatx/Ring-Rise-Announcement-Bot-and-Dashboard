@@ -173,12 +173,12 @@ export function AdminAnalyticsTab({
           {/* Daily History */}
           <TabsContent value="daily" className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <Input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-44"
+                  className="w-full sm:w-44"
                 />
                 {dailyData && (
                   <Badge variant="secondary">
@@ -245,7 +245,7 @@ export function AdminAnalyticsTab({
                         key={s.businessDateEst}
                         type="button"
                         onClick={() => setDate(s.businessDateEst)}
-                        className="w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 text-left"
+                        className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
                       >
                         <span className="font-mono text-slate-800">{s.businessDateEst}</span>
                         <span className="text-slate-600">
@@ -262,12 +262,12 @@ export function AdminAnalyticsTab({
           {/* Monthly History */}
           <TabsContent value="monthly" className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <Input
                   type="month"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
-                  className="w-44"
+                  className="w-full sm:w-44"
                 />
                 {monthlyData && (
                   <Badge variant="secondary">
@@ -332,7 +332,7 @@ export function AdminAnalyticsTab({
                         key={m.businessMonthEst}
                         type="button"
                         onClick={() => setMonth(m.businessMonthEst)}
-                        className="w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 text-left"
+                        className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
                       >
                         <span className="font-mono">{m.businessMonthEst}</span>
                         <span className="text-slate-600">
@@ -350,7 +350,7 @@ export function AdminAnalyticsTab({
           <TabsContent value="caller" className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <select
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm min-w-[240px]"
+                className="h-9 w-full sm:w-auto sm:min-w-[240px] rounded-md border border-input bg-background px-3 text-sm"
                 value={selectedCallerId}
                 onChange={(e) => onSelectCallerId(e.target.value)}
               >
@@ -393,18 +393,18 @@ export function AdminAnalyticsTab({
 
             {callerDetail && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">Today</p>
-                    <p className="mt-1 text-2xl font-bold">{callerDetail.totals.today}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{callerDetail.totals.today}</p>
                   </div>
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">This Month</p>
-                    <p className="mt-1 text-2xl font-bold">{callerDetail.totals.thisMonth}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{callerDetail.totals.thisMonth}</p>
                   </div>
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">Lifetime Leads</p>
-                    <p className="mt-1 text-2xl font-bold">{callerDetail.totals.lifetime}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{callerDetail.totals.lifetime}</p>
                   </div>
                 </div>
 
@@ -445,7 +445,7 @@ export function AdminAnalyticsTab({
           <TabsContent value="campaign" className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <select
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm min-w-[240px]"
+                className="h-9 w-full sm:w-auto sm:min-w-[240px] rounded-md border border-input bg-background px-3 text-sm"
                 value={selectedCampaignId}
                 onChange={(e) => onSelectCampaignId(e.target.value)}
               >
@@ -488,18 +488,18 @@ export function AdminAnalyticsTab({
 
             {campaignDetail && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">Today</p>
-                    <p className="mt-1 text-2xl font-bold">{campaignDetail.totals.today}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{campaignDetail.totals.today}</p>
                   </div>
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">This Month</p>
-                    <p className="mt-1 text-2xl font-bold">{campaignDetail.totals.thisMonth}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{campaignDetail.totals.thisMonth}</p>
                   </div>
-                  <div className="rounded-lg border bg-slate-50 p-4">
+                  <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
                     <p className="text-xs text-slate-500">Lifetime Leads</p>
-                    <p className="mt-1 text-2xl font-bold">{campaignDetail.totals.lifetime}</p>
+                    <p className="mt-1 text-xl sm:text-2xl font-bold">{campaignDetail.totals.lifetime}</p>
                   </div>
                 </div>
 

@@ -32,11 +32,11 @@ export function ActivityFeedPanel({ items }: { items: ActivityFeedItem[] }) {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between gap-3 px-5 py-3 text-sm transition-colors hover:bg-[#FAFBFD]"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 px-4 sm:px-5 py-3 text-sm transition-colors hover:bg-[#FAFBFD]"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#0077B6]" />
-                  <p className="truncate text-[#425466]">
+                <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
+                  <span className="mt-1.5 sm:mt-0 h-2 w-2 shrink-0 rounded-full bg-[#0077B6]" />
+                  <p className="text-xs sm:text-sm leading-snug text-[#425466] break-words sm:truncate">
                     <span className="font-mono text-xs text-[#64748B] mr-2 tabular-nums">
                       {formatEstTime(item.createdAt)}
                     </span>
@@ -47,7 +47,7 @@ export function ActivityFeedPanel({ items }: { items: ActivityFeedItem[] }) {
                     </span>
                   </p>
                 </div>
-                <span className="shrink-0 text-xs tabular-nums text-[#64748B]">
+                <span className="pl-4.5 sm:pl-0 shrink-0 text-[11px] sm:text-xs tabular-nums text-[#64748B]">
                   {formatRelativeTime(item.createdAt, now)}
                 </span>
               </div>

@@ -244,13 +244,13 @@ export function AdminCallersTab({
         <div>
           <CardTitle className="text-base">Caller & Account Management</CardTitle>
         </div>
-        <Button onClick={openCreateDialog}>
+        <Button onClick={openCreateDialog} className="w-full sm:w-auto">
           <UserPlus className="h-4 w-4" />
           Add Account
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="relative max-w-sm">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <Input
             value={search}
@@ -260,7 +260,104 @@ export function AdminCallersTab({
           />
         </div>
 
-        <div className="overflow-x-auto rounded-lg border">
+        {/* Mobile Caller Cards */}
+        <div className="space-y-3 md:hidden">
+          {loading ? (
+            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
+              Loading accounts...
+            </div>
+          ) : callers.length === 0 ? (
+            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
+              No matching accounts found.
+            </div>
+          ) : (
+            callers.map((c) => (
+              <div key={c.id} className="rounded-lg border bg-card p-3.5 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => onInspectCaller(c.id)}
+                      className="font-semibold text-slate-900 hover:underline text-left truncate block max-w-full"
+                    >
+                      {c.fullName}
+                    </button>
+                    <p className="text-xs text-slate-500 font-mono truncate">
+                      @{c.username} · Display: {c.announcementName}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-1 shrink-0">
+                    <Badge variant={c.role === "ADMIN" ? "default" : "secondary"}>
+                      {c.role}
+                    </Badge>
+                    <Badge variant={c.status === "ACTIVE" ? "success" : "warning"}>
+                      {c.status}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 rounded-md bg-slate-50 p-2.5 text-center text-xs">
+                  <div>
+                    <p className="text-slate-500">Today</p>
+                    <p className="font-semibold tabular-nums text-slate-900">{c.leadsToday}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Month</p>
+                    <p className="font-semibold tabular-nums text-slate-900">{c.leadsThisMonth}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Lifetime</p>
+                    <p className="font-semibold tabular-nums text-slate-900">{c.leadsAllTime}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-1 pt-0.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openEditDialog(c)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    title="Reset password"
+                    onClick={() => {
+                      setNewPassword("");
+                      setResetTarget(c);
+                    }}
+                  >
+                    <KeyRound className="h-4 w-4" />
+                  </Button>
+                  {c.id !== currentUserId && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title={c.status === "ACTIVE" ? "Deactivate" : "Activate"}
+                        onClick={() => handleToggleStatus(c)}
+                      >
+                        <Power className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title="Delete account"
+                        onClick={() => setDeleteTarget(c)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500 border-b">
               <tr>

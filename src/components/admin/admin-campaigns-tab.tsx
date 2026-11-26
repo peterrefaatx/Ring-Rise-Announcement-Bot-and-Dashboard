@@ -155,6 +155,7 @@ export function AdminCampaignsTab({
           <CardTitle className="text-base">Campaign Management</CardTitle>
         </div>
         <Button
+          className="w-full sm:w-auto"
           onClick={() => {
             setFormState({ name: "", description: "", dailyTarget: 50, status: "ACTIVE" });
             setCreateOpen(true);
@@ -165,7 +166,134 @@ export function AdminCampaignsTab({
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto rounded-lg border">
+        {/* Mobile Campaign Cards */}
+        <div className="space-y-3 md:hidden">
+          {loading ? (
+            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
+              Loading campaigns...
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
+              No campaigns created yet.
+            </div>
+          ) : (
+            campaigns.map((c) => (
+              <div key={c.id} className="rounded-lg border bg-card p-3.5 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => onInspectCampaign(c.id)}
+                      className="font-semibold text-slate-900 hover:underline text-left truncate block max-w-full"
+                    >
+                      {c.name}
+                    </button>
+                    {c.description && (
+                      <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">
+                        {c.description}
+                      </p>
+                    )}
+                  </div>
+                  <Badge
+                    variant={
+                      c.status === "ACTIVE"
+                        ? "success"
+                        : c.status === "PAUSED"
+                        ? "warning"
+                        : "secondary"
+                    }
+                  >
+                    {c.status}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 rounded-md bg-slate-50 p-2.5 text-center text-xs">
+                  <div>
+                    <p className="text-slate-500">Today</p>
+                    <p className="font-semibold tabular-nums text-slate-900">
+                      {c.leadsToday}/{c.dailyTarget}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Month</p>
+                    <p className="font-semibold tabular-nums text-slate-900">{c.leadsThisMonth}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Lifetime</p>
+                    <p className="font-semibold tabular-nums text-slate-900">{c.leadsAllTime}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFormState({
+                        name: c.name,
+                        description: c.description || "",
+                        dailyTarget: c.dailyTarget,
+                        status: c.status,
+                      });
+                      setEditTarget(c);
+                    }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit
+                  </Button>
+                  {c.status === "ACTIVE" ? (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      title="Pause campaign"
+                      onClick={() => handleStatusChange(c, "PAUSED")}
+                    >
+                      <Pause className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      title={c.status === "ARCHIVED" ? "Reactivate campaign" : "Activate campaign"}
+                      onClick={() => handleStatusChange(c, "ACTIVE")}
+                    >
+                      {c.status === "ARCHIVED" ? (
+                        <RotateCcw className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                  {c.status !== "ARCHIVED" && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      title="Archive campaign"
+                      onClick={() => handleStatusChange(c, "ARCHIVED")}
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    title={
+                      c.leadsAllTime > 0
+                        ? "Cannot delete campaign with historical leads (archive instead)"
+                        : "Delete campaign"
+                    }
+                    disabled={c.leadsAllTime > 0}
+                    onClick={() => handleDelete(c)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-600" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500 border-b">
               <tr>
@@ -324,7 +452,7 @@ export function AdminCampaignsTab({
                 onChange={(e) => setFormState({ ...formState, description: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label>Daily Team Target</Label>
                 <Input
@@ -389,7 +517,7 @@ export function AdminCampaignsTab({
                 onChange={(e) => setFormState({ ...formState, description: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label>Daily Team Target</Label>
                 <Input

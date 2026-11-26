@@ -205,7 +205,7 @@ export function AdminSettingsTab({
               />
             </div>
 
-            <div className="rounded-lg border bg-slate-50 p-3.5 flex items-center justify-between">
+            <div className="rounded-lg border bg-slate-50 p-3.5 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-slate-500" />
                 <span className="font-medium text-slate-800">Business Day Timezone</span>
@@ -282,7 +282,7 @@ export function AdminSettingsTab({
 
       {/* Telegram Notification Delivery Queue */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle className="text-base">Telegram Delivery Status</CardTitle>
           </div>
@@ -297,7 +297,55 @@ export function AdminSettingsTab({
           )}
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-lg border">
+          {/* Mobile Queue Cards */}
+          <div className="space-y-2.5 md:hidden">
+            {!queue || queue.jobs.length === 0 ? (
+              <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
+                No Telegram notification jobs recorded yet.
+              </div>
+            ) : (
+              queue.jobs.map((job) => (
+                <div key={job.id} className="rounded-lg border bg-card p-3 space-y-2 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs text-slate-500">
+                      {formatEstTime(job.createdAt)} EST
+                    </span>
+                    <Badge
+                      variant={
+                        job.status === "SENT"
+                          ? "success"
+                          : job.status === "FAILED"
+                          ? "destructive"
+                          : "warning"
+                      }
+                    >
+                      {job.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-slate-800 line-clamp-2">{job.messageText}</p>
+                  <div className="flex items-center justify-between gap-2 text-xs text-slate-500">
+                    <span className="truncate">
+                      Attempts: {job.attempts}/{job.maxAttempts} ·{" "}
+                      {job.lastError || (job.telegramMessageId ? `Msg #${job.telegramMessageId}` : "Queued")}
+                    </span>
+                    {job.status !== "SENT" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={retryingJobId === job.id}
+                        onClick={() => handleRetryJob(job.id)}
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Retry
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500 border-b">
                 <tr>

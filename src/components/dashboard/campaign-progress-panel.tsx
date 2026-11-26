@@ -30,7 +30,7 @@ export function CampaignProgressPanel({
         ) : (
           <div className="divide-y divide-[#E3E8EE]">
             {campaigns.map((campaign) => (
-              <div key={campaign.id} className="p-5 space-y-3 transition-colors hover:bg-[#FAFBFD]">
+              <div key={campaign.id} className="p-4 sm:p-5 space-y-2.5 sm:space-y-3 transition-colors hover:bg-[#FAFBFD]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h4 className="truncate text-sm font-semibold tracking-[-0.01em] text-[#0A2540]">

@@ -109,20 +109,20 @@ export function ProfileClient({
               <CardTitle className="text-base">Account Identity</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between py-1.5 border-b">
-                <span className="text-slate-500">Account Name</span>
-                <span className="font-medium text-slate-900">{user.fullName}</span>
+              <div className="flex justify-between gap-3 py-1.5 border-b">
+                <span className="text-slate-500 shrink-0">Account Name</span>
+                <span className="font-medium text-slate-900 text-right truncate">{user.fullName}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b">
-                <span className="text-slate-500">Login Username</span>
-                <span className="font-mono text-slate-900">@{user.username}</span>
+              <div className="flex justify-between gap-3 py-1.5 border-b">
+                <span className="text-slate-500 shrink-0">Login Username</span>
+                <span className="font-mono text-slate-900 text-right truncate">@{user.username}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b">
-                <span className="text-slate-500">Email</span>
-                <span className="text-slate-900">{user.email || "—"}</span>
+              <div className="flex justify-between gap-3 py-1.5 border-b">
+                <span className="text-slate-500 shrink-0">Email</span>
+                <span className="text-slate-900 text-right break-all">{user.email || "—"}</span>
               </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-500">Role</span>
+              <div className="flex justify-between gap-3 py-1.5">
+                <span className="text-slate-500 shrink-0">Role</span>
                 <Badge variant="secondary">{user.role}</Badge>
               </div>
             </CardContent>
@@ -222,18 +222,18 @@ export function ProfileClient({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">Today (EST)</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums">{history.totals.today}</p>
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+              <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
+                <p className="text-[11px] sm:text-xs text-slate-500">Today (EST)</p>
+                <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums">{history.totals.today}</p>
               </div>
-              <div className="rounded-lg border bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">This Month (EST)</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums">{history.totals.thisMonth}</p>
+              <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
+                <p className="text-[11px] sm:text-xs text-slate-500">This Month (EST)</p>
+                <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums">{history.totals.thisMonth}</p>
               </div>
-              <div className="rounded-lg border bg-slate-50 p-4">
-                <p className="text-xs text-slate-500">Lifetime Total</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums">{history.totals.lifetime}</p>
+              <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
+                <p className="text-[11px] sm:text-xs text-slate-500">Lifetime Total</p>
+                <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums">{history.totals.lifetime}</p>
               </div>
             </div>
 

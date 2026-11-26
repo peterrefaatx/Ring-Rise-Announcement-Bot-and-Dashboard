@@ -69,7 +69,7 @@ export function AdminPortal({
           <aside className="w-full lg:fixed lg:top-24 lg:z-20 lg:w-56">
             <nav
               aria-label="Administration sections"
-              className="flex flex-wrap gap-1.5 lg:flex-col lg:gap-1"
+              className="flex overflow-x-auto no-scrollbar gap-1.5 pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0"
             >
               {ADMIN_NAV_ITEMS.map((item) => {
                 const active = activeSection === item.id;
@@ -79,7 +79,7 @@ export function AdminPortal({
                     type="button"
                     onClick={() => setActiveSection(item.id)}
                     className={cn(
-                      "flex items-center rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                      "flex shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors text-left",
                       active
                         ? "bg-[#0077B6]/10 font-semibold text-[#0077B6]"
                         : "font-medium text-[#425466] hover:bg-white/70 hover:text-[#0A2540]"
@@ -96,14 +96,14 @@ export function AdminPortal({
           <div className="flex-1 min-w-0 lg:pl-64">
             {activeSection === "overview" && (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
                   <Card>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-slate-500">
                         <span>LEADS TODAY</span>
-                        <Flame className="h-4 w-4 text-primary" />
+                        <Flame className="h-4 w-4 text-primary shrink-0" />
                       </div>
-                      <p className="mt-2 text-3xl font-bold tabular-nums">
+                      <p className="mt-2 text-2xl sm:text-3xl font-bold tabular-nums">
                         {snapshot.totals.leadsToday}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
@@ -113,12 +113,12 @@ export function AdminPortal({
                   </Card>
 
                   <Card>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-slate-500">
                         <span>LEADS THIS MONTH</span>
-                        <CalendarDays className="h-4 w-4 text-slate-400" />
+                        <CalendarDays className="h-4 w-4 text-slate-400 shrink-0" />
                       </div>
-                      <p className="mt-2 text-3xl font-bold tabular-nums">
+                      <p className="mt-2 text-2xl sm:text-3xl font-bold tabular-nums">
                         {snapshot.totals.leadsThisMonth}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
@@ -128,12 +128,12 @@ export function AdminPortal({
                   </Card>
 
                   <Card>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-slate-500">
                         <span>ACTIVE CALLERS</span>
-                        <Users className="h-4 w-4 text-emerald-600" />
+                        <Users className="h-4 w-4 text-emerald-600 shrink-0" />
                       </div>
-                      <p className="mt-2 text-3xl font-bold tabular-nums">
+                      <p className="mt-2 text-2xl sm:text-3xl font-bold tabular-nums">
                         {snapshot.totals.activeCallers}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
@@ -143,12 +143,12 @@ export function AdminPortal({
                   </Card>
 
                   <Card>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-slate-500">
                         <span>ACTIVE CAMPAIGNS</span>
-                        <Target className="h-4 w-4 text-amber-500" />
+                        <Target className="h-4 w-4 text-amber-500 shrink-0" />
                       </div>
-                      <p className="mt-2 text-3xl font-bold tabular-nums">
+                      <p className="mt-2 text-2xl sm:text-3xl font-bold tabular-nums">
                         {snapshot.totals.activeCampaigns}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">

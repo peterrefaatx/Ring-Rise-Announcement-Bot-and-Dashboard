@@ -73,10 +73,10 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {isAdmin ? (
               <>
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <p className="text-xs font-medium text-[#64748B]">Leads Today</p>
-                  <div className="mt-1.5 flex items-baseline gap-2.5">
-                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
                       {snapshot.totals.leadsToday}
                     </span>
                     <span className="text-xs text-[#64748B]">
@@ -85,16 +85,16 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <div className="flex items-center justify-between">
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-medium text-[#64748B]">Campaigns Progress</p>
                     <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
                       {snapshot.totals.activeCampaigns}{" "}
                       {snapshot.totals.activeCampaigns === 1 ? "campaign" : "campaigns"}
                     </span>
                   </div>
-                  <div className="mt-1.5 flex items-baseline gap-2.5">
-                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
                       {snapshot.totals.overallDailyProgressPercent}%
                     </span>
                     <span className="text-xs tabular-nums text-[#64748B]">
@@ -111,10 +111,10 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               </>
             ) : (
               <>
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <p className="text-xs font-medium text-[#64748B]">My Leads Today</p>
-                  <div className="mt-1.5 flex items-baseline gap-2.5">
-                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
                       {snapshot.personal.leadsToday}
                     </span>
                     <span className="text-xs text-[#64748B]">
@@ -127,15 +127,15 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                   </div>
                 </div>
 
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <p className="text-xs font-medium text-[#64748B]">Daily Rank</p>
-                  <div className="mt-1.5 flex items-center gap-2.5">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
                     {snapshot.personal.dailyRank &&
                       snapshot.personal.dailyRank <= 3 &&
                       snapshot.personal.leadsToday > 0 && (
                         <CrownBadge rank={snapshot.personal.dailyRank} />
                       )}
-                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                    <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
                       {snapshot.personal.dailyRank ? `#${snapshot.personal.dailyRank}` : "—"}
                     </span>
                     <span className="text-xs text-[#64748B]">
@@ -146,15 +146,15 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               </>
             )}
 
-            <div className="p-5">
-              <div className="flex items-center justify-between">
+            <div className="p-4 sm:p-5">
+              <div className="flex items-center justify-between gap-2">
                 <p className="text-xs font-medium text-[#64748B]">Team Daily Progress</p>
                 <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
                   {snapshot.totals.overallDailyProgressPercent}%
                 </span>
               </div>
-              <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+              <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
                   {snapshot.totals.leadsToday}
                 </span>
                 <span className="text-xs tabular-nums text-[#64748B]">
@@ -173,7 +173,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
         </section>
 
         {/* Main Workspace: Left (Daily Leaderboard) | Right (Telegram Summary Buttons + Active Campaign Targets) */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[7fr_4fr] lg:items-start">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-[7fr_4fr] lg:items-start">
           <div className="min-w-0">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
@@ -188,35 +188,35 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           </div>
 
           <div className="space-y-3 min-w-0">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-3 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between gap-2 border-[#E3E8EE] bg-white px-2.5 sm:px-3 py-2.5 h-auto text-[11px] sm:text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("campaigns")}
               >
-                <span className="truncate">
+                <span className="text-left leading-tight whitespace-normal sm:truncate">
                   {sendingSummary === "campaigns"
                     ? "Sending Campaigns..."
                     : "Send Campaigns Progress"}
                 </span>
-                <Send className="h-5 w-5 shrink-0 text-[#0077B6]" />
+                <Send className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-[#0077B6]" />
               </Button>
 
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-3 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between gap-2 border-[#E3E8EE] bg-white px-2.5 sm:px-3 py-2.5 h-auto text-[11px] sm:text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("callers")}
               >
-                <span className="truncate">
+                <span className="text-left leading-tight whitespace-normal sm:truncate">
                   {sendingSummary === "callers"
                     ? "Sending Callers..."
                     : "Send Callers Progress"}
                 </span>
-                <Send className="h-5 w-5 shrink-0 text-[#0077B6]" />
+                <Send className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-[#0077B6]" />
               </Button>
             </div>
 
@@ -228,10 +228,10 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       {/* Floating Bottom-Center Announce Button (Callers Only) */}
       {user.role !== "ADMIN" && (
         <>
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+          <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40">
             <Button
               size="lg"
-              className="h-12 rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+              className="h-12 w-full sm:w-auto rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
               onClick={() => setAnnounceOpen(true)}
             >
               <Megaphone className="h-4 w-4" />

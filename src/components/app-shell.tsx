@@ -91,8 +91,8 @@ export function AppShell({ user, brand, children }: AppShellProps) {
     >
       {/* Top Bar */}
       <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-          <Link href="/" className="min-w-0 hover:opacity-90 transition-opacity">
+        <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
+          <Link href="/" className="min-w-0 flex-1 sm:flex-initial hover:opacity-90 transition-opacity">
             <BrandLogo
               brandName={brand.brandName}
               brandPrimaryColor={brand.brandPrimaryColor}
@@ -101,19 +101,19 @@ export function AppShell({ user, brand, children }: AppShellProps) {
             />
           </Link>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <ThemeSwitcher />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-1.5 pl-1.5 pr-3 text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full border border-border bg-card py-1 pl-1 pr-2.5 sm:py-1.5 sm:pl-1.5 sm:pr-3 text-xs sm:text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-primary/15 text-[11px] sm:text-xs font-semibold text-primary">
                     {initials}
                   </span>
-                  <span className="max-w-[130px] truncate">{user.announcementName}</span>
+                  <span className="max-w-[80px] sm:max-w-[130px] truncate">{user.announcementName}</span>
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
@@ -166,7 +166,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
         </div>
       </header>
 
-      <main className="flex-1 p-4 sm:p-6 pb-28 max-w-7xl w-full mx-auto">{children}</main>
+      <main className="flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto">{children}</main>
     </div>
   );
 }

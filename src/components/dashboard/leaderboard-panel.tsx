@@ -120,13 +120,13 @@ export function LeaderboardList({
           <div
             key={entry.userId}
             className={cn(
-              "flex items-center justify-between gap-4 px-5 py-3.5 transition-colors",
+              "flex items-center justify-between gap-3 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-3.5 transition-colors",
               isTop1 && "bg-amber-50/45",
               !isTop1 && isMe && "bg-[#0077B6]/[0.04]",
               !isTop1 && !isMe && "hover:bg-[#F8FAFC]"
             )}
           >
-            <div className="flex items-center gap-3.5 min-w-0">
+            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
               <CrownBadge rank={entry.rank} />
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
