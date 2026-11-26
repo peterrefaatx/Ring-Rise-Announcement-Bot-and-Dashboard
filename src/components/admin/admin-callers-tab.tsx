@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -244,9 +243,6 @@ export function AdminCallersTab({
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="text-base">Caller & Account Management</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Create, edit, activate/deactivate accounts, reset passwords, and review individual announcement customization.
-          </p>
         </div>
         <Button onClick={openCreateDialog}>
           <UserPlus className="h-4 w-4" />
@@ -380,7 +376,6 @@ export function AdminCallersTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Account</DialogTitle>
-            <DialogDescription>Add a new caller or administrator account.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="mt-3 space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -462,7 +457,6 @@ export function AdminCallersTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Account</DialogTitle>
-            <DialogDescription>Update profile details, role, and announcement template.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEdit} className="mt-3 space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -544,9 +538,6 @@ export function AdminCallersTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>
-              Set a new password for {resetTarget?.fullName} (@{resetTarget?.username}). All existing sessions will be logged out.
-            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleResetPassword} className="mt-3 space-y-3">
             <div className="space-y-1">
@@ -575,12 +566,12 @@ export function AdminCallersTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Account</DialogTitle>
-            <DialogDescription>
-              {deleteTarget && deleteTarget.leadsAllTime > 0
-                ? `${deleteTarget.fullName} has ${deleteTarget.leadsAllTime} historical lead records. Deleting will archive the account and revoke login access while keeping historical statistics intact.`
-                : `Permanently delete ${deleteTarget?.fullName}? This action cannot be undone.`}
-            </DialogDescription>
           </DialogHeader>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {deleteTarget && deleteTarget.leadsAllTime > 0
+              ? `${deleteTarget.fullName} has ${deleteTarget.leadsAllTime} historical lead records. Deleting will archive the account and revoke login access while keeping historical statistics intact.`
+              : `Permanently delete ${deleteTarget?.fullName}? This action cannot be undone.`}
+          </p>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDeleteTarget(null)}>
               Cancel

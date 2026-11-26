@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Save, Send, RefreshCw, Bot, Palette, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -179,9 +179,6 @@ export function AdminSettingsTab({
               <Palette className="h-4 w-4 text-primary" />
               Branding & System Timezone
             </CardTitle>
-            <CardDescription>
-              Configure company identity and logo URL.
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
@@ -225,9 +222,6 @@ export function AdminSettingsTab({
               <Bot className="h-4 w-4 text-primary" />
               Telegram Bot Configuration
             </CardTitle>
-            <CardDescription>
-              Bot tokens are encrypted server-side and never exposed to client code.
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -291,9 +285,6 @@ export function AdminSettingsTab({
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base">Telegram Delivery Status</CardTitle>
-            <CardDescription>
-              Failed deliveries retry automatically in the background without ever losing lead records.
-            </CardDescription>
           </div>
           {queue && (
             <div className="flex flex-wrap gap-2">

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Lock } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,9 +64,9 @@ export function LoginForm({
         <div className="flex justify-center">
           <BrandLogo
             brandName={brand.brandName}
-            brandTagline={brand.brandTagline}
             brandPrimaryColor={brand.brandPrimaryColor}
             brandLogoUrl={brand.brandLogoUrl}
+            compact
           />
         </div>
 
@@ -76,9 +76,6 @@ export function LoginForm({
               <Lock className="h-4 w-4 text-[#0077B6]" />
               Sign in to your account
             </CardTitle>
-            <CardDescription>
-              Enter your team credentials to view live rankings and announce leads.
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">

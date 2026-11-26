@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -154,9 +153,6 @@ export function AdminCampaignsTab({
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="text-base">Campaign Management</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Manage shared daily team targets, pause or archive campaigns, and preserve historical campaign records.
-          </p>
         </div>
         <Button
           onClick={() => {
@@ -310,9 +306,6 @@ export function AdminCampaignsTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Campaign</DialogTitle>
-            <DialogDescription>
-              Set a shared daily team target for the new campaign.
-            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="mt-3 space-y-3">
             <div className="space-y-1">
@@ -379,9 +372,6 @@ export function AdminCampaignsTab({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Campaign</DialogTitle>
-            <DialogDescription>
-              Changing the daily target only affects forward tracking and preserves historical records.
-            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEdit} className="mt-3 space-y-3">
             <div className="space-y-1">

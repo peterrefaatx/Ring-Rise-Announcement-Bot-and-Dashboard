@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -123,11 +122,6 @@ export function AnnounceLeadDialog({
             <Megaphone className="h-5 w-5 text-primary" />
             {step === "select" ? "Select Campaign for New Lead" : "Confirm Lead Announcement"}
           </DialogTitle>
-          <DialogDescription>
-            {step === "select"
-              ? "Choose the active campaign for this lead. Each announcement registers exactly 1 lead."
-              : "Review your Telegram announcement before publishing."}
-          </DialogDescription>
         </DialogHeader>
 
         {step === "select" ? (

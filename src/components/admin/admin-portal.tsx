@@ -52,9 +52,6 @@ export function AdminPortal({
               <ShieldCheck className="h-5 w-5 text-primary" />
               Administration Console
             </h1>
-            <p className="text-sm text-slate-500">
-              Real-time team oversight, caller management, campaigns, historical analytics, and Telegram settings.
-            </p>
           </div>
         </div>
 

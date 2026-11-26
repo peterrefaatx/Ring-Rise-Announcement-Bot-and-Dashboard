@@ -141,9 +141,6 @@ export function AdminAnalyticsTab({
             <BarChart3 className="h-4 w-4 text-primary" />
             Historical Analytics & Exports
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Permanent historical records in fixed EST (UTC-5). Export any report in CSV or Excel (.xlsx).
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button

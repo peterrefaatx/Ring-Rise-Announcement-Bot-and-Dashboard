@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { Save, RotateCcw, MessageSquare, History } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,9 +98,6 @@ export function ProfileClient({
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">
             Profile & Personal Performance
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Customize how your lead announcements appear on Telegram and review your performance history.
-          </p>
         </div>
 
         {/* Account Summary + Telegram Customization */}
@@ -108,9 +105,6 @@ export function ProfileClient({
           <Card className="lg:col-span-5">
             <CardHeader>
               <CardTitle className="text-base">Account Identity</CardTitle>
-              <CardDescription>
-                Managed by administrators. Changing your announcement name does not change your login username.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between py-1.5 border-b">
@@ -138,9 +132,6 @@ export function ProfileClient({
                 <MessageSquare className="h-4 w-4 text-primary" />
                 Telegram Announcement Customization
               </CardTitle>
-              <CardDescription>
-                Personalize your announcement display name and message template sent to the team Telegram group.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSave} className="space-y-4">
