@@ -14,12 +14,14 @@ import {
 interface ThemeContextValue {
   themeId: ThemeId;
   theme: ThemeDefinition;
+  mounted: boolean;
   setThemeId: (id: ThemeId) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   themeId: DEFAULT_THEME_ID,
   theme: getThemeDefinition(DEFAULT_THEME_ID),
+  mounted: false,
   setThemeId: () => {},
 });
 
@@ -34,22 +36,26 @@ function applyThemeToDocument(id: ThemeId) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [themeId, setThemeIdState] = useState<ThemeId>(() => {
-    if (typeof document !== "undefined") {
-      const fromDom = document.documentElement.dataset.theme;
-      if (isValidThemeId(fromDom)) return fromDom;
-    }
-    return DEFAULT_THEME_ID;
-  });
+  // Start with DEFAULT_THEME_ID so SSR and initial client hydration always match.
+  // Visual styles are already applied before paint by layout.tsx themeInitScript.
+  const [themeId, setThemeIdState] = useState<ThemeId>(DEFAULT_THEME_ID);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
-      const next = isValidThemeId(saved) ? saved : DEFAULT_THEME_ID;
+      const fromDom = document.documentElement.dataset.theme;
+      const next = isValidThemeId(saved)
+        ? saved
+        : isValidThemeId(fromDom)
+          ? fromDom
+          : DEFAULT_THEME_ID;
       setThemeIdState(next);
       applyThemeToDocument(next);
     } catch {
       applyThemeToDocument(DEFAULT_THEME_ID);
+    } finally {
+      setMounted(true);
     }
 
     function onStorage(event: StorageEvent) {
@@ -79,9 +85,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     () => ({
       themeId,
       theme,
+      mounted,
       setThemeId,
     }),
-    [themeId, theme, setThemeId]
+    [themeId, theme, mounted, setThemeId]
   );
 
   return (
@@ -91,7 +98,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         position="top-right"
         richColors
         closeButton
-        theme={theme.isDark ? "dark" : "light"}
+        theme={mounted && theme.isDark ? "dark" : "light"}
       />
     </ThemeContext.Provider>
   );

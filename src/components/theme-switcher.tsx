@@ -41,7 +41,9 @@ function ThemeCategoryIcon({ id, className }: { id: ThemeId; className?: string 
 }
 
 export function ThemeSwitcher() {
-  const { themeId, theme, setThemeId } = useTheme();
+  const { themeId, theme, mounted, setThemeId } = useTheme();
+
+  const labelText = mounted ? theme.name : "Theme";
 
   return (
     <DropdownMenu>
@@ -52,17 +54,19 @@ export function ThemeSwitcher() {
           className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Palette className="h-3.5 w-3.5 text-primary" />
-          <span className="hidden sm:inline max-w-[110px] truncate">{theme.name}</span>
-          <span className="flex items-center gap-0.5">
-            <span
-              className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
-              style={{ backgroundColor: theme.swatches.primary }}
-            />
-            <span
-              className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10 -ml-1"
-              style={{ backgroundColor: theme.swatches.secondary }}
-            />
-          </span>
+          <span className="hidden sm:inline max-w-[110px] truncate">{labelText}</span>
+          {mounted && (
+            <span className="flex items-center gap-0.5">
+              <span
+                className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                style={{ backgroundColor: theme.swatches.primary }}
+              />
+              <span
+                className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10 -ml-1"
+                style={{ backgroundColor: theme.swatches.secondary }}
+              />
+            </span>
+          )}
         </button>
       </DropdownMenuTrigger>
 
