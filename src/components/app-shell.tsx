@@ -42,7 +42,13 @@ interface AppShellProps {
   children: React.ReactNode;
 }
 
-export function AppShell({ user, brand, children }: AppShellProps) {
+export function AppShell({
+  user,
+  brand,
+  businessDateEst,
+  connectionState,
+  children,
+}: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -92,11 +98,13 @@ export function AppShell({ user, brand, children }: AppShellProps) {
       {/* Top Bar */}
       <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200">
         <div className="mx-auto flex h-16 sm:h-[72px] max-w-7xl items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
-          <Link href="/" className="min-w-0 flex-1 sm:flex-initial hover:opacity-90 transition-opacity">
+          <Link href="/" className="group min-w-0 flex-1 sm:flex-initial hover:opacity-95 transition-opacity">
             <BrandLogo
               brandName={brand.brandName}
               brandPrimaryColor={brand.brandPrimaryColor}
               brandLogoUrl={brand.brandLogoUrl}
+              connectionState={connectionState}
+              businessDateEst={businessDateEst}
               compact
             />
           </Link>
