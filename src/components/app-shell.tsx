@@ -54,7 +54,11 @@ export function AppShell({ user, brand, children }: AppShellProps) {
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/profile", label: "Profile & History", icon: UserCog },
+    {
+      href: "/profile",
+      label: user.role === "ADMIN" ? "Profile" : "Profile & History",
+      icon: UserCog,
+    },
     ...(user.role === "ADMIN"
       ? [{ href: "/admin", label: "Administration", icon: ShieldCheck }]
       : []),
@@ -120,7 +124,8 @@ export function AppShell({ user, brand, children }: AppShellProps) {
                   </Badge>
                 </div>
                 <p className="mt-0.5 truncate text-xs text-slate-500">
-                  @{user.username} · Display: {user.announcementName}
+                  @{user.username}
+                  {user.role !== "ADMIN" ? ` · Display: ${user.announcementName}` : ""}
                 </p>
               </div>
               <DropdownMenuSeparator />

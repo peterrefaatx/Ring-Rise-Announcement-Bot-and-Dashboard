@@ -91,18 +91,20 @@ export function ProfileClient({
     }
   }
 
+  const isAdmin = user.role === "ADMIN";
+
   return (
     <AppShell user={user} brand={brand} businessDateEst={businessDateEst}>
       <div className="space-y-6">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-            Profile & Personal Performance
+            {isAdmin ? "Profile" : "Profile & Personal Performance"}
           </h1>
         </div>
 
         {/* Account Summary + Telegram Customization */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <Card className="lg:col-span-5">
+          <Card className={isAdmin ? "lg:col-span-6" : "lg:col-span-5"}>
             <CardHeader>
               <CardTitle className="text-base">Account Identity</CardTitle>
             </CardHeader>
@@ -126,7 +128,8 @@ export function ProfileClient({
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-7">
+          {!isAdmin && (
+            <Card className="lg:col-span-7">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <MessageSquare className="h-4 w-4 text-primary" />
@@ -206,9 +209,11 @@ export function ProfileClient({
               </form>
             </CardContent>
           </Card>
+          )}
         </div>
 
-        {/* Personal Historical Performance */}
+        {/* Personal Historical Performance (Callers Only) */}
+        {!isAdmin && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -294,6 +299,7 @@ export function ProfileClient({
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </AppShell>
   );
