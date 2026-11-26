@@ -76,12 +76,12 @@ export function AdminPortal({
           </h1>
         </div>
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          {/* In-Page Sidebar Navigation */}
-          <aside className="w-full shrink-0 lg:w-60 lg:sticky lg:top-24">
+        <div className="flex flex-col gap-6 lg:block">
+          {/* Fixed In-Page Sidebar Navigation (No Container) */}
+          <aside className="w-full lg:fixed lg:left-6 lg:top-24 lg:z-20 lg:w-56">
             <nav
               aria-label="Administration sections"
-              className="flex flex-wrap gap-1 rounded-xl border border-[#E3E8EE] bg-white p-2 shadow-[0_1px_2px_rgba(10,37,64,0.04)] lg:flex-col"
+              className="flex flex-wrap gap-1.5 lg:flex-col lg:gap-1"
             >
               {ADMIN_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
@@ -95,7 +95,7 @@ export function AdminPortal({
                       "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors text-left",
                       active
                         ? "bg-[#0077B6]/10 font-semibold text-[#0077B6]"
-                        : "font-medium text-[#425466] hover:bg-[#F8FAFC] hover:text-[#0A2540]"
+                        : "font-medium text-[#425466] hover:bg-white/70 hover:text-[#0A2540]"
                     )}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -107,7 +107,7 @@ export function AdminPortal({
           </aside>
 
           {/* Active Section Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 lg:pl-60">
             {activeSection === "overview" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
