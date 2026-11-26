@@ -2,12 +2,10 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BrandLogo } from "@/components/brand-logo";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import type { BrandSettingsPublic } from "@/lib/dashboard";
 
@@ -54,99 +52,116 @@ export function LoginForm({
   }
 
   return (
-    <div className="theme-canvas relative min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+    <div className="theme-canvas relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12 transition-colors duration-200">
+      {/* Soft top radial light wash */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 h-96 w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
+        style={{ background: "var(--theme-accent-soft)" }}
+      />
+
       <div className="fixed top-4 right-4 z-20">
         <ThemeSwitcher />
       </div>
-      <div className="w-full max-w-md space-y-7">
-        <div className="flex justify-center">
-          <BrandLogo
-            brandName={brand.brandName}
-            brandPrimaryColor={brand.brandPrimaryColor}
-            brandLogoUrl={brand.brandLogoUrl}
-            compact
-            size="lg"
+
+      {/* Cardless Centered Flow */}
+      <div className="relative z-10 w-full max-w-[360px] space-y-6">
+        <div className="flex flex-col items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={brand.brandLogoUrl || "/logo.png"}
+            alt={brand.brandName}
+            className="h-20 sm:h-24 w-auto object-contain"
           />
         </div>
 
-        <Card className="border-[#E3E8EE] shadow-[0_8px_30px_rgba(10,37,64,0.06)]">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg text-[#0A2540]">
-              <Lock className="h-4 w-4 text-[#0077B6]" />
-              Sign in to your account
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {setupWarning && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
-                  {setupWarning}
-                </div>
-              )}
-              <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-xs font-medium text-[#425466]">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  disabled={submitting}
-                  className="h-10 border-[#D5DCE4] focus-visible:ring-[#0077B6]"
-                />
-              </div>
+        {/* Gradient hairline divider */}
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" />
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs font-medium text-[#425466]">
-                  Password
-                </Label>
-                <PasswordInput
-                  id="password"
-                  name="password"
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={submitting}
-                  className="h-10 border-[#D5DCE4] focus-visible:ring-[#0077B6]"
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {setupWarning && (
+            <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-3.5 py-2.5 text-xs text-amber-700 dark:text-amber-300">
+              {setupWarning}
+            </div>
+          )}
 
-              <label className="flex items-center gap-2 text-sm text-[#425466] select-none cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  disabled={submitting}
-                  className="h-4 w-4 rounded border-[#D5DCE4] text-[#0077B6] accent-[#0077B6] focus:ring-[#0077B6]"
-                />
-                <span>Remember me</span>
-              </label>
-
-              {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="h-10 w-full rounded-lg bg-primary font-semibold text-primary-foreground hover:opacity-90"
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-xs font-medium text-muted-foreground">
+              Username
+            </Label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
                 disabled={submitting}
-              >
-                {submitting ? "Signing in..." : "Continue"}
-                {!submitting && <ArrowRight className="h-4 w-4" />}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                className="h-11 rounded-xl border-border/75 bg-card/85 pl-10 pr-3.5 shadow-sm backdrop-blur-sm focus-visible:bg-card"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">
+              Password
+            </Label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <PasswordInput
+                id="password"
+                name="password"
+                autoComplete="current-password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={submitting}
+                className="h-11 rounded-xl border-border/75 bg-card/85 pl-10 pr-10 shadow-sm backdrop-blur-sm focus-visible:bg-card"
+              />
+            </div>
+          </div>
+
+          <label className="flex cursor-pointer select-none items-center gap-2 pt-0.5 text-xs sm:text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={submitting}
+              className="h-4 w-4 rounded border-border accent-primary focus:ring-primary"
+            />
+            <span>Remember me</span>
+          </label>
+
+          {error && (
+            <div className="rounded-xl border border-red-500/35 bg-red-500/10 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="mt-2 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_10px_25px_-6px_var(--theme-accent-soft)] transition-all hover:opacity-95 active:scale-[0.99]"
+            disabled={submitting}
+          >
+            {submitting ? "Signing in..." : "Sign in"}
+            {!submitting && <ArrowRight className="h-4 w-4" />}
+          </Button>
+        </form>
+
+        <p className="text-center text-xs text-muted-foreground/75">
+          Need an account or password reset? Contact your administrator.
+        </p>
       </div>
+
+      {/* Subtle footer metadata */}
+      <footer className="pointer-events-none fixed bottom-4 inset-x-0 text-center text-[11px] font-medium text-muted-foreground/60">
+        {brand.brandName} · {brand.timezoneLabel}
+      </footer>
     </div>
   );
 }
