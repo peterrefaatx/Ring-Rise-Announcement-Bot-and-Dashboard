@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
-import { formatEstTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
 
 interface LeaderboardPanelProps {
@@ -25,8 +24,6 @@ export function LeaderboardPanel({
   monthly,
   allTime,
   currentUserId,
-  businessDateEst,
-  businessMonthEst,
   dailyOnly = false,
   hideTitle = false,
 }: LeaderboardPanelProps) {
@@ -34,15 +31,10 @@ export function LeaderboardPanel({
     <Card className="overflow-hidden">
       {!hideTitle && (
         <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Trophy className="h-4 w-4 text-amber-500" />
-              {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
-            </CardTitle>
-            <span className="text-xs text-[#64748B]">
-              Earliest achievement breaks ties
-            </span>
-          </div>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
+          </CardTitle>
         </CardHeader>
       )}
       <CardContent className={cn("p-0", !hideTitle && "pt-4 px-5 pb-5")}>
@@ -60,24 +52,15 @@ export function LeaderboardPanel({
               <TabsTrigger value="all-time">All-Time</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="daily">
-              <p className="mb-3 text-xs text-[#64748B]">
-                Daily window: <span className="font-mono">{businessDateEst}</span>
-              </p>
+            <TabsContent value="daily" className="mt-3">
               <LeaderboardList entries={daily} currentUserId={currentUserId} />
             </TabsContent>
 
-            <TabsContent value="monthly">
-              <p className="mb-3 text-xs text-[#64748B]">
-                Monthly window: <span className="font-mono">{businessMonthEst}</span>
-              </p>
+            <TabsContent value="monthly" className="mt-3">
               <LeaderboardList entries={monthly} currentUserId={currentUserId} />
             </TabsContent>
 
-            <TabsContent value="all-time">
-              <p className="mb-3 text-xs text-[#64748B]">
-                Cumulative lifetime rankings
-              </p>
+            <TabsContent value="all-time" className="mt-3">
               <LeaderboardList entries={allTime} currentUserId={currentUserId} />
             </TabsContent>
           </Tabs>
@@ -198,7 +181,7 @@ export function LeaderboardList({
               }
             }}
             className={cn(
-              "relative flex items-center justify-between gap-3 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-3.5 transition-colors will-change-transform",
+              "relative flex min-h-[76px] sm:min-h-[84px] items-center justify-between gap-3 px-4 py-5 sm:gap-4 sm:px-5 sm:py-6 transition-colors will-change-transform",
               isTop1 && "bg-amber-50/45",
               !isTop1 && isMe && "bg-[#0077B6]/[0.04]",
               !isTop1 && !isMe && "hover:bg-[#F8FAFC]",
@@ -211,7 +194,7 @@ export function LeaderboardList({
                 <div className="flex items-center gap-2">
                   <span
                     className={cn(
-                      "truncate text-sm text-[#0A2540]",
+                      "truncate text-[15px] sm:text-base text-[#0A2540]",
                       isTop3 ? "font-semibold" : "font-medium"
                     )}
                   >
@@ -229,11 +212,6 @@ export function LeaderboardList({
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 text-xs text-[#64748B]">
-                  {entry.achievedAt
-                    ? `Reached at ${formatEstTime(entry.achievedAt)}`
-                    : "No leads yet"}
-                </p>
               </div>
             </div>
 

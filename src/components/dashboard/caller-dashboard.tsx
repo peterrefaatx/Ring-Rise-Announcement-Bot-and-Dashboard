@@ -70,7 +70,11 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       <div className="space-y-6">
         {/* Unified Executive Daily Metric Strip */}
         <section className="theme-surface rounded-xl border transition-colors duration-200">
-          <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div
+            className={`grid grid-cols-1 divide-y divide-border ${
+              isAdmin ? "sm:grid-cols-2" : "sm:grid-cols-3"
+            } sm:divide-x sm:divide-y-0`}
+          >
             {isAdmin ? (
               <>
                 <div className="p-4 sm:p-5">
@@ -143,32 +147,32 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
                     </span>
                   </div>
                 </div>
+
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-medium text-[#64748B]">Team Daily Progress</p>
+                    <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
+                      {snapshot.totals.overallDailyProgressPercent}%
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                      {snapshot.totals.leadsToday}
+                    </span>
+                    <span className="text-xs tabular-nums text-[#64748B]">
+                      / {snapshot.totals.overallDailyTarget} target across{" "}
+                      {snapshot.totals.activeCampaigns} campaigns
+                    </span>
+                  </div>
+                  <div className="theme-track mt-2.5 h-1.5 w-full overflow-hidden rounded-full">
+                    <div
+                      className="theme-progress-fill h-full rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
+                    />
+                  </div>
+                </div>
               </>
             )}
-
-            <div className="p-4 sm:p-5">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-[#64748B]">Team Daily Progress</p>
-                <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
-                  {snapshot.totals.overallDailyProgressPercent}%
-                </span>
-              </div>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
-                  {snapshot.totals.leadsToday}
-                </span>
-                <span className="text-xs tabular-nums text-[#64748B]">
-                  / {snapshot.totals.overallDailyTarget} target across{" "}
-                  {snapshot.totals.activeCampaigns} campaigns
-                </span>
-              </div>
-              <div className="theme-track mt-2.5 h-1.5 w-full overflow-hidden rounded-full">
-                <div
-                  className="theme-progress-fill h-full rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
-                />
-              </div>
-            </div>
           </div>
         </section>
 
