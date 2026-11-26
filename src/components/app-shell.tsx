@@ -11,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ThemeSwitcher } from "./theme-switcher";
+import { PageLoader } from "./page-loader";
 import { Badge } from "./ui/badge";
 import {
   DropdownMenu,
@@ -45,6 +46,20 @@ export function AppShell({ user, brand, children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+
+  React.useEffect(() => {
+    setNavigating(false);
+  }, [pathname]);
+
+  function handleNavigate(href: string) {
+    const isSameRoute =
+      href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+    if (!isSameRoute) {
+      setNavigating(true);
+    }
+    router.push(href);
+  }
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -93,6 +108,9 @@ export function AppShell({ user, brand, children }: AppShellProps) {
           {/* Center: Clean Centered Logo */}
           <Link
             href="/"
+            onClick={() => {
+              if (pathname !== "/") setNavigating(true);
+            }}
             aria-label={brand.brandName}
             title={brand.brandName}
             className="flex items-center justify-center hover:opacity-90 transition-opacity focus-visible:outline-none"
@@ -140,7 +158,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
                   return (
                     <DropdownMenuItem
                       key={item.href}
-                      onSelect={() => router.push(item.href)}
+                      onSelect={() => handleNavigate(item.href)}
                       className={cn(
                         "rounded-md px-3 py-2 text-sm text-muted-foreground",
                         active && "bg-primary/15 font-semibold text-primary"
@@ -166,7 +184,14 @@ export function AppShell({ user, brand, children }: AppShellProps) {
         </div>
       </header>
 
-      <main className="flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto">
+      {navigating && (
+        <PageLoader variant="overlay" logoUrl={brand.brandLogoUrl} />
+      )}
+
+      <main
+        key={pathname}
+        className="animate-nav-enter flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto"
+      >
         {children}
       </main>
     </div>

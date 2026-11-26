@@ -18,6 +18,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatEstTime } from "@/lib/timezone";
+import {
+  fetchAdminCachedJson,
+  getAdminCache,
+  invalidateAdminCache,
+} from "@/lib/admin-cache";
 
 interface AdminSettingsResponse {
   settings: {
@@ -54,25 +59,40 @@ interface TelegramQueueResponse {
 }
 
 export function AdminSettingsTab({
+  isActive = true,
   refreshSignal,
   onSettingsSaved,
 }: {
+  isActive?: boolean;
   refreshSignal: number;
   onSettingsSaved: () => void;
 }) {
-  const [brandName, setBrandName] = useState("");
-  const [brandTagline, setBrandTagline] = useState("");
-  const [brandLogoUrl, setBrandLogoUrl] = useState("");
-  const [timezoneLabel, setTimezoneLabel] = useState("EST (UTC-5 Fixed)");
+  const initialSettings = getAdminCache<AdminSettingsResponse>("settings:app")?.data.settings;
+  const [brandName, setBrandName] = useState(initialSettings?.brandName ?? "");
+  const [brandTagline, setBrandTagline] = useState(initialSettings?.brandTagline ?? "");
+  const [brandLogoUrl, setBrandLogoUrl] = useState(initialSettings?.brandLogoUrl ?? "");
+  const [timezoneLabel, setTimezoneLabel] = useState(
+    initialSettings?.timezoneLabel ?? "EST (UTC-5 Fixed)"
+  );
 
-  const [telegramEnabled, setTelegramEnabled] = useState(true);
-  const [telegramChatId, setTelegramChatId] = useState("");
+  const [telegramEnabled, setTelegramEnabled] = useState(
+    initialSettings?.telegramEnabled ?? true
+  );
+  const [telegramChatId, setTelegramChatId] = useState(
+    initialSettings?.telegramChatId ?? ""
+  );
   const [newBotToken, setNewBotToken] = useState("");
-  const [hasToken, setHasToken] = useState(false);
-  const [maskedToken, setMaskedToken] = useState<string | null>(null);
-  const [configSource, setConfigSource] = useState<string>("unconfigured");
+  const [hasToken, setHasToken] = useState(initialSettings?.hasTelegramBotToken ?? false);
+  const [maskedToken, setMaskedToken] = useState<string | null>(
+    initialSettings?.telegramBotTokenMasked ?? null
+  );
+  const [configSource, setConfigSource] = useState<string>(
+    initialSettings?.telegramConfigSource ?? "unconfigured"
+  );
 
-  const [queue, setQueue] = useState<TelegramQueueResponse | null>(null);
+  const [queue, setQueue] = useState<TelegramQueueResponse | null>(
+    () => getAdminCache<TelegramQueueResponse>("settings:telegram")?.data ?? null
+  );
   const [saving, setSaving] = useState(false);
   const [testingTelegram, setTestingTelegram] = useState(false);
   const [retryingJobId, setRetryingJobId] = useState<string | null>(null);
@@ -80,31 +100,44 @@ export function AdminSettingsTab({
   const [resetConfirmText, setResetConfirmText] = useState("");
   const [resettingLeads, setResettingLeads] = useState(false);
 
-  const loadAll = useCallback(async () => {
-    const [sRes, qRes] = await Promise.all([
-      fetch("/api/admin/settings", { cache: "no-store" }),
-      fetch("/api/admin/telegram", { cache: "no-store" }),
-    ]);
-    if (sRes.ok) {
-      const data = (await sRes.json()) as AdminSettingsResponse;
-      setBrandName(data.settings.brandName);
-      setBrandTagline(data.settings.brandTagline);
-      setBrandLogoUrl(data.settings.brandLogoUrl);
-      setTimezoneLabel(data.settings.timezoneLabel);
-      setTelegramEnabled(data.settings.telegramEnabled);
-      setTelegramChatId(data.settings.telegramChatId);
-      setHasToken(data.settings.hasTelegramBotToken);
-      setMaskedToken(data.settings.telegramBotTokenMasked);
-      setConfigSource(data.settings.telegramConfigSource);
-    }
-    if (qRes.ok) {
-      setQueue((await qRes.json()) as TelegramQueueResponse);
-    }
-  }, []);
+  const loadAll = useCallback(
+    async (force = false) => {
+      const [sData, qData] = await Promise.all([
+        fetchAdminCachedJson<AdminSettingsResponse>(
+          "settings:app",
+          "/api/admin/settings",
+          refreshSignal,
+          { force }
+        ),
+        fetchAdminCachedJson<TelegramQueueResponse>(
+          "settings:telegram",
+          "/api/admin/telegram",
+          refreshSignal,
+          { force }
+        ),
+      ]);
+      if (sData) {
+        setBrandName(sData.settings.brandName);
+        setBrandTagline(sData.settings.brandTagline);
+        setBrandLogoUrl(sData.settings.brandLogoUrl);
+        setTimezoneLabel(sData.settings.timezoneLabel);
+        setTelegramEnabled(sData.settings.telegramEnabled);
+        setTelegramChatId(sData.settings.telegramChatId);
+        setHasToken(sData.settings.hasTelegramBotToken);
+        setMaskedToken(sData.settings.telegramBotTokenMasked);
+        setConfigSource(sData.settings.telegramConfigSource);
+      }
+      if (qData) {
+        setQueue(qData);
+      }
+    },
+    [refreshSignal]
+  );
 
   useEffect(() => {
+    if (!isActive) return;
     void loadAll();
-  }, [loadAll, refreshSignal]);
+  }, [isActive, loadAll]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -131,7 +164,8 @@ export function AdminSettingsTab({
       }
       setNewBotToken("");
       toast.success("Settings saved");
-      await loadAll();
+      invalidateAdminCache("settings:");
+      await loadAll(true);
       onSettingsSaved();
     } finally {
       setSaving(false);
@@ -174,7 +208,8 @@ export function AdminSettingsTab({
       } else {
         toast.error(data?.error || `Retry status: ${data?.status || "failed"}`);
       }
-      await loadAll();
+      invalidateAdminCache("settings:");
+      await loadAll(true);
     } finally {
       setRetryingJobId(null);
     }
@@ -201,7 +236,8 @@ export function AdminSettingsTab({
       toast.success(`All leads reset (${data?.deletedCount ?? 0} removed).`);
       setResetDialogOpen(false);
       setResetConfirmText("");
-      await loadAll();
+      invalidateAdminCache();
+      await loadAll(true);
       onSettingsSaved();
     } catch {
       toast.error("Network error while resetting leads.");

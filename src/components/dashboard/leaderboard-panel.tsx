@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Trophy } from "lucide-react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ArrowUp, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
@@ -96,6 +96,70 @@ export function LeaderboardList({
   currentUserId?: string;
   flush?: boolean;
 }) {
+  const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const prevTopsRef = useRef<Map<string, number>>(new Map());
+  const prevRanksRef = useRef<Map<string, number>>(new Map());
+  const [climbedIds, setClimbedIds] = useState<Record<string, number>>({});
+
+  useLayoutEffect(() => {
+    const nextTops = new Map<string, number>();
+    const nextRanks = new Map<string, number>();
+    const newlyClimbed: Record<string, number> = {};
+    const isInitial = prevTopsRef.current.size === 0;
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    for (const entry of entries) {
+      const el = rowRefs.current.get(entry.userId);
+      if (!el) continue;
+
+      const currentTop = el.getBoundingClientRect().top;
+      nextTops.set(entry.userId, currentTop);
+      nextRanks.set(entry.userId, entry.rank);
+
+      if (isInitial) continue;
+
+      const prevTop = prevTopsRef.current.get(entry.userId);
+      const prevRank = prevRanksRef.current.get(entry.userId);
+      if (prevRank !== undefined && entry.rank < prevRank) {
+        newlyClimbed[entry.userId] = prevRank - entry.rank;
+      }
+
+      if (!prefersReducedMotion && prevTop !== undefined) {
+        const deltaY = prevTop - currentTop;
+        if (Math.abs(deltaY) > 1) {
+          const movedUp = deltaY > 0;
+          el.style.transition = "none";
+          el.style.transform = `translateY(${deltaY}px)`;
+          el.style.zIndex = movedUp ? "10" : "1";
+          el.style.position = "relative";
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              el.style.transition =
+                "transform 520ms cubic-bezier(0.22, 1, 0.36, 1), background-color 300ms ease";
+              el.style.transform = "translateY(0)";
+            });
+          });
+        }
+      }
+    }
+
+    prevTopsRef.current = nextTops;
+    prevRanksRef.current = nextRanks;
+
+    if (Object.keys(newlyClimbed).length > 0) {
+      setClimbedIds(newlyClimbed);
+    }
+  }, [entries]);
+
+  useEffect(() => {
+    if (Object.keys(climbedIds).length === 0) return;
+    const timer = setTimeout(() => setClimbedIds({}), 1500);
+    return () => clearTimeout(timer);
+  }, [climbedIds]);
+
   if (entries.length === 0) {
     return (
       <div className="p-8 text-center text-sm text-[#64748B]">
@@ -115,15 +179,30 @@ export function LeaderboardList({
         const isMe = entry.userId === currentUserId;
         const isTop1 = entry.rank === 1 && entry.leadCount > 0;
         const isTop3 = entry.rank <= 3 && entry.leadCount > 0;
+        const rankDelta = climbedIds[entry.userId] ?? 0;
 
         return (
           <div
             key={entry.userId}
+            ref={(el) => {
+              if (el) {
+                rowRefs.current.set(entry.userId, el);
+              } else {
+                rowRefs.current.delete(entry.userId);
+              }
+            }}
+            onTransitionEnd={(e) => {
+              if (e.propertyName === "transform") {
+                e.currentTarget.style.zIndex = "";
+                e.currentTarget.style.transition = "";
+              }
+            }}
             className={cn(
-              "flex items-center justify-between gap-3 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-3.5 transition-colors",
+              "relative flex items-center justify-between gap-3 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-3.5 transition-colors will-change-transform",
               isTop1 && "bg-amber-50/45",
               !isTop1 && isMe && "bg-[#0077B6]/[0.04]",
-              !isTop1 && !isMe && "hover:bg-[#F8FAFC]"
+              !isTop1 && !isMe && "hover:bg-[#F8FAFC]",
+              rankDelta > 0 && "animate-rank-climb"
             )}
           >
             <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
@@ -141,6 +220,12 @@ export function LeaderboardList({
                   {isMe && (
                     <span className="inline-flex items-center rounded-full bg-[#0077B6]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0077B6]">
                       You
+                    </span>
+                  )}
+                  {rankDelta > 0 && (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      <ArrowUp className="h-2.5 w-2.5" />
+                      {rankDelta}
                     </span>
                   )}
                 </div>

@@ -42,17 +42,29 @@ export function AdminPortal({
 }) {
   const { snapshot, connectionState, refreshNow } = useRealtimeDashboard(initialSnapshot);
   const [activeSection, setActiveSection] = useState<AdminSection>("overview");
+  const [visitedSections, setVisitedSections] = useState<Record<AdminSection, boolean>>({
+    overview: true,
+    callers: false,
+    campaigns: false,
+    analytics: false,
+    settings: false,
+  });
   const [selectedCallerId, setSelectedCallerId] = useState("");
   const [selectedCampaignId, setSelectedCampaignId] = useState("");
 
+  function selectSection(section: AdminSection) {
+    setVisitedSections((prev) => (prev[section] ? prev : { ...prev, [section]: true }));
+    setActiveSection(section);
+  }
+
   function handleInspectCaller(callerId: string) {
     setSelectedCallerId(callerId);
-    setActiveSection("analytics");
+    selectSection("analytics");
   }
 
   function handleInspectCampaign(campaignId: string) {
     setSelectedCampaignId(campaignId);
-    setActiveSection("analytics");
+    selectSection("analytics");
   }
 
   return (
@@ -77,11 +89,11 @@ export function AdminPortal({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => selectSection(item.id)}
                     className={cn(
-                      "flex shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                      "flex shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-all duration-200 text-left",
                       active
-                        ? "bg-primary/15 font-semibold text-primary"
+                        ? "bg-primary/15 font-semibold text-primary shadow-sm"
                         : "font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     )}
                   >
@@ -92,9 +104,9 @@ export function AdminPortal({
             </nav>
           </aside>
 
-          {/* Active Section Content */}
+          {/* Section Content (kept mounted after first visit for instant tab switching) */}
           <div className="flex-1 min-w-0 lg:pl-64">
-            {activeSection === "overview" && (
+            <div className={activeSection === "overview" ? "animate-nav-enter" : "hidden"}>
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
                   <Card>
@@ -175,39 +187,52 @@ export function AdminPortal({
                   </div>
                 </div>
               </div>
+            </div>
+
+            {visitedSections.callers && (
+              <div className={activeSection === "callers" ? "animate-nav-enter" : "hidden"}>
+                <AdminCallersTab
+                  currentUserId={user.id}
+                  isActive={activeSection === "callers"}
+                  refreshSignal={snapshot.latestEventSeq}
+                  onInspectCaller={handleInspectCaller}
+                />
+              </div>
             )}
 
-            {activeSection === "callers" && (
-              <AdminCallersTab
-                currentUserId={user.id}
-                refreshSignal={snapshot.latestEventSeq}
-                onInspectCaller={handleInspectCaller}
-              />
+            {visitedSections.campaigns && (
+              <div className={activeSection === "campaigns" ? "animate-nav-enter" : "hidden"}>
+                <AdminCampaignsTab
+                  isActive={activeSection === "campaigns"}
+                  refreshSignal={snapshot.latestEventSeq}
+                  onInspectCampaign={handleInspectCampaign}
+                />
+              </div>
             )}
 
-            {activeSection === "campaigns" && (
-              <AdminCampaignsTab
-                refreshSignal={snapshot.latestEventSeq}
-                onInspectCampaign={handleInspectCampaign}
-              />
+            {visitedSections.analytics && (
+              <div className={activeSection === "analytics" ? "animate-nav-enter" : "hidden"}>
+                <AdminAnalyticsTab
+                  isActive={activeSection === "analytics"}
+                  refreshSignal={snapshot.latestEventSeq}
+                  defaultDateEst={snapshot.businessDateEst}
+                  defaultMonthEst={snapshot.businessMonthEst}
+                  selectedCallerId={selectedCallerId}
+                  selectedCampaignId={selectedCampaignId}
+                  onSelectCallerId={setSelectedCallerId}
+                  onSelectCampaignId={setSelectedCampaignId}
+                />
+              </div>
             )}
 
-            {activeSection === "analytics" && (
-              <AdminAnalyticsTab
-                defaultDateEst={snapshot.businessDateEst}
-                defaultMonthEst={snapshot.businessMonthEst}
-                selectedCallerId={selectedCallerId}
-                selectedCampaignId={selectedCampaignId}
-                onSelectCallerId={setSelectedCallerId}
-                onSelectCampaignId={setSelectedCampaignId}
-              />
-            )}
-
-            {activeSection === "settings" && (
-              <AdminSettingsTab
-                refreshSignal={snapshot.latestEventSeq}
-                onSettingsSaved={refreshNow}
-              />
+            {visitedSections.settings && (
+              <div className={activeSection === "settings" ? "animate-nav-enter" : "hidden"}>
+                <AdminSettingsTab
+                  isActive={activeSection === "settings"}
+                  refreshSignal={snapshot.latestEventSeq}
+                  onSettingsSaved={refreshNow}
+                />
+              </div>
             )}
           </div>
         </div>

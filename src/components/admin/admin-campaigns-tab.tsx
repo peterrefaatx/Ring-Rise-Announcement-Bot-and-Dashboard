@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { SectionLoader } from "@/components/ui/section-loader";
+import {
+  fetchAdminCachedJson,
+  getAdminCache,
+  invalidateAdminCache,
+} from "@/lib/admin-cache";
 import {
   Dialog,
   DialogContent,
@@ -30,14 +36,20 @@ export interface AdminCampaignRow {
 }
 
 export function AdminCampaignsTab({
+  isActive = true,
   refreshSignal,
   onInspectCampaign,
 }: {
+  isActive?: boolean;
   refreshSignal: number;
   onInspectCampaign: (campaignId: string) => void;
 }) {
-  const [campaigns, setCampaigns] = useState<AdminCampaignRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [campaigns, setCampaigns] = useState<AdminCampaignRow[]>(
+    () => getAdminCache<{ campaigns: AdminCampaignRow[] }>("campaigns:all")?.data.campaigns ?? []
+  );
+  const [loading, setLoading] = useState(
+    () => !getAdminCache<{ campaigns: AdminCampaignRow[] }>("campaigns:all")
+  );
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<AdminCampaignRow | null>(null);
   const [formState, setFormState] = useState({
@@ -48,20 +60,35 @@ export function AdminCampaignsTab({
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const loadCampaigns = useCallback(async () => {
-    try {
-      const res = await fetch("/api/admin/campaigns", { cache: "no-store" });
-      if (!res.ok) return;
-      const data = (await res.json()) as { campaigns: AdminCampaignRow[] };
-      setCampaigns(data.campaigns);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadCampaigns = useCallback(
+    async (force = false) => {
+      const cached = getAdminCache<{ campaigns: AdminCampaignRow[] }>("campaigns:all");
+      if (cached) {
+        setCampaigns(cached.data.campaigns);
+        setLoading(false);
+      }
+
+      try {
+        const data = await fetchAdminCachedJson<{ campaigns: AdminCampaignRow[] }>(
+          "campaigns:all",
+          "/api/admin/campaigns",
+          refreshSignal,
+          { force }
+        );
+        if (data) {
+          setCampaigns(data.campaigns);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [refreshSignal]
+  );
 
   useEffect(() => {
+    if (!isActive) return;
     void loadCampaigns();
-  }, [loadCampaigns, refreshSignal]);
+  }, [isActive, loadCampaigns]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -84,7 +111,9 @@ export function AdminCampaignsTab({
       }
       toast.success("Campaign created");
       setCreateOpen(false);
-      await loadCampaigns();
+      invalidateAdminCache("campaigns");
+      invalidateAdminCache("analytics:");
+      await loadCampaigns(true);
     } finally {
       setSubmitting(false);
     }
@@ -112,7 +141,9 @@ export function AdminCampaignsTab({
       }
       toast.success("Campaign updated");
       setEditTarget(null);
-      await loadCampaigns();
+      invalidateAdminCache("campaigns");
+      invalidateAdminCache("analytics:");
+      await loadCampaigns(true);
     } finally {
       setSubmitting(false);
     }
@@ -132,7 +163,9 @@ export function AdminCampaignsTab({
       return;
     }
     toast.success(`Campaign "${campaign.name}" set to ${status}`);
-    await loadCampaigns();
+    invalidateAdminCache("campaigns");
+    invalidateAdminCache("analytics:");
+    await loadCampaigns(true);
   }
 
   async function handleDelete(campaign: AdminCampaignRow) {
@@ -145,7 +178,9 @@ export function AdminCampaignsTab({
       return;
     }
     toast.success(`Campaign "${campaign.name}" deleted`);
-    await loadCampaigns();
+    invalidateAdminCache("campaigns");
+    invalidateAdminCache("analytics:");
+    await loadCampaigns(true);
   }
 
   return (
@@ -169,8 +204,8 @@ export function AdminCampaignsTab({
         {/* Mobile Campaign Cards */}
         <div className="space-y-3 md:hidden">
           {loading ? (
-            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
-              Loading campaigns...
+            <div className="rounded-lg border">
+              <SectionLoader label="Loading campaigns..." />
             </div>
           ) : campaigns.length === 0 ? (
             <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
@@ -309,8 +344,8 @@ export function AdminCampaignsTab({
             <tbody className="divide-y bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                    Loading campaigns...
+                  <td colSpan={7} className="px-4 py-4">
+                    <SectionLoader label="Loading campaigns..." />
                   </td>
                 </tr>
               ) : campaigns.length === 0 ? (

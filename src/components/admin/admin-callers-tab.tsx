@@ -15,6 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Input, PasswordInput, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { SectionLoader } from "@/components/ui/section-loader";
+import {
+  fetchAdminCachedJson,
+  getAdminCache,
+  invalidateAdminCache,
+} from "@/lib/admin-cache";
 import {
   Dialog,
   DialogContent,
@@ -41,16 +47,22 @@ export interface AdminCallerRow {
 
 export function AdminCallersTab({
   currentUserId,
+  isActive = true,
   refreshSignal,
   onInspectCaller,
 }: {
   currentUserId: string;
+  isActive?: boolean;
   refreshSignal: number;
   onInspectCaller: (callerId: string) => void;
 }) {
-  const [callers, setCallers] = useState<AdminCallerRow[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [callers, setCallers] = useState<AdminCallerRow[]>(
+    () => getAdminCache<{ callers: AdminCallerRow[] }>("callers:all")?.data.callers ?? []
+  );
+  const [loading, setLoading] = useState(
+    () => !getAdminCache<{ callers: AdminCallerRow[] }>("callers:all")
+  );
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<AdminCallerRow | null>(null);
@@ -69,21 +81,38 @@ export function AdminCallersTab({
   const [newPassword, setNewPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const loadCallers = useCallback(async () => {
-    try {
-      const qs = search.trim() ? `?q=${encodeURIComponent(search.trim())}` : "";
-      const res = await fetch(`/api/admin/callers${qs}`, { cache: "no-store" });
-      if (!res.ok) return;
-      const data = (await res.json()) as { callers: AdminCallerRow[] };
-      setCallers(data.callers);
-    } finally {
-      setLoading(false);
-    }
-  }, [search]);
+  const loadCallers = useCallback(
+    async (force = false) => {
+      const normalizedQuery = search.trim().toLowerCase();
+      const cacheKey = normalizedQuery ? `callers:q:${normalizedQuery}` : "callers:all";
+      const cached = getAdminCache<{ callers: AdminCallerRow[] }>(cacheKey);
+      if (cached) {
+        setCallers(cached.data.callers);
+        setLoading(false);
+      }
+
+      try {
+        const qs = search.trim() ? `?q=${encodeURIComponent(search.trim())}` : "";
+        const data = await fetchAdminCachedJson<{ callers: AdminCallerRow[] }>(
+          cacheKey,
+          `/api/admin/callers${qs}`,
+          refreshSignal,
+          { force }
+        );
+        if (data) {
+          setCallers(data.callers);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [search, refreshSignal]
+  );
 
   useEffect(() => {
+    if (!isActive) return;
     void loadCallers();
-  }, [loadCallers, refreshSignal]);
+  }, [isActive, loadCallers]);
 
   function openCreateDialog() {
     setFormState({
@@ -134,7 +163,9 @@ export function AdminCallersTab({
       }
       toast.success("Account created successfully");
       setCreateOpen(false);
-      await loadCallers();
+      invalidateAdminCache("callers");
+      invalidateAdminCache("analytics:");
+      await loadCallers(true);
     } finally {
       setSubmitting(false);
     }
@@ -164,7 +195,9 @@ export function AdminCallersTab({
       }
       toast.success("Account updated");
       setEditTarget(null);
-      await loadCallers();
+      invalidateAdminCache("callers");
+      invalidateAdminCache("analytics:");
+      await loadCallers(true);
     } finally {
       setSubmitting(false);
     }
@@ -185,7 +218,9 @@ export function AdminCallersTab({
     toast.success(
       nextStatus === "ACTIVE" ? `${caller.fullName} activated` : `${caller.fullName} deactivated`
     );
-    await loadCallers();
+    invalidateAdminCache("callers");
+    invalidateAdminCache("analytics:");
+    await loadCallers(true);
   }
 
   async function handleResetPassword(e: React.FormEvent) {
@@ -232,7 +267,9 @@ export function AdminCallersTab({
           : "Account permanently deleted"
       );
       setDeleteTarget(null);
-      await loadCallers();
+      invalidateAdminCache("callers");
+      invalidateAdminCache("analytics:");
+      await loadCallers(true);
     } finally {
       setSubmitting(false);
     }
@@ -263,8 +300,8 @@ export function AdminCallersTab({
         {/* Mobile Caller Cards */}
         <div className="space-y-3 md:hidden">
           {loading ? (
-            <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
-              Loading accounts...
+            <div className="rounded-lg border">
+              <SectionLoader label="Loading accounts..." />
             </div>
           ) : callers.length === 0 ? (
             <div className="rounded-lg border p-6 text-center text-sm text-slate-500">
@@ -373,8 +410,8 @@ export function AdminCallersTab({
             <tbody className="divide-y bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                    Loading accounts...
+                  <td colSpan={7} className="px-4 py-4">
+                    <SectionLoader label="Loading accounts..." />
                   </td>
                 </tr>
               ) : callers.length === 0 ? (

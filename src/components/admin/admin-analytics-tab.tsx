@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LeaderboardList } from "@/components/dashboard/leaderboard-panel";
+import { SectionLoader } from "@/components/ui/section-loader";
 import type {
   CallerHistoryAnalytics,
   CampaignHistoryAnalytics,
@@ -19,8 +20,21 @@ import type {
 import type { AdminCallerRow } from "./admin-callers-tab";
 import type { AdminCampaignRow } from "./admin-campaigns-tab";
 import { formatEstTime } from "@/lib/timezone";
+import { fetchAdminCachedJson, getAdminCache } from "@/lib/admin-cache";
+
+type DailyAnalyticsResponse = {
+  summaries: DailySummaryRow[];
+  detail: DailyDetailAnalytics;
+};
+
+type MonthlyAnalyticsResponse = {
+  summaries: MonthlySummaryRow[];
+  detail: MonthlyDetailAnalytics;
+};
 
 export function AdminAnalyticsTab({
+  isActive = true,
+  refreshSignal = 0,
   defaultDateEst,
   defaultMonthEst,
   selectedCallerId,
@@ -28,6 +42,8 @@ export function AdminAnalyticsTab({
   onSelectCallerId,
   onSelectCampaignId,
 }: {
+  isActive?: boolean;
+  refreshSignal?: number;
   defaultDateEst: string;
   defaultMonthEst: string;
   selectedCallerId: string;
@@ -39,95 +55,159 @@ export function AdminAnalyticsTab({
   const [date, setDate] = useState(defaultDateEst);
   const [month, setMonth] = useState(defaultMonthEst);
 
-  const [dailyData, setDailyData] = useState<{
-    summaries: DailySummaryRow[];
-    detail: DailyDetailAnalytics;
-  } | null>(null);
-  const [monthlyData, setMonthlyData] = useState<{
-    summaries: MonthlySummaryRow[];
-    detail: MonthlyDetailAnalytics;
-  } | null>(null);
-  const [callerOptions, setCallerOptions] = useState<AdminCallerRow[]>([]);
-  const [campaignOptions, setCampaignOptions] = useState<AdminCampaignRow[]>([]);
-  const [callerDetail, setCallerDetail] = useState<CallerHistoryAnalytics | null>(null);
-  const [campaignDetail, setCampaignDetail] = useState<CampaignHistoryAnalytics | null>(null);
+  const [dailyData, setDailyData] = useState<DailyAnalyticsResponse | null>(
+    () => getAdminCache<DailyAnalyticsResponse>(`analytics:daily:${defaultDateEst}`)?.data ?? null
+  );
+  const [monthlyData, setMonthlyData] = useState<MonthlyAnalyticsResponse | null>(
+    () =>
+      getAdminCache<MonthlyAnalyticsResponse>(`analytics:monthly:${defaultMonthEst}`)?.data ??
+      null
+  );
+  const [callerOptions, setCallerOptions] = useState<AdminCallerRow[]>(
+    () =>
+      getAdminCache<{ callers: AdminCallerRow[] }>("callers:includeDeleted")?.data.callers ?? []
+  );
+  const [campaignOptions, setCampaignOptions] = useState<AdminCampaignRow[]>(
+    () => getAdminCache<{ campaigns: AdminCampaignRow[] }>("campaigns:all")?.data.campaigns ?? []
+  );
+  const [callerDetail, setCallerDetail] = useState<CallerHistoryAnalytics | null>(() =>
+    selectedCallerId
+      ? getAdminCache<{ detail: CallerHistoryAnalytics }>(
+          `analytics:caller:${selectedCallerId}`
+        )?.data.detail ?? null
+      : null
+  );
+  const [campaignDetail, setCampaignDetail] = useState<CampaignHistoryAnalytics | null>(() =>
+    selectedCampaignId
+      ? getAdminCache<{ detail: CampaignHistoryAnalytics }>(
+          `analytics:campaign:${selectedCampaignId}`
+        )?.data.detail ?? null
+      : null
+  );
 
   useEffect(() => {
+    if (!isActive) return;
     void (async () => {
-      const [cRes, campRes] = await Promise.all([
-        fetch("/api/admin/callers?includeDeleted=true", { cache: "no-store" }),
-        fetch("/api/admin/campaigns", { cache: "no-store" }),
+      const [cData, campData] = await Promise.all([
+        fetchAdminCachedJson<{ callers: AdminCallerRow[] }>(
+          "callers:includeDeleted",
+          "/api/admin/callers?includeDeleted=true",
+          refreshSignal
+        ),
+        fetchAdminCachedJson<{ campaigns: AdminCampaignRow[] }>(
+          "campaigns:all",
+          "/api/admin/campaigns",
+          refreshSignal
+        ),
       ]);
-      if (cRes.ok) {
-        const d = (await cRes.json()) as { callers: AdminCallerRow[] };
-        setCallerOptions(d.callers);
-        if (!selectedCallerId && d.callers[0]) {
-          onSelectCallerId(d.callers[0].id);
+      if (cData) {
+        setCallerOptions(cData.callers);
+        if (!selectedCallerId && cData.callers[0]) {
+          onSelectCallerId(cData.callers[0].id);
         }
       }
-      if (campRes.ok) {
-        const d = (await campRes.json()) as { campaigns: AdminCampaignRow[] };
-        setCampaignOptions(d.campaigns);
-        if (!selectedCampaignId && d.campaigns[0]) {
-          onSelectCampaignId(d.campaigns[0].id);
+      if (campData) {
+        setCampaignOptions(campData.campaigns);
+        if (!selectedCampaignId && campData.campaigns[0]) {
+          onSelectCampaignId(campData.campaigns[0].id);
         }
       }
     })();
-  }, [onSelectCallerId, onSelectCampaignId, selectedCallerId, selectedCampaignId]);
+  }, [isActive, refreshSignal, onSelectCallerId, onSelectCampaignId, selectedCallerId, selectedCampaignId]);
 
-  const loadDaily = useCallback(async (targetDate: string) => {
-    const res = await fetch(`/api/admin/analytics?type=daily&date=${targetDate}`, {
-      cache: "no-store",
-    });
-    if (res.ok) {
-      setDailyData(await res.json());
-    }
-  }, []);
+  const loadDaily = useCallback(
+    async (targetDate: string) => {
+      const key = `analytics:daily:${targetDate}`;
+      const cached = getAdminCache<DailyAnalyticsResponse>(key);
+      if (cached) {
+        setDailyData(cached.data);
+      } else {
+        setDailyData(null);
+      }
+      const data = await fetchAdminCachedJson<DailyAnalyticsResponse>(
+        key,
+        `/api/admin/analytics?type=daily&date=${encodeURIComponent(targetDate)}`,
+        refreshSignal
+      );
+      if (data) {
+        setDailyData(data);
+      }
+    },
+    [refreshSignal]
+  );
 
-  const loadMonthly = useCallback(async (targetMonth: string) => {
-    const res = await fetch(`/api/admin/analytics?type=monthly&month=${targetMonth}`, {
-      cache: "no-store",
-    });
-    if (res.ok) {
-      setMonthlyData(await res.json());
-    }
-  }, []);
+  const loadMonthly = useCallback(
+    async (targetMonth: string) => {
+      const key = `analytics:monthly:${targetMonth}`;
+      const cached = getAdminCache<MonthlyAnalyticsResponse>(key);
+      if (cached) {
+        setMonthlyData(cached.data);
+      } else {
+        setMonthlyData(null);
+      }
+      const data = await fetchAdminCachedJson<MonthlyAnalyticsResponse>(
+        key,
+        `/api/admin/analytics?type=monthly&month=${encodeURIComponent(targetMonth)}`,
+        refreshSignal
+      );
+      if (data) {
+        setMonthlyData(data);
+      }
+    },
+    [refreshSignal]
+  );
 
   useEffect(() => {
+    if (!isActive || subTab !== "daily") return;
     void loadDaily(date);
-  }, [date, loadDaily]);
+  }, [isActive, subTab, date, loadDaily]);
 
   useEffect(() => {
+    if (!isActive || subTab !== "monthly") return;
     void loadMonthly(month);
-  }, [month, loadMonthly]);
+  }, [isActive, subTab, month, loadMonthly]);
 
   useEffect(() => {
-    if (!selectedCallerId) return;
+    if (!isActive || subTab !== "caller" || !selectedCallerId) return;
+    const key = `analytics:caller:${selectedCallerId}`;
+    const cached = getAdminCache<{ detail: CallerHistoryAnalytics }>(key);
+    if (cached) {
+      setCallerDetail(cached.data.detail);
+    } else {
+      setCallerDetail(null);
+    }
     void (async () => {
-      const res = await fetch(
+      const data = await fetchAdminCachedJson<{ detail: CallerHistoryAnalytics }>(
+        key,
         `/api/admin/analytics?type=caller&callerId=${encodeURIComponent(selectedCallerId)}`,
-        { cache: "no-store" }
+        refreshSignal
       );
-      if (res.ok) {
-        const d = (await res.json()) as { detail: CallerHistoryAnalytics };
-        setCallerDetail(d.detail);
+      if (data) {
+        setCallerDetail(data.detail);
       }
     })();
-  }, [selectedCallerId]);
+  }, [isActive, subTab, selectedCallerId, refreshSignal]);
 
   useEffect(() => {
-    if (!selectedCampaignId) return;
+    if (!isActive || subTab !== "campaign" || !selectedCampaignId) return;
+    const key = `analytics:campaign:${selectedCampaignId}`;
+    const cached = getAdminCache<{ detail: CampaignHistoryAnalytics }>(key);
+    if (cached) {
+      setCampaignDetail(cached.data.detail);
+    } else {
+      setCampaignDetail(null);
+    }
     void (async () => {
-      const res = await fetch(
+      const data = await fetchAdminCachedJson<{ detail: CampaignHistoryAnalytics }>(
+        key,
         `/api/admin/analytics?type=campaign&campaignId=${encodeURIComponent(selectedCampaignId)}`,
-        { cache: "no-store" }
+        refreshSignal
       );
-      if (res.ok) {
-        const d = (await res.json()) as { detail: CampaignHistoryAnalytics };
-        setCampaignDetail(d.detail);
+      if (data) {
+        setCampaignDetail(data.detail);
       }
     })();
-  }, [selectedCampaignId]);
+  }, [isActive, subTab, selectedCampaignId, refreshSignal]);
 
   function downloadExport(url: string) {
     window.location.href = url;
@@ -210,6 +290,7 @@ export function AdminAnalyticsTab({
               </div>
             </div>
 
+            {!dailyData && <SectionLoader label="Loading analytics..." />}
             {dailyData && (
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                 <div className="lg:col-span-5 space-y-4">
@@ -299,6 +380,7 @@ export function AdminAnalyticsTab({
               </div>
             </div>
 
+            {!monthlyData && <SectionLoader label="Loading analytics..." />}
             {monthlyData && (
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                 <div className="lg:col-span-5 space-y-4">
@@ -391,6 +473,7 @@ export function AdminAnalyticsTab({
               )}
             </div>
 
+            {selectedCallerId && !callerDetail && <SectionLoader label="Loading analytics..." />}
             {callerDetail && (
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
@@ -486,6 +569,7 @@ export function AdminAnalyticsTab({
               )}
             </div>
 
+            {selectedCampaignId && !campaignDetail && <SectionLoader label="Loading analytics..." />}
             {campaignDetail && (
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
