@@ -26,6 +26,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
     null
   );
 
+  const isAdmin = user.role === "ADMIN";
   const leaderToday = snapshot.leaderboards.daily[0];
   const gapToFirst =
     leaderToday && snapshot.personal.dailyRank && snapshot.personal.dailyRank > 1
@@ -70,38 +71,80 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
         {/* Unified Executive Daily Metric Strip */}
         <section className="rounded-xl border border-[#E3E8EE] bg-white shadow-[0_1px_2px_rgba(10,37,64,0.04),0_4px_12px_rgba(10,37,64,0.03)]">
           <div className="grid grid-cols-1 divide-y divide-[#E3E8EE] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            <div className="p-5">
-              <p className="text-xs font-medium text-[#64748B]">My Leads Today</p>
-              <div className="mt-1.5 flex items-baseline gap-2.5">
-                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
-                  {snapshot.personal.leadsToday}
-                </span>
-                <span className="text-xs text-[#64748B]">
-                  {snapshot.personal.dailyRank === 1 && snapshot.personal.leadsToday > 0
-                    ? "Leading today"
-                    : gapToFirst > 0
-                    ? `${gapToFirst} behind ${leaderToday?.fullName}`
-                    : "Ready to score"}
-                </span>
-              </div>
-            </div>
+            {isAdmin ? (
+              <>
+                <div className="p-5">
+                  <p className="text-xs font-medium text-[#64748B]">Leads Today</p>
+                  <div className="mt-1.5 flex items-baseline gap-2.5">
+                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                      {snapshot.totals.leadsToday}
+                    </span>
+                    <span className="text-xs text-[#64748B]">
+                      from all callers
+                    </span>
+                  </div>
+                </div>
 
-            <div className="p-5">
-              <p className="text-xs font-medium text-[#64748B]">Daily Rank</p>
-              <div className="mt-1.5 flex items-center gap-2.5">
-                {snapshot.personal.dailyRank &&
-                  snapshot.personal.dailyRank <= 3 &&
-                  snapshot.personal.leadsToday > 0 && (
-                    <CrownBadge rank={snapshot.personal.dailyRank} />
-                  )}
-                <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
-                  {snapshot.personal.dailyRank ? `#${snapshot.personal.dailyRank}` : "—"}
-                </span>
-                <span className="text-xs text-[#64748B]">
-                  of {snapshot.personal.totalCallersRankedToday} callers
-                </span>
-              </div>
-            </div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-[#64748B]">Campaigns Progress</p>
+                    <span className="text-xs font-semibold tabular-nums text-[#0077B6]">
+                      {snapshot.totals.activeCampaigns}{" "}
+                      {snapshot.totals.activeCampaigns === 1 ? "campaign" : "campaigns"}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex items-baseline gap-2.5">
+                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                      {snapshot.totals.overallDailyProgressPercent}%
+                    </span>
+                    <span className="text-xs tabular-nums text-[#64748B]">
+                      {snapshot.totals.leadsToday} / {snapshot.totals.overallDailyTarget} total target
+                    </span>
+                  </div>
+                  <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[#EEF2F6]">
+                    <div
+                      className="h-full rounded-full bg-[#0077B6] transition-all duration-300 ease-out"
+                      style={{ width: `${snapshot.totals.overallDailyProgressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="p-5">
+                  <p className="text-xs font-medium text-[#64748B]">My Leads Today</p>
+                  <div className="mt-1.5 flex items-baseline gap-2.5">
+                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                      {snapshot.personal.leadsToday}
+                    </span>
+                    <span className="text-xs text-[#64748B]">
+                      {snapshot.personal.dailyRank === 1 && snapshot.personal.leadsToday > 0
+                        ? "Leading today"
+                        : gapToFirst > 0
+                          ? `${gapToFirst} behind ${leaderToday?.fullName}`
+                          : "Ready to score"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <p className="text-xs font-medium text-[#64748B]">Daily Rank</p>
+                  <div className="mt-1.5 flex items-center gap-2.5">
+                    {snapshot.personal.dailyRank &&
+                      snapshot.personal.dailyRank <= 3 &&
+                      snapshot.personal.leadsToday > 0 && (
+                        <CrownBadge rank={snapshot.personal.dailyRank} />
+                      )}
+                    <span className="text-3xl font-bold tracking-tight tabular-nums text-[#0A2540]">
+                      {snapshot.personal.dailyRank ? `#${snapshot.personal.dailyRank}` : "—"}
+                    </span>
+                    <span className="text-xs text-[#64748B]">
+                      of {snapshot.personal.totalCallersRankedToday} callers
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="p-5">
               <div className="flex items-center justify-between">
