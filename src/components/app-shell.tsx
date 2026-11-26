@@ -91,7 +91,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
     >
       {/* Top Bar */}
       <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200">
-        <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
+        <div className="mx-auto flex h-16 sm:h-[72px] max-w-7xl items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
           <Link href="/" className="min-w-0 flex-1 sm:flex-initial hover:opacity-90 transition-opacity">
             <BrandLogo
               brandName={brand.brandName}

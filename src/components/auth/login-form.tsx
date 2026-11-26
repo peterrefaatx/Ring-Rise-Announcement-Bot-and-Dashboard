@@ -65,6 +65,7 @@ export function LoginForm({
             brandPrimaryColor={brand.brandPrimaryColor}
             brandLogoUrl={brand.brandLogoUrl}
             compact
+            size="lg"
           />
         </div>
 
