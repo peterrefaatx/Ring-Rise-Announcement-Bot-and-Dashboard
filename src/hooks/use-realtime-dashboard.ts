@@ -14,7 +14,9 @@ interface StreamActivityEvent {
   createdAt: string;
 }
 
-const VERCEL_POLL_INTERVAL_MS = 25_000;
+const ACTIVE_POLL_INTERVAL_MS = 8_000;
+const QUIET_POLL_INTERVAL_MS = 20_000;
+const QUIET_AFTER_MS = 3 * 60_000;
 
 export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
   const [snapshot, setSnapshot] = useState<DashboardSnapshot>(initialSnapshot);
@@ -24,6 +26,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
   );
   const lastSeqRef = useRef<number>(initialSnapshot.latestEventSeq);
   const businessDateRef = useRef<string>(initialSnapshot.businessDateEst);
+  const lastActivityAtRef = useRef<number>(Date.now());
   const seenSeqsRef = useRef<Set<number>>(new Set());
   const syncInFlightRef = useRef<boolean>(false);
   const syncQueuedRef = useRef<boolean>(false);
@@ -41,66 +44,93 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
     }
   }, [snapshot]);
 
-  const fetchAuthoritativeSnapshot = useCallback(async () => {
-    if (syncInFlightRef.current) {
-      syncQueuedRef.current = true;
-      return;
-    }
-    syncInFlightRef.current = true;
-    try {
-      const res = await fetch("/api/dashboard/state", { cache: "no-store" });
-      if (res.status === 401) {
-        window.location.href = "/login";
+  const fetchAuthoritativeSnapshot = useCallback(
+    async (options?: { conditional?: boolean }) => {
+      if (syncInFlightRef.current) {
+        syncQueuedRef.current = true;
         return;
       }
-      if (!res.ok) return;
-      const next = (await res.json()) as DashboardSnapshot;
-      const prevSeq = lastSeqRef.current;
-      const prevDate = businessDateRef.current;
+      syncInFlightRef.current = true;
+      try {
+        const useConditional = Boolean(options?.conditional);
+        const url = useConditional
+          ? `/api/dashboard/state?sinceSeq=${lastSeqRef.current}&date=${encodeURIComponent(
+              businessDateRef.current
+            )}`
+          : "/api/dashboard/state";
 
-      if (next.realtimeMode === "poll") {
-        setConnectionState("live");
-        if (next.businessDateEst !== prevDate) {
-          toast.info("New EST business day started — daily leaderboard reset.");
+        const res = await fetch(url, { cache: "no-store" });
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
         }
-        const unseenLeads = next.activityFeed
-          .filter((item) => item.seq > prevSeq && !seenSeqsRef.current.has(item.seq))
-          .slice(0, 3)
-          .reverse();
-        for (const item of unseenLeads) {
-          seenSeqsRef.current.add(item.seq);
-          toast.info(`${item.callerName} announced a lead in ${item.campaignName}`);
-        }
-        if (seenSeqsRef.current.size > 1000) {
-          const first = seenSeqsRef.current.values().next().value;
-          if (first !== undefined) seenSeqsRef.current.delete(first);
-        }
-      }
+        if (!res.ok) return;
 
-      lastSeqRef.current = Math.max(prevSeq, next.latestEventSeq);
-      setSnapshot(next);
-    } catch {
-      if (realtimeMode === "poll" && typeof navigator !== "undefined" && !navigator.onLine) {
-        setConnectionState("offline");
+        const payload = (await res.json()) as
+          | DashboardSnapshot
+          | { unchanged: true; latestEventSeq: number; businessDateEst: string };
+
+        if ("unchanged" in payload && payload.unchanged) {
+          lastSeqRef.current = Math.max(lastSeqRef.current, payload.latestEventSeq);
+          if (realtimeMode === "poll") {
+            setConnectionState("live");
+          }
+          return;
+        }
+
+        const next = payload as DashboardSnapshot;
+        const prevSeq = lastSeqRef.current;
+        const prevDate = businessDateRef.current;
+
+        if (next.latestEventSeq > prevSeq || next.businessDateEst !== prevDate) {
+          lastActivityAtRef.current = Date.now();
+        }
+
+        if (next.realtimeMode === "poll") {
+          setConnectionState("live");
+          if (next.businessDateEst !== prevDate) {
+            toast.info("New EST business day started — daily leaderboard reset.");
+          }
+          const unseenLeads = next.activityFeed
+            .filter((item) => item.seq > prevSeq && !seenSeqsRef.current.has(item.seq))
+            .slice(0, 3)
+            .reverse();
+          for (const item of unseenLeads) {
+            seenSeqsRef.current.add(item.seq);
+            toast.info(`${item.callerName} announced a lead in ${item.campaignName}`);
+          }
+          if (seenSeqsRef.current.size > 1000) {
+            const first = seenSeqsRef.current.values().next().value;
+            if (first !== undefined) seenSeqsRef.current.delete(first);
+          }
+        }
+
+        lastSeqRef.current = Math.max(prevSeq, next.latestEventSeq);
+        setSnapshot(next);
+      } catch {
+        if (realtimeMode === "poll" && typeof navigator !== "undefined" && !navigator.onLine) {
+          setConnectionState("offline");
+        }
+        // Transient fetch failure will be reconciled on next poll/event or reconnect
+      } finally {
+        syncInFlightRef.current = false;
+        if (syncQueuedRef.current) {
+          syncQueuedRef.current = false;
+          void fetchAuthoritativeSnapshot();
+        }
       }
-      // Transient fetch failure will be reconciled on next poll/event or reconnect
-    } finally {
-      syncInFlightRef.current = false;
-      if (syncQueuedRef.current) {
-        syncQueuedRef.current = false;
-        void fetchAuthoritativeSnapshot();
-      }
-    }
-  }, [realtimeMode]);
+    },
+    [realtimeMode]
+  );
 
   const scheduleSync = useCallback(
-    (delayMs = 40) => {
+    (delayMs = 40, options?: { conditional?: boolean }) => {
       if (syncTimerRef.current) {
         clearTimeout(syncTimerRef.current);
       }
       syncTimerRef.current = setTimeout(() => {
         syncTimerRef.current = null;
-        void fetchAuthoritativeSnapshot();
+        void fetchAuthoritativeSnapshot(options);
       }, delayMs);
     },
     [fetchAuthoritativeSnapshot]
@@ -109,34 +139,50 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
   useEffect(() => {
     if (realtimeMode === "poll") {
       setConnectionState(navigator.onLine ? "live" : "offline");
+      let pollTimeout: ReturnType<typeof setTimeout> | null = null;
+      let disposed = false;
 
-      const pollTimer = setInterval(() => {
-        if (document.visibilityState === "visible" && navigator.onLine) {
-          void fetchAuthoritativeSnapshot();
-        }
-      }, VERCEL_POLL_INTERVAL_MS);
-
-      const handleOnline = () => {
-        setConnectionState("live");
-        scheduleSync(20);
+      const scheduleNextPoll = () => {
+        if (disposed) return;
+        const isQuiet = Date.now() - lastActivityAtRef.current > QUIET_AFTER_MS;
+        const delay = isQuiet ? QUIET_POLL_INTERVAL_MS : ACTIVE_POLL_INTERVAL_MS;
+        pollTimeout = setTimeout(async () => {
+          if (disposed) return;
+          if (document.visibilityState === "visible" && navigator.onLine) {
+            await fetchAuthoritativeSnapshot({ conditional: true });
+          }
+          scheduleNextPoll();
+        }, delay);
       };
+
+      scheduleNextPoll();
+
+      const markActiveAndResync = () => {
+        lastActivityAtRef.current = Date.now();
+        if (navigator.onLine) {
+          setConnectionState("live");
+          scheduleSync(20, { conditional: true });
+        }
+      };
+
       const handleOffline = () => {
         setConnectionState("offline");
       };
       const handleVisibility = () => {
-        if (document.visibilityState === "visible" && navigator.onLine) {
-          scheduleSync(20);
+        if (document.visibilityState === "visible") {
+          markActiveAndResync();
         }
       };
 
-      window.addEventListener("online", handleOnline);
+      window.addEventListener("online", markActiveAndResync);
       window.addEventListener("offline", handleOffline);
       document.addEventListener("visibilitychange", handleVisibility);
 
       return () => {
-        clearInterval(pollTimer);
+        disposed = true;
+        if (pollTimeout) clearTimeout(pollTimeout);
         if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
-        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("online", markActiveAndResync);
         window.removeEventListener("offline", handleOffline);
         document.removeEventListener("visibilitychange", handleVisibility);
       };
@@ -264,9 +310,13 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
     return () => clearTimeout(timer);
   }, [snapshot.businessDateEst, fetchAuthoritativeSnapshot]);
 
+  const refreshNow = useCallback(async () => {
+    await fetchAuthoritativeSnapshot({ conditional: false });
+  }, [fetchAuthoritativeSnapshot]);
+
   return {
     snapshot,
     connectionState,
-    refreshNow: fetchAuthoritativeSnapshot,
+    refreshNow,
   };
 }

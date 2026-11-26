@@ -106,12 +106,24 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
   });
 }
 
+export async function getLatestDashboardEventSeq(): Promise<number> {
+  const latest = await prisma.activityEvent.findFirst({
+    orderBy: { seq: "desc" },
+    select: { seq: true },
+  });
+  return latest?.seq ?? 0;
+}
+
 async function getSharedDashboardCore() {
   const now = new Date();
   const businessDateEst = getBusinessDateEst(now);
   const businessMonthEst = getBusinessMonthEst(now);
+  const isPollMode = getRealtimeMode() === "poll";
+  const seqSuffix = isPollMode ? `:seq:${await getLatestDashboardEventSeq()}` : "";
+  const cacheKey = `dashboard:${businessDateEst}${seqSuffix}`;
+  const ttlMs = isPollMode ? 60000 : 30000;
 
-  return cached(`dashboard:${businessDateEst}`, 30000, async () => {
+  return cached(cacheKey, ttlMs, async () => {
     const dayRange = getEstDayRangeUtc(businessDateEst);
     const monthRange = getEstMonthRangeUtc(businessMonthEst);
 
