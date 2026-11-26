@@ -96,11 +96,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       {children}
       <Toaster
         position="bottom-right"
-        richColors
         closeButton
         duration={5000}
-        toastOptions={{ duration: 5000 }}
         theme={mounted && theme.isDark ? "dark" : "light"}
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: "var(--theme-surface)",
+            color: "var(--theme-ink)",
+            border: "1px solid var(--theme-border)",
+            boxShadow: "var(--theme-card-shadow)",
+          },
+          classNames: {
+            toast: "themed-toast font-sans rounded-xl",
+            title: "text-sm font-semibold",
+            description: "text-xs opacity-80",
+            closeButton: "themed-toast-close",
+          },
+        }}
       />
     </ThemeContext.Provider>
   );
