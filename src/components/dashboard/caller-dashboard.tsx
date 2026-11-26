@@ -173,8 +173,8 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
         </section>
 
         {/* Main Workspace: Left (Daily Leaderboard) | Right (Telegram Summary Buttons + Active Campaign Targets) */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
-          <div className="lg:col-span-7 min-w-0">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[7fr_4fr] lg:items-start">
+          <div className="min-w-0">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
               monthly={snapshot.leaderboards.monthly}
@@ -187,12 +187,12 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
             />
           </div>
 
-          <div className="space-y-3 lg:col-span-5 min-w-0">
+          <div className="space-y-3 min-w-0">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-3.5 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-3 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("campaigns")}
               >
@@ -207,7 +207,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-3.5 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-3 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("callers")}
               >
