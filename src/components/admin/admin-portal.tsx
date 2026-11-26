@@ -69,8 +69,8 @@ export function AdminPortal({
     >
       <div className="space-y-6">
         <div className="flex flex-col gap-6 lg:block">
-          {/* Fixed In-Page Sidebar Navigation (No Container) */}
-          <aside className="w-full lg:fixed lg:left-6 lg:top-24 lg:z-20 lg:w-56">
+          {/* Fixed In-Page Sidebar Navigation aligned to normal page width (No Container) */}
+          <aside className="w-full lg:fixed lg:top-24 lg:z-20 lg:w-56">
             <nav
               aria-label="Administration sections"
               className="flex flex-wrap gap-1.5 lg:flex-col lg:gap-1"
@@ -99,7 +99,7 @@ export function AdminPortal({
           </aside>
 
           {/* Active Section Content */}
-          <div className="flex-1 min-w-0 lg:pl-60">
+          <div className="flex-1 min-w-0 lg:pl-64">
             {activeSection === "overview" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
