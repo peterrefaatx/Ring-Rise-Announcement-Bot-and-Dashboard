@@ -98,6 +98,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         position="top-right"
         richColors
         closeButton
+        duration={5000}
+        toastOptions={{ duration: 5000 }}
         theme={mounted && theme.isDark ? "dark" : "light"}
       />
     </ThemeContext.Provider>
