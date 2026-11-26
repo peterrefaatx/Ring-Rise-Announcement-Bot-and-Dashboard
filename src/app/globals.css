@@ -270,6 +270,96 @@ html[data-theme="nature"] {
   --theme-scrollbar-hover: #6DA37A;
 }
 
+/* 6. Sakura Blush (Rose category) */
+html[data-theme="blush"] {
+  --background: 340 100% 98%;
+  --foreground: 328 58% 15%;
+  --card: 340 100% 99.5%;
+  --card-foreground: 328 58% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 328 58% 15%;
+  --primary: 333 77% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 338 55% 94%;
+  --secondary-foreground: 328 58% 15%;
+  --muted: 338 45% 94%;
+  --muted-foreground: 330 22% 45%;
+  --accent: 336 72% 93%;
+  --accent-foreground: 333 77% 40%;
+  --destructive: 0 74% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 336 42% 89%;
+  --input: 336 38% 85%;
+  --ring: 333 77% 50%;
+
+  --theme-canvas: #FFF6F9;
+  --theme-canvas-image:
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(244, 114, 182, 0.16), transparent),
+    radial-gradient(ellipse 50% 35% at 88% 8%, rgba(251, 113, 133, 0.1), transparent);
+  --theme-surface: #FFFFFF;
+  --theme-surface-muted: #FFF1F6;
+  --theme-surface-track: #FCE4EE;
+  --theme-header: rgba(255, 250, 252, 0.92);
+  --theme-border: #F5D5E2;
+  --theme-ink: #3C1028;
+  --theme-ink-secondary: #683350;
+  --theme-ink-muted: #8C5873;
+  --theme-accent: #E11D74;
+  --theme-accent-hover: #BE185D;
+  --theme-accent-soft: rgba(225, 29, 116, 0.12);
+  --theme-accent-subtle: rgba(244, 114, 182, 0.09);
+  --theme-progress-fill: linear-gradient(90deg, #E11D74 0%, #F472B6 55%, #FB7185 100%);
+  --theme-top1-row: rgba(253, 230, 138, 0.45);
+  --theme-card-shadow: 0 1px 2px rgba(60, 16, 40, 0.04), 0 6px 18px rgba(225, 29, 116, 0.06);
+  --theme-scrollbar: #F3B8D0;
+  --theme-scrollbar-hover: #EC4899;
+}
+
+/* 7. Lavender Silk (Pastel category) */
+html[data-theme="lavender"] {
+  --background: 263 100% 98%;
+  --foreground: 264 55% 17%;
+  --card: 264 100% 99.5%;
+  --card-foreground: 264 55% 17%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 264 55% 17%;
+  --primary: 271 81% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 265 45% 94%;
+  --secondary-foreground: 264 55% 17%;
+  --muted: 265 40% 94%;
+  --muted-foreground: 265 20% 46%;
+  --accent: 268 70% 93%;
+  --accent-foreground: 271 76% 42%;
+  --destructive: 0 74% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 266 38% 89%;
+  --input: 266 34% 85%;
+  --ring: 271 81% 56%;
+
+  --theme-canvas: #F9F6FF;
+  --theme-canvas-image:
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(192, 132, 252, 0.16), transparent),
+    radial-gradient(ellipse 50% 35% at 15% 8%, rgba(232, 121, 249, 0.1), transparent);
+  --theme-surface: #FFFFFF;
+  --theme-surface-muted: #F5F0FF;
+  --theme-surface-track: #ECE2FE;
+  --theme-header: rgba(251, 249, 255, 0.92);
+  --theme-border: #E5D9FB;
+  --theme-ink: #261342;
+  --theme-ink-secondary: #4D3373;
+  --theme-ink-muted: #765B99;
+  --theme-accent: #9333EA;
+  --theme-accent-hover: #7E22CE;
+  --theme-accent-soft: rgba(147, 51, 234, 0.12);
+  --theme-accent-subtle: rgba(192, 132, 252, 0.09);
+  --theme-progress-fill: linear-gradient(90deg, #9333EA 0%, #C084FC 55%, #EC4899 100%);
+  --theme-top1-row: rgba(253, 230, 138, 0.45);
+  --theme-card-shadow: 0 1px 2px rgba(38, 19, 66, 0.04), 0 6px 18px rgba(147, 51, 234, 0.06);
+  --theme-scrollbar: #D5BDF8;
+  --theme-scrollbar-hover: #A855F7;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -428,12 +518,16 @@ html[data-theme="nature"] {
 /* Harmonize dark-mode & custom-palette utilities across inner admin/profile/dialog tabs */
 @layer utilities {
   html[data-theme-mode="dark"] .bg-white,
-  html[data-theme="nature"] .bg-white {
+  html[data-theme="nature"] .bg-white,
+  html[data-theme="blush"] .bg-white,
+  html[data-theme="lavender"] .bg-white {
     background-color: var(--theme-surface);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#F6F9FC\],
-  html[data-theme="nature"] .bg-\[\#F6F9FC\] {
+  html[data-theme="nature"] .bg-\[\#F6F9FC\],
+  html[data-theme="blush"] .bg-\[\#F6F9FC\],
+  html[data-theme="lavender"] .bg-\[\#F6F9FC\] {
     background-color: var(--theme-canvas);
   }
 
@@ -441,13 +535,21 @@ html[data-theme="nature"] {
   html[data-theme-mode="dark"] .bg-\[\#F8FAFC\],
   html[data-theme-mode="dark"] .bg-slate-50,
   html[data-theme-mode="dark"] .bg-slate-50\/70,
-  html[data-theme="nature"] .bg-\[\#FAFBFD\] {
+  html[data-theme="nature"] .bg-\[\#FAFBFD\],
+  html[data-theme="blush"] .bg-\[\#FAFBFD\],
+  html[data-theme="blush"] .bg-slate-50,
+  html[data-theme="lavender"] .bg-\[\#FAFBFD\],
+  html[data-theme="lavender"] .bg-slate-50 {
     background-color: var(--theme-surface-muted);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#EEF2F6\],
   html[data-theme-mode="dark"] .bg-\[\#F1F5F9\],
-  html[data-theme-mode="dark"] .bg-slate-100 {
+  html[data-theme-mode="dark"] .bg-slate-100,
+  html[data-theme="blush"] .bg-\[\#EEF2F6\],
+  html[data-theme="blush"] .bg-slate-100,
+  html[data-theme="lavender"] .bg-\[\#EEF2F6\],
+  html[data-theme="lavender"] .bg-slate-100 {
     background-color: var(--theme-surface-track);
   }
 
@@ -455,7 +557,13 @@ html[data-theme="nature"] {
   html[data-theme-mode="dark"] .hover\:bg-\[\#F8FAFC\]:hover,
   html[data-theme-mode="dark"] .hover\:bg-slate-50:hover,
   html[data-theme-mode="dark"] .hover\:bg-white\/70:hover,
-  html[data-theme="nature"] .hover\:bg-\[\#FAFBFD\]:hover {
+  html[data-theme="nature"] .hover\:bg-\[\#FAFBFD\]:hover,
+  html[data-theme="blush"] .hover\:bg-\[\#FAFBFD\]:hover,
+  html[data-theme="blush"] .hover\:bg-\[\#F8FAFC\]:hover,
+  html[data-theme="blush"] .hover\:bg-slate-50:hover,
+  html[data-theme="lavender"] .hover\:bg-\[\#FAFBFD\]:hover,
+  html[data-theme="lavender"] .hover\:bg-\[\#F8FAFC\]:hover,
+  html[data-theme="lavender"] .hover\:bg-slate-50:hover {
     background-color: var(--theme-surface-muted);
   }
 
@@ -463,19 +571,33 @@ html[data-theme="nature"] {
   html[data-theme-mode="dark"] .text-slate-900,
   html[data-theme-mode="dark"] .text-slate-800,
   html[data-theme="nature"] .text-\[\#0A2540\],
-  html[data-theme="nature"] .text-slate-900 {
+  html[data-theme="nature"] .text-slate-900,
+  html[data-theme="blush"] .text-\[\#0A2540\],
+  html[data-theme="blush"] .text-slate-900,
+  html[data-theme="lavender"] .text-\[\#0A2540\],
+  html[data-theme="lavender"] .text-slate-900 {
     color: var(--theme-ink);
   }
 
   html[data-theme-mode="dark"] .text-\[\#425466\],
   html[data-theme-mode="dark"] .text-slate-700,
-  html[data-theme-mode="dark"] .text-slate-600 {
+  html[data-theme-mode="dark"] .text-slate-600,
+  html[data-theme="blush"] .text-\[\#425466\],
+  html[data-theme="blush"] .text-slate-700,
+  html[data-theme="blush"] .text-slate-600,
+  html[data-theme="lavender"] .text-\[\#425466\],
+  html[data-theme="lavender"] .text-slate-700,
+  html[data-theme="lavender"] .text-slate-600 {
     color: var(--theme-ink-secondary);
   }
 
   html[data-theme-mode="dark"] .text-\[\#64748B\],
   html[data-theme-mode="dark"] .text-slate-500,
-  html[data-theme-mode="dark"] .text-slate-400 {
+  html[data-theme-mode="dark"] .text-slate-400,
+  html[data-theme="blush"] .text-\[\#64748B\],
+  html[data-theme="blush"] .text-slate-500,
+  html[data-theme="lavender"] .text-\[\#64748B\],
+  html[data-theme="lavender"] .text-slate-500 {
     color: var(--theme-ink-muted);
   }
 
@@ -484,32 +606,48 @@ html[data-theme="nature"] {
   html[data-theme-mode="dark"] .border-slate-100,
   html[data-theme-mode="dark"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
   html[data-theme="nature"] .border-\[\#E3E8EE\],
-  html[data-theme="nature"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]) {
+  html[data-theme="nature"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
+  html[data-theme="blush"] .border-\[\#E3E8EE\],
+  html[data-theme="blush"] .border-slate-200,
+  html[data-theme="blush"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
+  html[data-theme="lavender"] .border-\[\#E3E8EE\],
+  html[data-theme="lavender"] .border-slate-200,
+  html[data-theme="lavender"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]) {
     border-color: var(--theme-border);
   }
 
   html[data-theme-mode="dark"] .text-\[\#0077B6\],
-  html[data-theme="nature"] .text-\[\#0077B6\] {
+  html[data-theme="nature"] .text-\[\#0077B6\],
+  html[data-theme="blush"] .text-\[\#0077B6\],
+  html[data-theme="lavender"] .text-\[\#0077B6\] {
     color: var(--theme-accent);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\],
-  html[data-theme="nature"] .bg-\[\#0077B6\] {
+  html[data-theme="nature"] .bg-\[\#0077B6\],
+  html[data-theme="blush"] .bg-\[\#0077B6\],
+  html[data-theme="lavender"] .bg-\[\#0077B6\] {
     background-color: var(--theme-accent);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/10,
-  html[data-theme="nature"] .bg-\[\#0077B6\]\/10 {
+  html[data-theme="nature"] .bg-\[\#0077B6\]\/10,
+  html[data-theme="blush"] .bg-\[\#0077B6\]\/10,
+  html[data-theme="lavender"] .bg-\[\#0077B6\]\/10 {
     background-color: var(--theme-accent-soft);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/\[0\.04\],
-  html[data-theme="nature"] .bg-\[\#0077B6\]\/\[0\.04\] {
+  html[data-theme="nature"] .bg-\[\#0077B6\]\/\[0\.04\],
+  html[data-theme="blush"] .bg-\[\#0077B6\]\/\[0\.04\],
+  html[data-theme="lavender"] .bg-\[\#0077B6\]\/\[0\.04\] {
     background-color: var(--theme-accent-subtle);
   }
 
   html[data-theme-mode="dark"] .hover\:bg-\[\#005A8D\]:hover,
-  html[data-theme="nature"] .hover\:bg-\[\#005A8D\]:hover {
+  html[data-theme="nature"] .hover\:bg-\[\#005A8D\]:hover,
+  html[data-theme="blush"] .hover\:bg-\[\#005A8D\]:hover,
+  html[data-theme="lavender"] .hover\:bg-\[\#005A8D\]:hover {
     background-color: var(--theme-accent-hover);
   }
 

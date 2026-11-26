@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { DEFAULT_THEME_ID, THEME_STORAGE_KEY } from "@/lib/themes";
+import { APP_THEMES, DEFAULT_THEME_ID, THEME_STORAGE_KEY } from "@/lib/themes";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,14 +29,18 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+const VALID_THEME_IDS = APP_THEMES.map((t) => t.id);
+const DARK_THEME_IDS = APP_THEMES.filter((t) => t.isDark).map((t) => t.id);
+
 const themeInitScript = `
 (function() {
   try {
     var key = ${JSON.stringify(THEME_STORAGE_KEY)};
     var saved = window.localStorage.getItem(key) || ${JSON.stringify(DEFAULT_THEME_ID)};
-    var valid = ["classic", "dark", "music", "gaming", "space", "nature"];
-    var id = valid.indexOf(saved) !== -1 ? saved : "classic";
-    var isDark = id === "dark" || id === "music" || id === "gaming" || id === "space";
+    var valid = ${JSON.stringify(VALID_THEME_IDS)};
+    var darkIds = ${JSON.stringify(DARK_THEME_IDS)};
+    var id = valid.indexOf(saved) !== -1 ? saved : ${JSON.stringify(DEFAULT_THEME_ID)};
+    var isDark = darkIds.indexOf(id) !== -1;
     var root = document.documentElement;
     root.dataset.theme = id;
     root.dataset.themeMode = isDark ? "dark" : "light";

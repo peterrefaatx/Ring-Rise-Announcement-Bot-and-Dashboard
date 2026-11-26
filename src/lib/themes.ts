@@ -1,4 +1,12 @@
-export type ThemeId = "classic" | "dark" | "music" | "gaming" | "space" | "nature";
+export type ThemeId =
+  | "classic"
+  | "dark"
+  | "music"
+  | "gaming"
+  | "space"
+  | "nature"
+  | "blush"
+  | "lavender";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -94,6 +102,32 @@ export const APP_THEMES: ThemeDefinition[] = [
       surface: "#FAFDF9",
       primary: "#15803D",
       secondary: "#10B981",
+    },
+  },
+  {
+    id: "blush",
+    name: "Sakura Blush",
+    category: "Rose",
+    description: "Soft petal pink & roseberry glow",
+    isDark: false,
+    swatches: {
+      canvas: "#FFF6F9",
+      surface: "#FFFFFF",
+      primary: "#E11D74",
+      secondary: "#F472B6",
+    },
+  },
+  {
+    id: "lavender",
+    name: "Lavender Silk",
+    category: "Pastel",
+    description: "Dreamy lilac & pearlescent orchid",
+    isDark: false,
+    swatches: {
+      canvas: "#F9F6FF",
+      surface: "#FFFFFF",
+      primary: "#9333EA",
+      secondary: "#C084FC",
     },
   },
 ];

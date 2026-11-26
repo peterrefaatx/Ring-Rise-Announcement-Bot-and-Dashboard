@@ -3,12 +3,14 @@
 import React from "react";
 import {
   Check,
+  Flower2,
   Gamepad2,
   Leaf,
   Moon,
   Music2,
   Orbit,
   Palette,
+  Sparkles,
   Sun,
 } from "lucide-react";
 import { APP_THEMES, type ThemeId } from "@/lib/themes";
@@ -34,6 +36,10 @@ function ThemeCategoryIcon({ id, className }: { id: ThemeId; className?: string 
       return <Orbit className={className} />;
     case "nature":
       return <Leaf className={className} />;
+    case "blush":
+      return <Flower2 className={className} />;
+    case "lavender":
+      return <Sparkles className={className} />;
     case "classic":
     default:
       return <Sun className={className} />;
@@ -90,7 +96,7 @@ export function ThemeSwitcher({
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align={align} className="w-72 p-2 shadow-xl">
+      <DropdownMenuContent align={align} className="w-72 max-h-[75vh] overflow-y-auto p-2 shadow-xl">
         <div className="px-2 py-1.5">
           <p className="text-xs font-semibold text-foreground">Appearance Themes</p>
           <p className="text-[11px] text-muted-foreground">
