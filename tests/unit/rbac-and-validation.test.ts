@@ -22,6 +22,7 @@ vi.mock("@/lib/db", () => ({
 
 import { GET as getAdminCallers, POST as createAdminCaller } from "@/app/api/admin/callers/route";
 import { GET as getAdminSettings, PATCH as patchAdminSettings } from "@/app/api/admin/settings/route";
+import { POST as postResetAllLeads } from "@/app/api/admin/leads/reset/route";
 import { POST as postAdminCampaign } from "@/app/api/admin/campaigns/route";
 import { POST as postLead } from "@/app/api/leads/route";
 import { POST as postTelegramSummary } from "@/app/api/telegram/summary/route";
@@ -60,6 +61,14 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
       })
     );
     expect(summaryRes.status).toBe(401);
+
+    const resetRes = await postResetAllLeads(
+      new NextRequest("http://localhost/api/admin/leads/reset", {
+        method: "POST",
+        body: JSON.stringify({ confirm: "RESET" }),
+      })
+    );
+    expect(resetRes.status).toBe(401);
   });
 
   it("blocks deactivated accounts even with an active session cookie", async () => {
@@ -97,6 +106,14 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
       })
     );
     expect(summaryRes.status).toBe(401);
+
+    const resetRes = await postResetAllLeads(
+      new NextRequest("http://localhost/api/admin/leads/reset", {
+        method: "POST",
+        body: JSON.stringify({ confirm: "RESET" }),
+      })
+    );
+    expect(resetRes.status).toBe(401);
   });
 
   it("blocks CALLER role from all ADMIN endpoints with 403 Forbidden", async () => {
@@ -148,6 +165,14 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
       })
     );
     expect(patchSettings.status).toBe(403);
+
+    const resetLeads = await postResetAllLeads(
+      new NextRequest("http://localhost/api/admin/leads/reset", {
+        method: "POST",
+        body: JSON.stringify({ confirm: "RESET" }),
+      })
+    );
+    expect(resetLeads.status).toBe(403);
   });
 
   it("validates schemas strictly for campaigns, callers, profile templates, and announcements", () => {

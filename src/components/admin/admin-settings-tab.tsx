@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Save, Send, RefreshCw, Bot, Palette, Clock } from "lucide-react";
+import { Save, Send, RefreshCw, Bot, Palette, Clock, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,14 @@ import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { formatEstTime } from "@/lib/timezone";
 
 interface AdminSettingsResponse {
@@ -68,6 +76,9 @@ export function AdminSettingsTab({
   const [saving, setSaving] = useState(false);
   const [testingTelegram, setTestingTelegram] = useState(false);
   const [retryingJobId, setRetryingJobId] = useState<string | null>(null);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [resettingLeads, setResettingLeads] = useState(false);
 
   const loadAll = useCallback(async () => {
     const [sRes, qRes] = await Promise.all([
@@ -166,6 +177,36 @@ export function AdminSettingsTab({
       await loadAll();
     } finally {
       setRetryingJobId(null);
+    }
+  }
+
+  async function handleResetAllLeads(e: React.FormEvent) {
+    e.preventDefault();
+    if (resetConfirmText.trim() !== "RESET" || resettingLeads) return;
+    setResettingLeads(true);
+    try {
+      const res = await fetch("/api/admin/leads/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "RESET" }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+        deletedCount?: number;
+      } | null;
+      if (!res.ok) {
+        toast.error(data?.error || "Failed to reset leads.");
+        return;
+      }
+      toast.success(`All leads reset (${data?.deletedCount ?? 0} removed).`);
+      setResetDialogOpen(false);
+      setResetConfirmText("");
+      await loadAll();
+      onSettingsSaved();
+    } catch {
+      toast.error("Network error while resetting leads.");
+    } finally {
+      setResettingLeads(false);
     }
   }
 
@@ -411,6 +452,93 @@ export function AdminSettingsTab({
           </div>
         </CardContent>
       </Card>
+
+      {/* Danger Zone: Reset All Leads */}
+      <Card className="border-red-500/30">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="flex items-center gap-2 text-base text-red-600">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              Data Management
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Permanently clear all lead announcements and reset daily, monthly, and lifetime leaderboards to zero while keeping accounts and campaigns.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-full sm:w-auto shrink-0"
+            onClick={() => {
+              setResetConfirmText("");
+              setResetDialogOpen(true);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Reset All Leads
+          </Button>
+        </CardHeader>
+      </Card>
+
+      <Dialog
+        open={resetDialogOpen}
+        onOpenChange={(open) => {
+          if (!resettingLeads) {
+            setResetDialogOpen(open);
+            if (!open) setResetConfirmText("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Reset All Leads
+            </DialogTitle>
+            <DialogDescription>
+              This action permanently deletes all announced leads across Today, This Month, and Lifetime totals, clears campaign progress counts, and removes Telegram delivery queue history. Caller accounts, campaigns, and settings will not be deleted.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleResetAllLeads} className="mt-2 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="reset-leads-confirm">
+                Type <span className="font-mono font-bold">RESET</span> to confirm
+              </Label>
+              <Input
+                id="reset-leads-confirm"
+                value={resetConfirmText}
+                onChange={(e) => setResetConfirmText(e.target.value)}
+                placeholder="RESET"
+                autoComplete="off"
+                disabled={resettingLeads}
+                required
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={resettingLeads}
+                onClick={() => {
+                  setResetDialogOpen(false);
+                  setResetConfirmText("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={resetConfirmText.trim() !== "RESET" || resettingLeads}
+              >
+                {resettingLeads ? "Resetting..." : "Confirm Reset All Leads"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
