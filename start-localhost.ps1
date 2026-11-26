@@ -59,7 +59,7 @@ Get-Content ".env" | ForEach-Object {
 # 3. Ensure local PostgreSQL cluster (.pgdata) is initialized and running on port 5433
 $pgPort = 5433
 $pgStartedByScript = $false
-$pgListening = Get-NetTCPConnection -LocalPort $pgPort -State Listen -ErrorAction SilentlyContinue
+$pgListening = try { Get-NetTCPConnection -LocalPort $pgPort -State Listen -ErrorAction SilentlyContinue } catch { $null }
 
 if (-not $pgListening) {
   if (-not (Test-Path ".pgdata\PG_VERSION")) {
@@ -91,17 +91,30 @@ if ($dbExists -ne "1") {
   if ($LASTEXITCODE -ne 0) { throw "createdb failed" }
 }
 
-# 4. Install dependencies if missing, generate Prisma client, migrate, and seed
+# 4. Install dependencies if missing, generate Prisma client if needed, migrate, and seed
 if (-not (Test-Path "node_modules")) {
   Write-Host "[INFO] Installing npm dependencies..."
   npm install
   if ($LASTEXITCODE -ne 0) { throw "npm install failed" }
 }
 
-Write-Host "[INFO] Applying database migrations & ensuring initial admin account..."
-node node_modules/prisma/build/index.js generate
-if ($LASTEXITCODE -ne 0) { throw "prisma generate failed" }
+$appPort = if ($env:PORT) { $env:PORT } else { "3000" }
+$existingApp = try { Get-NetTCPConnection -LocalPort ([int]$appPort) -State Listen -ErrorAction SilentlyContinue } catch { $null }
+if ($existingApp) {
+  Write-Host "[OK] Application is already running at http://localhost:$appPort" -ForegroundColor Green
+  Start-Process "http://localhost:$appPort"
+  exit 0
+}
 
+$prismaClientEntry = "node_modules\.prisma\client\index.js"
+$needsGenerate = (-not (Test-Path $prismaClientEntry)) -or ((Get-Item "prisma\schema.prisma").LastWriteTime -gt (Get-Item $prismaClientEntry).LastWriteTime)
+if ($needsGenerate) {
+  Write-Host "[INFO] Generating Prisma Client..."
+  node node_modules/prisma/build/index.js generate
+  if ($LASTEXITCODE -ne 0) { throw "prisma generate failed" }
+}
+
+Write-Host "[INFO] Applying database migrations & ensuring initial admin account..."
 node node_modules/prisma/build/index.js migrate deploy
 if ($LASTEXITCODE -ne 0) { throw "prisma migrate deploy failed" }
 
@@ -109,13 +122,6 @@ node node_modules/tsx/dist/cli.mjs prisma/seed.ts
 if ($LASTEXITCODE -ne 0) { throw "seed failed" }
 
 # 5. Start Next.js server
-$appPort = if ($env:PORT) { $env:PORT } else { "3000" }
-$existingApp = Get-NetTCPConnection -LocalPort ([int]$appPort) -State Listen -ErrorAction SilentlyContinue
-if ($existingApp) {
-  Write-Host "[WARN] Port $appPort is already in use. Open http://localhost:$appPort in your browser." -ForegroundColor Yellow
-  Start-Process "http://localhost:$appPort"
-  exit 0
-}
 
 try {
   if ($Dev) {
