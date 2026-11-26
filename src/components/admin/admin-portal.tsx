@@ -81,8 +81,8 @@ export function AdminPortal({
                     className={cn(
                       "flex shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors text-left",
                       active
-                        ? "bg-[#0077B6]/10 font-semibold text-[#0077B6]"
-                        : "font-medium text-[#425466] hover:bg-white/70 hover:text-[#0A2540]"
+                        ? "bg-primary/15 font-semibold text-primary"
+                        : "font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     )}
                   >
                     <span>{item.label}</span>
