@@ -66,7 +66,7 @@ export function AdminPortal({
       <div className="space-y-6">
         <div className="flex flex-col gap-6 lg:block">
           {/* Fixed In-Page Sidebar Navigation aligned to normal page width (No Container) */}
-          <aside className="w-full lg:fixed lg:top-24 lg:z-20 lg:w-56">
+          <aside className="w-full lg:fixed lg:top-[104px] lg:z-20 lg:w-56">
             <nav
               aria-label="Administration sections"
               className="flex overflow-x-auto no-scrollbar gap-1.5 pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0"

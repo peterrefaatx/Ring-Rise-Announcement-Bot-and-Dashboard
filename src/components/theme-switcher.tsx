@@ -40,7 +40,13 @@ function ThemeCategoryIcon({ id, className }: { id: ThemeId; className?: string 
   }
 }
 
-export function ThemeSwitcher() {
+export function ThemeSwitcher({
+  fullWidth = false,
+  align = "end",
+}: {
+  fullWidth?: boolean;
+  align?: "start" | "center" | "end";
+} = {}) {
   const { themeId, theme, mounted, setThemeId } = useTheme();
 
   const labelText = mounted ? theme.name : "Theme";
@@ -51,12 +57,26 @@ export function ThemeSwitcher() {
         <button
           type="button"
           aria-label="Switch visual theme"
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={cn(
+            "inline-flex items-center gap-2 border border-border bg-card text-xs font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            fullWidth
+              ? "w-full justify-between rounded-lg px-3 py-2"
+              : "rounded-full px-3 py-1.5"
+          )}
         >
-          <Palette className="h-3.5 w-3.5 text-primary" />
-          <span className="hidden sm:inline max-w-[110px] truncate">{labelText}</span>
+          <span className="flex items-center gap-2 min-w-0">
+            <Palette className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span
+              className={cn(
+                "truncate",
+                fullWidth ? "inline" : "hidden sm:inline max-w-[110px]"
+              )}
+            >
+              {labelText}
+            </span>
+          </span>
           {mounted && (
-            <span className="flex items-center gap-0.5">
+            <span className="flex items-center gap-0.5 shrink-0">
               <span
                 className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
                 style={{ backgroundColor: theme.swatches.primary }}
@@ -70,7 +90,7 @@ export function ThemeSwitcher() {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-72 p-2 shadow-xl">
+      <DropdownMenuContent align={align} className="w-72 p-2 shadow-xl">
         <div className="px-2 py-1.5">
           <p className="text-xs font-semibold text-foreground">Appearance Themes</p>
           <p className="text-[11px] text-muted-foreground">
@@ -91,16 +111,12 @@ export function ThemeSwitcher() {
                 )}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md border"
-                    style={{
-                      backgroundColor: item.swatches.canvas,
-                      borderColor: item.swatches.primary + "55",
-                      color: item.swatches.primary,
-                    }}
+                  <span
+                    className="flex shrink-0 items-center justify-center"
+                    style={{ color: item.swatches.primary }}
                   >
                     <ThemeCategoryIcon id={item.id} className="h-4 w-4" />
-                  </div>
+                  </span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="truncate text-xs font-semibold text-foreground">

@@ -10,7 +10,6 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
-import { BrandLogo } from "./brand-logo";
 import { ThemeSwitcher } from "./theme-switcher";
 import { Badge } from "./ui/badge";
 import {
@@ -42,22 +41,10 @@ interface AppShellProps {
   children: React.ReactNode;
 }
 
-export function AppShell({
-  user,
-  brand,
-  businessDateEst,
-  connectionState,
-  children,
-}: AppShellProps) {
+export function AppShell({ user, brand, children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
-
-  const initials = (user.announcementName || user.fullName || "U")
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() || "")
-    .join("");
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -95,33 +82,38 @@ export function AppShell({
       className="theme-canvas min-h-screen flex flex-col transition-colors duration-200"
       style={{ "--brand-accent": brand.brandPrimaryColor } as React.CSSProperties}
     >
-      {/* Top Bar */}
-      <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200">
-        <div className="mx-auto flex h-16 sm:h-[72px] max-w-7xl items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6">
-          <Link href="/" className="group min-w-0 flex-1 sm:flex-initial hover:opacity-95 transition-opacity">
-            <BrandLogo
-              brandName={brand.brandName}
-              brandPrimaryColor={brand.brandPrimaryColor}
-              brandLogoUrl={brand.brandLogoUrl}
-              connectionState={connectionState}
-              businessDateEst={businessDateEst}
-              compact
+      {/* Symmetric Split Header */}
+      <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-xl transition-colors duration-200">
+        <div className="mx-auto grid h-[72px] sm:h-20 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:px-6">
+          {/* Left: Theme Switcher */}
+          <div className="flex items-center justify-start min-w-0">
+            <ThemeSwitcher align="start" />
+          </div>
+
+          {/* Center: Clean Centered Logo */}
+          <Link
+            href="/"
+            aria-label={brand.brandName}
+            title={brand.brandName}
+            className="flex items-center justify-center hover:opacity-90 transition-opacity focus-visible:outline-none"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={brand.brandLogoUrl || "/logo.png"}
+              alt={brand.brandName}
+              className="h-12 sm:h-14 w-auto object-contain"
             />
           </Link>
 
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <ThemeSwitcher />
-
+          {/* Right: User Menu */}
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2.5 shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 sm:gap-2.5 rounded-full border border-border bg-card py-1 pl-1 pr-2.5 sm:py-1.5 sm:pl-1.5 sm:pr-3 text-xs sm:text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-primary/15 text-[11px] sm:text-xs font-semibold text-primary">
-                    {initials}
-                  </span>
-                  <span className="max-w-[80px] sm:max-w-[130px] truncate">{user.announcementName}</span>
+                  <span className="max-w-[90px] sm:max-w-[140px] truncate">{user.announcementName}</span>
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
@@ -174,7 +166,9 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto">{children}</main>
+      <main className="flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto">
+        {children}
+      </main>
     </div>
   );
 }
