@@ -10,7 +10,6 @@ import type { DashboardSnapshot } from "@/lib/dashboard";
 import { AnnounceLeadDialog } from "./announce-lead-dialog";
 import { LeaderboardPanel } from "./leaderboard-panel";
 import { CampaignProgressPanel } from "./campaign-progress-panel";
-import { ActivityFeedPanel } from "./activity-feed-panel";
 import { CrownBadge } from "@/components/crown-badge";
 
 interface CallerDashboardProps {
@@ -132,7 +131,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
 
         {/* Main Workspace: 60% Left (Daily Leaderboard) | 30% Right (Telegram Summary Buttons + Active Campaign Targets) */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="w-full space-y-6 lg:w-[60%]">
+          <div className="w-full lg:w-[60%]">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
               monthly={snapshot.leaderboards.monthly}
@@ -143,7 +142,6 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               dailyOnly
               hideTitle
             />
-            <ActivityFeedPanel items={snapshot.activityFeed} />
           </div>
 
           <div className="w-full space-y-3 lg:w-[30%]">
