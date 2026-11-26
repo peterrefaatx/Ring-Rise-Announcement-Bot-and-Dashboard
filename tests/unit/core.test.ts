@@ -23,6 +23,7 @@ import {
   buildExcelBuffer,
   sanitizeSpreadsheetCell,
 } from "@/lib/export";
+import { getRealtimeMode } from "@/lib/dashboard";
 
 describe("Fixed EST (UTC-5) Timezone Calculations", () => {
   it("resets business day at midnight EST (05:00:00 UTC) in winter without DST drift", () => {
@@ -193,5 +194,32 @@ describe("Cryptography & Export Security", () => {
 
     const xlsx = await buildExcelBuffer("Test", ["Name", "Count"], [["Ahmed", 10]]);
     expect(xlsx.byteLength).toBeGreaterThan(1000);
+  });
+});
+
+describe("Realtime Transport Mode Detection", () => {
+  it("uses sse by default and switches to poll on Vercel or REALTIME_MODE=poll", () => {
+    const prevVercel = process.env.VERCEL;
+    const prevMode = process.env.REALTIME_MODE;
+    try {
+      delete process.env.VERCEL;
+      delete process.env.REALTIME_MODE;
+      expect(getRealtimeMode()).toBe("sse");
+
+      process.env.VERCEL = "1";
+      expect(getRealtimeMode()).toBe("poll");
+
+      process.env.REALTIME_MODE = "sse";
+      expect(getRealtimeMode()).toBe("sse");
+
+      delete process.env.VERCEL;
+      process.env.REALTIME_MODE = "poll";
+      expect(getRealtimeMode()).toBe("poll");
+    } finally {
+      if (prevVercel === undefined) delete process.env.VERCEL;
+      else process.env.VERCEL = prevVercel;
+      if (prevMode === undefined) delete process.env.REALTIME_MODE;
+      else process.env.REALTIME_MODE = prevMode;
+    }
   });
 });

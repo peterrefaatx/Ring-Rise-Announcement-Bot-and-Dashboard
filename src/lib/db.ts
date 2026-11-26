@@ -31,7 +31,5 @@ export const pgPool =
     max: 10,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.prisma = prisma;
-  globalForDb.pgPool = pgPool;
-}
+globalForDb.prisma = prisma;
+globalForDb.pgPool = pgPool;

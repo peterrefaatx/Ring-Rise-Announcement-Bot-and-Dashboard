@@ -45,6 +45,7 @@ export interface DashboardSnapshot {
   businessDateEst: string;
   businessMonthEst: string;
   latestEventSeq: number;
+  realtimeMode?: "sse" | "poll";
   brand: BrandSettingsPublic;
   personal: {
     leadsToday: number;
@@ -229,6 +230,12 @@ async function getSharedDashboardCore() {
   });
 }
 
+export function getRealtimeMode(): "sse" | "poll" {
+  if (process.env.REALTIME_MODE === "poll") return "poll";
+  if (process.env.REALTIME_MODE === "sse") return "sse";
+  return process.env.VERCEL === "1" ? "poll" : "sse";
+}
+
 export async function getDashboardSnapshot(userId: string): Promise<DashboardSnapshot> {
   const shared = await getSharedDashboardCore();
 
@@ -238,6 +245,7 @@ export async function getDashboardSnapshot(userId: string): Promise<DashboardSna
 
   return {
     ...shared,
+    realtimeMode: getRealtimeMode(),
     personal: {
       leadsToday: dailyEntry?.leadCount ?? 0,
       leadsThisMonth: monthlyEntry?.leadCount ?? 0,
