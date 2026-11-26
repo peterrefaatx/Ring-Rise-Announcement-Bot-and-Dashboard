@@ -1,7 +1,6 @@
 databases:
   - name: ringrise-db
     databaseName: cold_calling_platform
-    user: postgres
     plan: free
 
 services:
@@ -34,6 +33,6 @@ services:
       - key: BRAND_PRIMARY_COLOR
         value: "#0077B6"
       - key: TELEGRAM_BOT_TOKEN
-        sync: false
+        value: ""
       - key: TELEGRAM_CHAT_ID
-        sync: false
+        value: ""
