@@ -130,10 +130,13 @@ export async function getLeaderboardForRange(options: {
   const rawRows: RawLeaderboardRow[] = [];
 
   for (const user of users) {
+    if (user.role !== "CALLER") {
+      continue;
+    }
     const agg = aggMap.get(user.id);
     const hasLeads = agg && agg.leadCount > 0;
     const isActiveCaller =
-      user.role === "CALLER" && user.status === "ACTIVE" && user.deletedAt === null;
+      user.status === "ACTIVE" && user.deletedAt === null;
 
     if (hasLeads || (options.includeZeroLeadActiveCallers && isActiveCaller)) {
       rawRows.push({

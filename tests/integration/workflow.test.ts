@@ -256,6 +256,20 @@ describe.skipIf(!hasDatabaseUrl)("PostgreSQL Integration Workflows", () => {
     const allTime = await getLeaderboardForRange({ includeZeroLeadActiveCallers: false });
     expect(allTime[0].userId).toBe(ahmedId);
     expect(allTime[0].leadCount).toBe(3);
+
+    // Admins must never compete in leaderboards even if they announce a lead
+    await announceLead(
+      {
+        userId: adminId,
+        campaignId: activeCampaignId,
+        idempotencyKey: "admin-should-not-rank",
+      },
+      { deferTelegramDispatch: true }
+    );
+    const allTimeWithAdminLead = await getLeaderboardForRange({
+      includeZeroLeadActiveCallers: true,
+    });
+    expect(allTimeWithAdminLead.some((entry) => entry.userId === adminId)).toBe(false);
   });
 
   it("delivers customized Telegram message, retries on failure, and prevents duplicates", async () => {
