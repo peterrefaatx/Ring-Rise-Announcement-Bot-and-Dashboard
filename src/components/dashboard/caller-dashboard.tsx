@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Megaphone, Send, BarChart2, Users } from "lucide-react";
+import { Megaphone, Send } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -172,9 +172,9 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
           </div>
         </section>
 
-        {/* Main Workspace: 60% Left (Daily Leaderboard) | 30% Right (Telegram Summary Buttons + Active Campaign Targets) */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="w-full lg:w-[60%]">
+        {/* Main Workspace: Left (Daily Leaderboard) | Right (Telegram Summary Buttons + Active Campaign Targets) */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
+          <div className="lg:col-span-7 min-w-0">
             <LeaderboardPanel
               daily={snapshot.leaderboards.daily}
               monthly={snapshot.leaderboards.monthly}
@@ -187,38 +187,36 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
             />
           </div>
 
-          <div className="w-full space-y-3 lg:w-[30%]">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="space-y-3 lg:col-span-5 min-w-0">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-4 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-3.5 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("campaigns")}
               >
-                <span className="flex items-center gap-2">
-                  <BarChart2 className="h-4 w-4 text-[#0077B6]" />
+                <span className="truncate">
                   {sendingSummary === "campaigns"
-                    ? "Sending Campaigns Progress..."
+                    ? "Sending Campaigns..."
                     : "Send Campaigns Progress"}
                 </span>
-                <Send className="h-3.5 w-3.5 text-[#64748B]" />
+                <Send className="h-5 w-5 shrink-0 text-[#0077B6]" />
               </Button>
 
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-between border-[#E3E8EE] bg-white px-4 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                className="w-full justify-between border-[#E3E8EE] bg-white px-3.5 py-2.5 h-auto text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
                 disabled={sendingSummary !== null}
                 onClick={() => handleSendTelegramSummary("callers")}
               >
-                <span className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-[#0077B6]" />
+                <span className="truncate">
                   {sendingSummary === "callers"
-                    ? "Sending Callers Progress..."
+                    ? "Sending Callers..."
                     : "Send Callers Progress"}
                 </span>
-                <Send className="h-3.5 w-3.5 text-[#64748B]" />
+                <Send className="h-5 w-5 shrink-0 text-[#0077B6]" />
               </Button>
             </div>
 
