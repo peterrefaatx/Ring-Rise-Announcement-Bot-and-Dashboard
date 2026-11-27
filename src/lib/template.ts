@@ -81,8 +81,41 @@ export function validateAnnouncementTemplate(rawTemplate: string): TemplateValid
   };
 }
 
+const RTL_CHAR_REGEX = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+const LTR_CHAR_REGEX = /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]/;
+const LRM = "\u200E";
+const RLM = "\u200F";
+const FSI = "\u2068";
+const PDI = "\u2069";
+
+/**
+ * Wraps text containing RTL characters in Unicode First-Strong Isolate marks
+ * so embedded RTL names do not scramble surrounding punctuation or word order.
+ */
+export function isolateRtlIfPresent(value: string): string {
+  return RTL_CHAR_REGEX.test(value) ? `${FSI}${value}${PDI}` : value;
+}
+
+/**
+ * Prefixes a line with Left-to-Right Mark when any RTL text is present so
+ * Telegram/browsers keep LTR line structure (numbers, bullets, trailing punctuation).
+ */
+export function ensureLtrLineBidi(line: string): string {
+  return RTL_CHAR_REGEX.test(line) ? `${LRM}${line}` : line;
+}
+
+function detectStrongDirection(text: string): "ltr" | "rtl" | null {
+  for (const ch of text) {
+    if (RTL_CHAR_REGEX.test(ch)) return "rtl";
+    if (LTR_CHAR_REGEX.test(ch)) return "ltr";
+  }
+  return null;
+}
+
 /**
  * Renders the final announcement message server-side without regex replacement $-token hazards.
+ * Applies Unicode Bidirectional Isolates & base-direction mark when RTL and LTR text mix so
+ * Telegram and web views preserve natural word and punctuation order.
  */
 export function renderAnnouncementMessage(
   template: string,
@@ -96,9 +129,38 @@ export function renderAnnouncementMessage(
     ? validated.normalized
     : DEFAULT_ANNOUNCEMENT_TEMPLATE;
 
-  return effectiveTemplate
+  const templateBody = effectiveTemplate
     .split("{name}")
-    .join(safeName)
+    .join("")
     .split("{campaign}")
-    .join(safeCampaign);
+    .join("");
+  const baseDir = detectStrongDirection(templateBody) ?? "ltr";
+
+  const hasAnyRtl =
+    RTL_CHAR_REGEX.test(templateBody) ||
+    RTL_CHAR_REGEX.test(safeName) ||
+    RTL_CHAR_REGEX.test(safeCampaign);
+
+  if (!hasAnyRtl) {
+    return effectiveTemplate
+      .split("{name}")
+      .join(safeName)
+      .split("{campaign}")
+      .join(safeCampaign);
+  }
+
+  const formatPlaceholder = (val: string) =>
+    baseDir === "ltr"
+      ? isolateRtlIfPresent(val)
+      : LTR_CHAR_REGEX.test(val)
+        ? `${FSI}${val}${PDI}`
+        : val;
+
+  const rendered = effectiveTemplate
+    .split("{name}")
+    .join(formatPlaceholder(safeName))
+    .split("{campaign}")
+    .join(formatPlaceholder(safeCampaign));
+
+  return `${baseDir === "rtl" ? RLM : LRM}${rendered}`;
 }

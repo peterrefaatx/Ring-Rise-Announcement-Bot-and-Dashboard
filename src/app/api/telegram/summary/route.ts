@@ -4,6 +4,7 @@ import { requireApiAuth, getRequestIp } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getLeaderboardForRange } from "@/lib/leaderboard";
 import { defaultTelegramTransport, getTelegramConfig } from "@/lib/telegram";
+import { ensureLtrLineBidi, isolateRtlIfPresent } from "@/lib/template";
 import {
   getBusinessDateEst,
   getEstDayRangeUtc,
@@ -80,7 +81,9 @@ export async function POST(request: NextRequest) {
     const lines = activeCampaigns.map((c) => {
       const leads = countMap.get(c.id) ?? 0;
       const pct = c.dailyTarget > 0 ? Math.round((leads / c.dailyTarget) * 100) : 0;
-      return `• ${c.name}: ${leads} / ${c.dailyTarget} leads (${pct}%)`;
+      return ensureLtrLineBidi(
+        `• ${isolateRtlIfPresent(c.name)}: ${leads} / ${c.dailyTarget} leads (${pct}%)`
+      );
     });
 
     const totalLeads = activeCampaigns.reduce(
@@ -106,7 +109,9 @@ export async function POST(request: NextRequest) {
 
     const lines = callers.map((c) => {
       const unit = c.leadCount === 1 ? "lead" : "leads";
-      return `${c.rank}. ${c.fullName}: ${c.leadCount} ${unit}`;
+      return ensureLtrLineBidi(
+        `${c.rank}. ${isolateRtlIfPresent(c.fullName)}: ${c.leadCount} ${unit}`
+      );
     });
     const teamTotal = callers.reduce((sum, c) => sum + c.leadCount, 0);
 

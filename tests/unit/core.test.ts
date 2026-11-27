@@ -89,6 +89,26 @@ describe("Announcement Template Validation & Server-Side Rendering", () => {
     );
   });
 
+  it("applies BiDi isolates and base direction mark when mixing Arabic and English", () => {
+    const rtlNameInLtr = renderAnnouncementMessage(
+      DEFAULT_ANNOUNCEMENT_TEMPLATE,
+      "الكارف",
+      "Oak City"
+    );
+    expect(rtlNameInLtr).toBe(
+      "\u200E\u2068الكارف\u2069 got a lead in Oak City, lets shout out to him!"
+    );
+
+    const ltrInRtlTemplate = renderAnnouncementMessage(
+      "عاش يا {name} في {campaign}!",
+      "Peter",
+      "Silkroad"
+    );
+    expect(ltrInRtlTemplate).toBe(
+      "\u200Fعاش يا \u2068Peter\u2069 في \u2068Silkroad\u2069!"
+    );
+  });
+
   it("rejects empty, missing required placeholders, unsupported placeholders, and oversized templates", () => {
     expect(validateAnnouncementTemplate("   ").valid).toBe(false);
     expect(validateAnnouncementTemplate("{name} got a lead!").valid).toBe(false);
