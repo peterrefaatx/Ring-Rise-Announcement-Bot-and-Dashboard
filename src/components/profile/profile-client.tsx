@@ -45,16 +45,18 @@ export function ProfileClient({
     [announcementTemplate]
   );
 
+  const sampleCampaign = "Silkroad";
+
   const livePreview = useMemo(() => {
     const previewName = announcementName.trim() || user.announcementName;
     if (!templateCheck.valid) {
       return renderAnnouncementMessage(
         DEFAULT_ANNOUNCEMENT_TEMPLATE,
         previewName,
-        "Digital Nomad"
+        sampleCampaign
       );
     }
-    return renderAnnouncementMessage(announcementTemplate, previewName, "Digital Nomad");
+    return renderAnnouncementMessage(announcementTemplate, previewName, sampleCampaign);
   }, [announcementName, announcementTemplate, templateCheck.valid, user.announcementName]);
 
   async function handleSave(e: React.FormEvent) {
@@ -184,7 +186,7 @@ export function ProfileClient({
 
                 <div className="rounded-lg border border-primary/25 bg-primary/10 p-3.5 space-y-1">
                   <p className="text-xs font-medium uppercase tracking-wide text-primary">
-                    Live Telegram Preview (sample campaign: Digital Nomad)
+                    Live Telegram Preview (sample campaign: {sampleCampaign})
                   </p>
                   <p className="text-sm font-medium text-foreground">{livePreview}</p>
                 </div>
