@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { APP_THEMES, type ThemeId } from "@/lib/themes";
 import { useTheme } from "./theme-provider";
+import { preloadThemeBackdropAssets } from "./theme-backdrop";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,7 +56,7 @@ export function ThemeSwitcher({
   const labelText = mounted ? theme.name : "Theme";
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={(open) => { if (open) preloadThemeBackdropAssets(); }}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"

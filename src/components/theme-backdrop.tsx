@@ -6,24 +6,19 @@ import { useTheme } from "./theme-provider";
 const MEME_TILES: Array<{
   src: string;
   rotate: string;
-  imgClass?: string;
 }> = [
-  { src: "/memes/unsettled-tom.jpg", rotate: "-rotate-1" },
-  {
-    src: "/memes/tom-newspaper.jpg",
-    rotate: "rotate-1",
-    imgClass: "object-bottom scale-[1.48] origin-bottom",
-  },
-  { src: "/memes/tom-shrugging.png", rotate: "-rotate-2" },
-  { src: "/memes/tom-swordfight.jpg", rotate: "rotate-2" },
-  { src: "/memes/disgusted-tom.png", rotate: "rotate-1" },
-  { src: "/memes/tom-gun.jpg", rotate: "-rotate-1" },
-  { src: "/memes/depressed-tom-jerry.png", rotate: "-rotate-2" },
-  { src: "/memes/tom-calls-goons.png", rotate: "rotate-1" },
-  { src: "/memes/suspicious-tom-newspaper.png", rotate: "rotate-2" },
-  { src: "/memes/unsettled-tom.jpg", rotate: "-rotate-1" },
-  { src: "/memes/tom-shrugging.png", rotate: "rotate-1" },
-  { src: "/memes/tom-swordfight.jpg", rotate: "-rotate-2" },
+  { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
+  { src: "/memes/tom-newspaper.webp", rotate: "rotate-1" },
+  { src: "/memes/tom-shrugging.webp", rotate: "-rotate-2" },
+  { src: "/memes/tom-swordfight.webp", rotate: "rotate-2" },
+  { src: "/memes/disgusted-tom.webp", rotate: "rotate-1" },
+  { src: "/memes/tom-gun.webp", rotate: "-rotate-1" },
+  { src: "/memes/depressed-tom-jerry.webp", rotate: "-rotate-2" },
+  { src: "/memes/tom-calls-goons.webp", rotate: "rotate-1" },
+  { src: "/memes/suspicious-tom-newspaper.webp", rotate: "rotate-2" },
+  { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
+  { src: "/memes/tom-shrugging.webp", rotate: "rotate-1" },
+  { src: "/memes/tom-swordfight.webp", rotate: "-rotate-2" },
 ];
 
 const SINGLE_BACKDROPS: Record<
@@ -31,21 +26,37 @@ const SINGLE_BACKDROPS: Record<
   { src: string; imgClass: string; overlayClass: string }
 > = {
   "breaking-bad": {
-    src: "/backgrounds/breaking-bad.jpg",
+    src: "/backgrounds/breaking-bad.webp",
     imgClass: "object-cover object-top opacity-[0.34] saturate-110",
     overlayClass: "bg-gradient-to-b from-[#090C0A]/55 via-[#090C0A]/45 to-[#090C0A]/75",
   },
   gaming: {
-    src: "/backgrounds/gta6.jpg",
+    src: "/backgrounds/gta6.webp",
     imgClass: "object-cover object-center opacity-[0.34] saturate-110",
     overlayClass: "bg-gradient-to-b from-[#070B12]/55 via-[#070B12]/45 to-[#070B12]/75",
   },
   music: {
-    src: "/backgrounds/music.jpg",
+    src: "/backgrounds/music.webp",
     imgClass: "object-cover object-bottom opacity-[0.42] saturate-110",
     overlayClass: "bg-gradient-to-b from-[#0E0918]/45 via-[#0E0918]/35 to-[#0E0918]/65",
   },
 };
+
+let preloadedThemeImages = false;
+
+export function preloadThemeBackdropAssets() {
+  if (preloadedThemeImages || typeof window === "undefined") return;
+  preloadedThemeImages = true;
+  const urls = [
+    ...Object.values(SINGLE_BACKDROPS).map((b) => b.src),
+    ...Array.from(new Set(MEME_TILES.map((t) => t.src))),
+  ];
+  for (const url of urls) {
+    const img = new window.Image();
+    img.decoding = "async";
+    img.src = url;
+  }
+}
 
 export function ThemeBackdrop() {
   const { themeId, mounted } = useTheme();
@@ -62,7 +73,12 @@ export function ThemeBackdrop() {
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={single.src} alt="" className={`h-full w-full ${single.imgClass}`} />
+        <img
+          src={single.src}
+          alt=""
+          decoding="async"
+          className={`h-full w-full ${single.imgClass}`}
+        />
         <div className={`absolute inset-0 ${single.overlayClass}`} />
       </div>
     );
@@ -82,12 +98,10 @@ export function ThemeBackdrop() {
               height="200"
               patternUnits="userSpaceOnUse"
             >
-              {/* Soft blush polka dots */}
               <circle cx="24" cy="28" r="2.5" fill="#F9A8D4" fillOpacity="0.45" />
               <circle cx="170" cy="36" r="2" fill="#F472B6" fillOpacity="0.35" />
               <circle cx="104" cy="176" r="2.5" fill="#FDA4AF" fillOpacity="0.4" />
 
-              {/* Primary 5-petal sakura blossom (top-left) */}
               <g transform="translate(56, 56)">
                 <ellipse cx="0" cy="-16" rx="7.5" ry="12" fill="#FBCFE8" />
                 <ellipse cx="0" cy="-16" rx="7.5" ry="12" fill="#FBCFE8" transform="rotate(72)" />
@@ -98,7 +112,6 @@ export function ThemeBackdrop() {
                 <circle cx="0" cy="0" r="1.8" fill="#FDE68A" />
               </g>
 
-              {/* Secondary smaller sakura blossom (bottom-right) */}
               <g transform="translate(152, 142) rotate(24) scale(0.78)">
                 <ellipse cx="0" cy="-15" rx="7" ry="11.5" fill="#F9A8D4" fillOpacity="0.72" />
                 <ellipse cx="0" cy="-15" rx="7" ry="11.5" fill="#F9A8D4" fillOpacity="0.72" transform="rotate(72)" />
@@ -109,7 +122,6 @@ export function ThemeBackdrop() {
                 <circle cx="0" cy="0" r="1.6" fill="#FDE68A" />
               </g>
 
-              {/* Drifting loose petals */}
               <path
                 d="M128 46 C135 38, 145 42, 141 52 C137 58, 127 54, 128 46 Z"
                 fill="#F472B6"
@@ -149,8 +161,8 @@ export function ThemeBackdrop() {
               <img
                 src={tile.src}
                 alt=""
-                loading="lazy"
-                className={`h-full w-full object-cover saturate-110 ${tile.imgClass ?? ""}`}
+                decoding="async"
+                className="h-full w-full object-cover saturate-110"
               />
             </div>
           ))}

@@ -1,13 +1,68 @@
 "use client";
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUp, Clock, Trophy } from "lucide-react";
+import {
+  ArrowUp,
+  Clock,
+  FlaskConical,
+  Flower2,
+  Gamepad2,
+  Laugh,
+  Music2,
+  Trophy,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
+import { useTheme } from "@/components/theme-provider";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
+import type { ThemeId } from "@/lib/themes";
 import { formatEstTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
+
+const RANK_POPUP_BY_THEME: Record<
+  ThemeId,
+  {
+    Icon: React.ComponentType<{ className?: string }>;
+    className: string;
+  }
+> = {
+  classic: {
+    Icon: ArrowUp,
+    className:
+      "rounded-full bg-gradient-to-r from-[#0077B6] to-[#0EA5E9] text-white shadow-md ring-2 ring-white/85",
+  },
+  dark: {
+    Icon: ArrowUp,
+    className:
+      "rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 text-slate-950 shadow-[0_6px_18px_rgba(56,189,248,0.4)] ring-2 ring-slate-900/70",
+  },
+  music: {
+    Icon: Music2,
+    className:
+      "rounded-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 text-white shadow-[0_6px_18px_rgba(236,72,153,0.45)] ring-2 ring-white/25",
+  },
+  gaming: {
+    Icon: Gamepad2,
+    className:
+      "rounded-full bg-gradient-to-r from-[#00E599] to-cyan-400 text-[#070B12] shadow-[0_6px_18px_rgba(0,229,153,0.4)] ring-2 ring-[#070B12]/70",
+  },
+  blush: {
+    Icon: Flower2,
+    className:
+      "rounded-full bg-gradient-to-r from-[#E11D74] to-[#F472B6] text-white shadow-[0_6px_16px_rgba(225,29,116,0.32)] ring-2 ring-white/90",
+  },
+  meme: {
+    Icon: Laugh,
+    className:
+      "rounded-full border-2 border-[#0D0F14] bg-gradient-to-r from-lime-400 to-yellow-400 text-[#0D0F14] shadow-[2px_2px_0px_#0D0F14]",
+  },
+  "breaking-bad": {
+    Icon: FlaskConical,
+    className:
+      "rounded-md border border-yellow-400/80 bg-gradient-to-r from-green-600 to-emerald-500 text-white shadow-[0_6px_18px_rgba(34,197,94,0.4)] ring-1 ring-black/40",
+  },
+};
 
 interface LeaderboardPanelProps {
   daily: LeaderboardEntry[];
@@ -90,6 +145,9 @@ export function LeaderboardList({
   currentUserId?: string;
   flush?: boolean;
 }) {
+  const { themeId } = useTheme();
+  const popupVariant = RANK_POPUP_BY_THEME[themeId] ?? RANK_POPUP_BY_THEME.classic;
+  const PopupIcon = popupVariant.Icon;
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const prevTopsRef = useRef<Map<string, number>>(new Map());
   const prevRanksRef = useRef<Map<string, number>>(new Map());
@@ -210,9 +268,12 @@ export function LeaderboardList({
             {rankDelta > 0 && (
               <div
                 aria-live="polite"
-                className="animate-rank-popup pointer-events-none absolute right-4 top-1.5 z-20 inline-flex items-center gap-0.5 rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-md ring-2 ring-white/75 dark:ring-black/30 sm:right-5"
+                className={cn(
+                  "animate-rank-popup pointer-events-none absolute right-4 top-1.5 z-20 inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold sm:right-5",
+                  popupVariant.className
+                )}
               >
-                <ArrowUp className="h-3 w-3 stroke-[2.5]" />
+                <PopupIcon className="h-3 w-3 stroke-[2.5]" />
                 <span>+{rankDelta}</span>
               </div>
             )}
