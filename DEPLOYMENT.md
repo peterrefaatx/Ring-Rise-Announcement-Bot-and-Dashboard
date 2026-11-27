@@ -39,33 +39,7 @@ Required variables in `.env`:
 
 ---
 
-## 3A. Deploying on Render.com (Single Full-Stack Service + PostgreSQL)
-
-Because Next.js serves both the frontend UI and the backend API (`/api/*`, SSE streaming, PostgreSQL `LISTEN/NOTIFY`, and the Telegram worker) in one Node.js application, you deploy **one PostgreSQL database** and **one Web Service** on Render.
-
-### Option 1: One-Click Blueprint (`render.yaml`)
-1. Push your latest code to GitHub.
-2. In Render Dashboard, click **New + -> Blueprint** and select this repository.
-3. Render automatically reads [render.yaml](./render.yaml), provisions `ringrise-db` (PostgreSQL) and `ringrise-app` (Node Web Service), and prompts for `INITIAL_ADMIN_PASSWORD`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_CHAT_ID`.
-
-### Option 2: Manual Setup on Render
-1. **Database**: Create **New + -> PostgreSQL** (copy its **Internal Database URL**).
-2. **Web Service**: Create **New + -> Web Service** connected to your GitHub repo:
-   - **Runtime**: `Node`
-   - **Build Command**: `npm ci --include=dev && npx prisma generate && npm run build`
-   - **Start Command**: `npx prisma migrate deploy && npx tsx prisma/seed.ts && npm run start`
-   - **Health Check Path**: `/api/health`
-3. **Environment Variables** on the Web Service:
-   - `DATABASE_URL`: paste the Internal Database URL from step 1
-   - `AUTH_SECRET`: 32+ random characters
-   - `FORCE_SECURE_COOKIES`: `true`
-   - `INITIAL_ADMIN_USERNAME`: `admin`
-   - `INITIAL_ADMIN_PASSWORD`: your chosen admin password
-   - `SEED_SAMPLE_TEAM`: `false` (or `true` for starter sample data)
-
----
-
-## 3B. Deploying with Docker Compose (VPS)
+## 3. Deploying with Docker Compose (VPS)
 
 Build and start PostgreSQL and the web application:
 
