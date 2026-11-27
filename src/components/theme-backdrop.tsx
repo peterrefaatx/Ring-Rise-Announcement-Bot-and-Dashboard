@@ -3,23 +3,70 @@
 import React from "react";
 import { useTheme } from "./theme-provider";
 
-const MEME_TILES: Array<{
+type CollageTile = {
   src: string;
   rotate: string;
-}> = [
-  { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
-  { src: "/memes/tom-newspaper.webp", rotate: "rotate-1" },
-  { src: "/memes/tom-shrugging.webp", rotate: "-rotate-2" },
-  { src: "/memes/tom-swordfight.webp", rotate: "rotate-2" },
-  { src: "/memes/disgusted-tom.webp", rotate: "rotate-1" },
-  { src: "/memes/tom-gun.webp", rotate: "-rotate-1" },
-  { src: "/memes/depressed-tom-jerry.webp", rotate: "-rotate-2" },
-  { src: "/memes/tom-calls-goons.webp", rotate: "rotate-1" },
-  { src: "/memes/suspicious-tom-newspaper.webp", rotate: "rotate-2" },
-  { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
-  { src: "/memes/tom-shrugging.webp", rotate: "rotate-1" },
-  { src: "/memes/tom-swordfight.webp", rotate: "-rotate-2" },
-];
+};
+
+type CollageBackdrop = {
+  gridClass: string;
+  tileClass: string;
+  imgClass: string;
+  tileOverlayClass?: string;
+  ambientClass?: string;
+  overlayClass: string;
+  tiles: CollageTile[];
+};
+
+const COLLAGE_BACKDROPS: Record<string, CollageBackdrop> = {
+  meme: {
+    gridClass: "gap-3 p-3 sm:gap-4 sm:p-4 opacity-[0.28]",
+    tileClass: "rounded-xl border border-yellow-400/25 bg-black/40 shadow-lg",
+    imgClass: "h-full w-full object-cover saturate-110",
+    overlayClass: "bg-gradient-to-b from-[#0D0F14]/55 via-[#0D0F14]/45 to-[#0D0F14]/70",
+    tiles: [
+      { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
+      { src: "/memes/tom-newspaper.webp", rotate: "rotate-1" },
+      { src: "/memes/tom-shrugging.webp", rotate: "-rotate-2" },
+      { src: "/memes/tom-swordfight.webp", rotate: "rotate-2" },
+      { src: "/memes/disgusted-tom.webp", rotate: "rotate-1" },
+      { src: "/memes/tom-gun.webp", rotate: "-rotate-1" },
+      { src: "/memes/depressed-tom-jerry.webp", rotate: "-rotate-2" },
+      { src: "/memes/tom-calls-goons.webp", rotate: "rotate-1" },
+      { src: "/memes/suspicious-tom-newspaper.webp", rotate: "rotate-2" },
+      { src: "/memes/unsettled-tom.webp", rotate: "-rotate-1" },
+      { src: "/memes/tom-shrugging.webp", rotate: "rotate-1" },
+      { src: "/memes/tom-swordfight.webp", rotate: "-rotate-2" },
+    ],
+  },
+  music: {
+    gridClass: "gap-3.5 p-3.5 sm:gap-5 sm:p-5 opacity-[0.46]",
+    tileClass:
+      "rounded-2xl border border-fuchsia-400/20 bg-[#12091E]/70 shadow-[0_14px_40px_rgba(0,0,0,0.6)] ring-1 ring-inset ring-white/10",
+    imgClass:
+      "h-full w-full object-cover object-[center_22%] grayscale contrast-125 brightness-90 scale-[1.03]",
+    tileOverlayClass:
+      "bg-gradient-to-tr from-[#3B0764]/65 via-fuchsia-500/25 to-violet-400/20 mix-blend-color",
+    ambientClass:
+      "bg-[radial-gradient(circle_at_18%_20%,rgba(236,72,153,0.18),transparent_44%),radial-gradient(circle_at_82%_78%,rgba(139,92,246,0.22),transparent_48%)]",
+    overlayClass:
+      "bg-gradient-to-b from-[#0E0918]/52 via-[#0E0918]/38 to-[#0E0918]/72",
+    tiles: [
+      { src: "/music/cairokee.webp", rotate: "-rotate-1" },
+      { src: "/music/queen.webp", rotate: "rotate-1" },
+      { src: "/music/massar-egbari.webp", rotate: "-rotate-2" },
+      { src: "/music/pink-floyd.webp", rotate: "rotate-2" },
+      { src: "/music/sharmoofers.webp", rotate: "rotate-1" },
+      { src: "/music/linkin-park.webp", rotate: "-rotate-1" },
+      { src: "/music/black-theama.webp", rotate: "-rotate-2" },
+      { src: "/music/metallica.webp", rotate: "rotate-1" },
+      { src: "/music/nirvana.webp", rotate: "rotate-2" },
+      { src: "/music/arctic-monkeys.webp", rotate: "-rotate-1" },
+      { src: "/music/coldplay.webp", rotate: "rotate-1" },
+      { src: "/music/acdc.webp", rotate: "-rotate-2" },
+    ],
+  },
+};
 
 const SINGLE_BACKDROPS: Record<
   string,
@@ -35,11 +82,6 @@ const SINGLE_BACKDROPS: Record<
     imgClass: "object-cover object-center opacity-[0.34] saturate-110",
     overlayClass: "bg-gradient-to-b from-[#070B12]/55 via-[#070B12]/45 to-[#070B12]/75",
   },
-  music: {
-    src: "/backgrounds/music.webp",
-    imgClass: "object-cover object-bottom opacity-[0.42] saturate-110",
-    overlayClass: "bg-gradient-to-b from-[#0E0918]/45 via-[#0E0918]/35 to-[#0E0918]/65",
-  },
 };
 
 let preloadedThemeImages = false;
@@ -49,7 +91,13 @@ export function preloadThemeBackdropAssets() {
   preloadedThemeImages = true;
   const urls = [
     ...Object.values(SINGLE_BACKDROPS).map((b) => b.src),
-    ...Array.from(new Set(MEME_TILES.map((t) => t.src))),
+    ...Array.from(
+      new Set(
+        Object.values(COLLAGE_BACKDROPS).flatMap((collage) =>
+          collage.tiles.map((t) => t.src)
+        )
+      )
+    ),
   ];
   for (const url of urls) {
     const img = new window.Image();
@@ -145,29 +193,41 @@ export function ThemeBackdrop() {
     );
   }
 
-  if (themeId === "meme") {
+  const collage = COLLAGE_BACKDROPS[themeId];
+  if (collage) {
     return (
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
       >
-        <div className="grid h-full w-full grid-cols-2 gap-3 p-3 sm:grid-cols-3 sm:gap-4 sm:p-4 lg:grid-cols-4 opacity-[0.28]">
-          {MEME_TILES.map((tile, index) => (
+        <div
+          className={`grid h-full w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${collage.gridClass}`}
+        >
+          {collage.tiles.map((tile, index) => (
             <div
               key={`${tile.src}-${index}`}
-              className={`relative overflow-hidden rounded-xl border border-yellow-400/25 bg-black/40 shadow-lg ${tile.rotate}`}
+              className={`relative overflow-hidden ${collage.tileClass} ${tile.rotate}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={tile.src}
                 alt=""
                 decoding="async"
-                className="h-full w-full object-cover saturate-110"
+                className={collage.imgClass}
               />
+              {collage.tileOverlayClass ? (
+                <>
+                  <div className={`absolute inset-0 ${collage.tileOverlayClass}`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E0918]/80 via-transparent to-[#0E0918]/25" />
+                </>
+              ) : null}
             </div>
           ))}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0D0F14]/55 via-[#0D0F14]/45 to-[#0D0F14]/70" />
+        {collage.ambientClass ? (
+          <div className={`absolute inset-0 ${collage.ambientClass}`} />
+        ) : null}
+        <div className={`absolute inset-0 ${collage.overlayClass}`} />
       </div>
     );
   }

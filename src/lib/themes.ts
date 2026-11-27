@@ -55,7 +55,7 @@ export const APP_THEMES: ThemeDefinition[] = [
     id: "music",
     name: "Vinyl Studio",
     category: "Music",
-    description: "Vinyl deck backdrop & stage neon",
+    description: "Rock & Egyptian bands collage backdrop",
     isDark: true,
     swatches: {
       canvas: "#0E0918",
