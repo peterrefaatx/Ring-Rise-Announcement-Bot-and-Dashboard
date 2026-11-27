@@ -7,9 +7,9 @@ import {
   FlaskConical,
   Flower2,
   Gamepad2,
+  Info,
   Laugh,
   Music2,
-  Trophy,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -83,22 +83,53 @@ export function LeaderboardPanel({
   hideTitle = false,
   showTiebreaker = true,
 }: LeaderboardPanelProps) {
+  const [tiebreakerOpen, setTiebreakerOpen] = useState(false);
+
   return (
     <Card className="overflow-hidden">
       {!hideTitle && (
-        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Trophy className="h-4 w-4 text-amber-500" />
-            {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
-          </CardTitle>
+        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] px-4 py-3.5 sm:px-5">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="text-base font-semibold text-[#0A2540]">
+              {dailyOnly ? "Today's Leaderboard" : "Team Leaderboards"}
+            </CardTitle>
+            {showTiebreaker && (
+              <div
+                className="relative group"
+                onMouseLeave={() => setTiebreakerOpen(false)}
+              >
+                <button
+                  type="button"
+                  aria-label="Tiebreaker rule"
+                  aria-expanded={tiebreakerOpen}
+                  onClick={() => setTiebreakerOpen((prev) => !prev)}
+                  onBlur={() => setTiebreakerOpen(false)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#64748B] transition-colors hover:bg-muted/80 hover:text-[#0A2540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
+                <div
+                  role="tooltip"
+                  className={cn(
+                    "pointer-events-none absolute right-0 top-full z-30 mt-2 w-60 rounded-lg border border-border bg-popover px-3 py-2 text-xs leading-relaxed text-popover-foreground shadow-lg transition-all duration-150",
+                    tiebreakerOpen
+                      ? "translate-y-0 opacity-100"
+                      : "-translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                  )}
+                >
+                  <span className="font-semibold text-foreground">Tiebreaker:</span> Earliest time to reach the lead count ranks first.
+                </div>
+              </div>
+            )}
+          </div>
         </CardHeader>
       )}
-      <CardContent className={cn("p-0", !hideTitle && "pt-4 px-5 pb-5")}>
+      <CardContent className={cn("p-0", !hideTitle && !dailyOnly && "pt-4 px-5 pb-5")}>
         {dailyOnly ? (
           <LeaderboardList
             entries={daily}
             currentUserId={currentUserId}
-            flush={hideTitle}
+            flush
           />
         ) : (
           <Tabs defaultValue="daily">
@@ -122,14 +153,10 @@ export function LeaderboardPanel({
           </Tabs>
         )}
       </CardContent>
-      {showTiebreaker && (
-        <div className="flex items-center gap-2 border-t border-[#E3E8EE] bg-[#FAFBFD] px-4 py-2.5 text-xs text-[#64748B] sm:px-5">
-          <Clock className="h-3.5 w-3.5 shrink-0 text-primary" />
-          <span>
-            <span className="font-semibold text-[#0A2540]">Tiebreaker:</span> Earliest time to reach the lead count ranks first
-          </span>
-        </div>
-      )}
+      <div
+        aria-hidden="true"
+        className="h-10 border-t border-[#E3E8EE] bg-[#FAFBFD]"
+      />
     </Card>
   );
 }

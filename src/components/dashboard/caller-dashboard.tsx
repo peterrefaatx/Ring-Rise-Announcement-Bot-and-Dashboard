@@ -205,7 +205,6 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               allTime={snapshot.leaderboards.allTime}
               currentUserId={user.id}
               dailyOnly
-              hideTitle
             />
           </div>
 
@@ -241,7 +240,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               ))}
             </div>
 
-            <CampaignProgressPanel campaigns={snapshot.campaigns} hideTitle />
+            <CampaignProgressPanel campaigns={snapshot.campaigns} />
           </div>
         </div>
       </div>

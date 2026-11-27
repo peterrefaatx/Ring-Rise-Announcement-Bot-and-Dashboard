@@ -13,13 +13,20 @@ export function CampaignProgressPanel({
   campaigns: CampaignProgressItem[];
   hideTitle?: boolean;
 }) {
+  const targetsMetCount = campaigns.filter((c) => c.targetReached).length;
+
   return (
     <Card className="overflow-hidden">
       {!hideTitle && (
-        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] pb-3.5">
-          <CardTitle className="text-base">
-            Active Campaign Targets
-          </CardTitle>
+        <CardHeader className="border-b border-[#E3E8EE] bg-[#FAFBFD] px-4 py-3.5 sm:px-5">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="text-base font-semibold text-[#0A2540]">
+              Active Campaigns
+            </CardTitle>
+            <span className="inline-flex items-center rounded-full bg-[#0077B6]/10 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-[#0077B6]">
+              {targetsMetCount}/{campaigns.length} targets met
+            </span>
+          </div>
         </CardHeader>
       )}
       <CardContent className="p-0">
@@ -80,6 +87,10 @@ export function CampaignProgressPanel({
           </div>
         )}
       </CardContent>
+      <div
+        aria-hidden="true"
+        className="h-10 border-t border-[#E3E8EE] bg-[#FAFBFD]"
+      />
     </Card>
   );
 }
