@@ -3,10 +3,9 @@ export type ThemeId =
   | "dark"
   | "music"
   | "gaming"
-  | "space"
-  | "nature"
   | "blush"
-  | "lavender";
+  | "meme"
+  | "breaking-bad";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -56,7 +55,7 @@ export const APP_THEMES: ThemeDefinition[] = [
     id: "music",
     name: "Vinyl Studio",
     category: "Music",
-    description: "Stage neon & equalizer glow",
+    description: "Vinyl deck backdrop & stage neon",
     isDark: true,
     swatches: {
       canvas: "#0E0918",
@@ -69,7 +68,7 @@ export const APP_THEMES: ThemeDefinition[] = [
     id: "gaming",
     name: "Cyber Arcade",
     category: "Gaming",
-    description: "Tactical HUD & neon matrix",
+    description: "GTA 6 backdrop & cyber neon",
     isDark: true,
     swatches: {
       canvas: "#070B12",
@@ -79,36 +78,10 @@ export const APP_THEMES: ThemeDefinition[] = [
     },
   },
   {
-    id: "space",
-    name: "Cosmic Nebula",
-    category: "Space",
-    description: "Deep indigo & solar starlight",
-    isDark: true,
-    swatches: {
-      canvas: "#070A19",
-      surface: "#111631",
-      primary: "#818CF8",
-      secondary: "#F59E0B",
-    },
-  },
-  {
-    id: "nature",
-    name: "Botanical Zen",
-    category: "Nature",
-    description: "Fresh sage mist & emerald",
-    isDark: false,
-    swatches: {
-      canvas: "#F2F6F1",
-      surface: "#FAFDF9",
-      primary: "#15803D",
-      secondary: "#10B981",
-    },
-  },
-  {
     id: "blush",
     name: "Sakura Blush",
     category: "Rose",
-    description: "Soft petal pink & roseberry glow",
+    description: "Sakura blossom pattern & rose glow",
     isDark: false,
     swatches: {
       canvas: "#FFF6F9",
@@ -118,16 +91,29 @@ export const APP_THEMES: ThemeDefinition[] = [
     },
   },
   {
-    id: "lavender",
-    name: "Lavender Silk",
-    category: "Pastel",
-    description: "Dreamy lilac & pearlescent orchid",
-    isDark: false,
+    id: "meme",
+    name: "Tom & Jerry",
+    category: "Memes",
+    description: "Tom & Jerry memes backdrop",
+    isDark: true,
     swatches: {
-      canvas: "#F9F6FF",
-      surface: "#FFFFFF",
-      primary: "#9333EA",
-      secondary: "#C084FC",
+      canvas: "#0D0F14",
+      surface: "#161922",
+      primary: "#84CC16",
+      secondary: "#FACC15",
+    },
+  },
+  {
+    id: "breaking-bad",
+    name: "Breaking Bad",
+    category: "TV",
+    description: "Heisenberg lab, hazmat gold & crystal",
+    isDark: true,
+    swatches: {
+      canvas: "#090C0A",
+      surface: "#121814",
+      primary: "#22C55E",
+      secondary: "#EAB308",
     },
   },
 ];

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { ThemeSwitcher } from "./theme-switcher";
 import { PageLoader } from "./page-loader";
+import { ThemeBackdrop } from "./theme-backdrop";
 import { Badge } from "./ui/badge";
 import {
   DropdownMenu,
@@ -94,9 +95,10 @@ export function AppShell({ user, brand, children }: AppShellProps) {
 
   return (
     <div
-      className="theme-canvas min-h-screen flex flex-col transition-colors duration-200"
+      className="theme-canvas relative min-h-screen flex flex-col transition-colors duration-200"
       style={{ "--brand-accent": brand.brandPrimaryColor } as React.CSSProperties}
     >
+      <ThemeBackdrop />
       {/* Symmetric Split Header */}
       <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-xl transition-colors duration-200">
         <div className="mx-auto grid h-[72px] sm:h-20 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:px-6">
@@ -190,7 +192,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
 
       <main
         key={pathname}
-        className="animate-nav-enter flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto"
+        className="animate-nav-enter relative z-10 flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto"
       >
         {children}
       </main>

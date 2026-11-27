@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ThemeBackdrop } from "@/components/theme-backdrop";
 import type { BrandSettingsPublic } from "@/lib/dashboard";
 
 export function LoginForm({
@@ -53,6 +54,7 @@ export function LoginForm({
 
   return (
     <div className="theme-canvas relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12 transition-colors duration-200">
+      <ThemeBackdrop />
       {/* Soft top radial light wash */}
       <div
         aria-hidden="true"

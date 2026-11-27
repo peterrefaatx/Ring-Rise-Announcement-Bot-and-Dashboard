@@ -115,8 +115,8 @@ html[data-theme="music"] {
   --theme-canvas-image:
     radial-gradient(ellipse 65% 42% at 15% 0%, rgba(236, 72, 153, 0.16), transparent),
     radial-gradient(ellipse 60% 42% at 85% 0%, rgba(139, 92, 246, 0.18), transparent);
-  --theme-surface: #171126;
-  --theme-surface-muted: #1E1733;
+  --theme-surface: rgba(23, 17, 38, 0.88);
+  --theme-surface-muted: rgba(30, 23, 51, 0.90);
   --theme-surface-track: #261E3F;
   --theme-header: rgba(20, 14, 34, 0.88);
   --theme-border: #2D234A;
@@ -162,8 +162,8 @@ html[data-theme="gaming"] {
     linear-gradient(to right, rgba(6, 182, 212, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(6, 182, 212, 0.04) 1px, transparent 1px);
   --theme-canvas-size: auto, 28px 28px, 28px 28px;
-  --theme-surface: #0F1724;
-  --theme-surface-muted: #141F30;
+  --theme-surface: rgba(15, 23, 36, 0.90);
+  --theme-surface-muted: rgba(20, 31, 48, 0.92);
   --theme-surface-track: #1B2A40;
   --theme-header: rgba(11, 17, 28, 0.9);
   --theme-border: #1F3147;
@@ -181,96 +181,7 @@ html[data-theme="gaming"] {
   --theme-scrollbar-hover: #00E599;
 }
 
-/* 4. Cosmic Nebula (Space category) */
-html[data-theme="space"] {
-  --background: 229 56% 6%;
-  --foreground: 226 45% 96%;
-  --card: 230 48% 12%;
-  --card-foreground: 226 45% 96%;
-  --popover: 230 48% 14%;
-  --popover-foreground: 226 45% 96%;
-  --primary: 239 84% 74%;
-  --primary-foreground: 229 56% 8%;
-  --secondary: 232 38% 18%;
-  --secondary-foreground: 226 45% 96%;
-  --muted: 232 36% 17%;
-  --muted-foreground: 228 28% 70%;
-  --accent: 236 45% 22%;
-  --accent-foreground: 43 96% 70%;
-  --destructive: 0 75% 58%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 233 36% 22%;
-  --input: 233 36% 25%;
-  --ring: 239 84% 74%;
-
-  --theme-canvas: #070A19;
-  --theme-canvas-image:
-    radial-gradient(ellipse 65% 45% at 75% 0%, rgba(129, 140, 248, 0.18), transparent),
-    radial-gradient(ellipse 50% 35% at 20% 10%, rgba(245, 158, 11, 0.11), transparent);
-  --theme-surface: #111631;
-  --theme-surface-muted: #171D3F;
-  --theme-surface-track: #212A54;
-  --theme-header: rgba(13, 17, 40, 0.88);
-  --theme-border: #262F5B;
-  --theme-ink: #EEF2FF;
-  --theme-ink-secondary: #C7D2FE;
-  --theme-ink-muted: #94A3F5;
-  --theme-accent: #818CF8;
-  --theme-accent-hover: #6366F1;
-  --theme-accent-soft: rgba(129, 140, 248, 0.18);
-  --theme-accent-subtle: rgba(245, 158, 11, 0.08);
-  --theme-progress-fill: linear-gradient(90deg, #818CF8 0%, #C084FC 55%, #F59E0B 100%);
-  --theme-top1-row: rgba(245, 158, 11, 0.12);
-  --theme-card-shadow: 0 8px 26px rgba(3, 5, 18, 0.5), inset 0 1px 0 rgba(199, 210, 254, 0.08);
-  --theme-scrollbar: #3730A3;
-  --theme-scrollbar-hover: #818CF8;
-}
-
-/* 5. Botanical Zen (Nature category) */
-html[data-theme="nature"] {
-  --background: 110 24% 95%;
-  --foreground: 156 48% 12%;
-  --card: 108 45% 98%;
-  --card-foreground: 156 48% 12%;
-  --popover: 108 45% 99%;
-  --popover-foreground: 156 48% 12%;
-  --primary: 142 71% 29%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 128 22% 91%;
-  --secondary-foreground: 156 48% 12%;
-  --muted: 128 20% 92%;
-  --muted-foreground: 150 15% 42%;
-  --accent: 142 42% 91%;
-  --accent-foreground: 142 71% 24%;
-  --destructive: 0 74% 52%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 132 20% 85%;
-  --input: 132 20% 82%;
-  --ring: 142 71% 29%;
-
-  --theme-canvas: #F2F6F1;
-  --theme-canvas-image:
-    radial-gradient(ellipse 75% 40% at 50% 0%, rgba(16, 185, 129, 0.09), transparent);
-  --theme-surface: #FAFDF9;
-  --theme-surface-muted: #F1F6EF;
-  --theme-surface-track: #E1ECE2;
-  --theme-header: rgba(250, 253, 249, 0.92);
-  --theme-border: #D5E3D6;
-  --theme-ink: #0F2E22;
-  --theme-ink-secondary: #335547;
-  --theme-ink-muted: #587868;
-  --theme-accent: #15803D;
-  --theme-accent-hover: #166534;
-  --theme-accent-soft: rgba(21, 128, 61, 0.11);
-  --theme-accent-subtle: rgba(16, 185, 129, 0.07);
-  --theme-progress-fill: linear-gradient(90deg, #15803D 0%, #10B981 100%);
-  --theme-top1-row: rgba(254, 243, 199, 0.65);
-  --theme-card-shadow: 0 1px 2px rgba(15, 46, 34, 0.04), 0 6px 16px rgba(21, 128, 61, 0.05);
-  --theme-scrollbar: #B7D0BC;
-  --theme-scrollbar-hover: #6DA37A;
-}
-
-/* 6. Sakura Blush (Rose category) */
+/* 4. Sakura Blush (Rose category) */
 html[data-theme="blush"] {
   --background: 340 100% 98%;
   --foreground: 328 58% 15%;
@@ -296,8 +207,8 @@ html[data-theme="blush"] {
   --theme-canvas-image:
     radial-gradient(ellipse 75% 42% at 50% 0%, rgba(244, 114, 182, 0.16), transparent),
     radial-gradient(ellipse 50% 35% at 88% 8%, rgba(251, 113, 133, 0.1), transparent);
-  --theme-surface: #FFFFFF;
-  --theme-surface-muted: #FFF1F6;
+  --theme-surface: rgba(255, 255, 255, 0.90);
+  --theme-surface-muted: rgba(255, 241, 246, 0.92);
   --theme-surface-track: #FCE4EE;
   --theme-header: rgba(255, 250, 252, 0.92);
   --theme-border: #F5D5E2;
@@ -315,49 +226,96 @@ html[data-theme="blush"] {
   --theme-scrollbar-hover: #EC4899;
 }
 
-/* 7. Lavender Silk (Pastel category) */
-html[data-theme="lavender"] {
-  --background: 263 100% 98%;
-  --foreground: 264 55% 17%;
-  --card: 264 100% 99.5%;
-  --card-foreground: 264 55% 17%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 264 55% 17%;
-  --primary: 271 81% 56%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 265 45% 94%;
-  --secondary-foreground: 264 55% 17%;
-  --muted: 265 40% 94%;
-  --muted-foreground: 265 20% 46%;
-  --accent: 268 70% 93%;
-  --accent-foreground: 271 76% 42%;
-  --destructive: 0 74% 52%;
+/* 6. Breaking Bad (TV category) */
+html[data-theme="breaking-bad"] {
+  --background: 145 18% 5%;
+  --foreground: 120 20% 96%;
+  --card: 145 18% 9%;
+  --card-foreground: 120 20% 96%;
+  --popover: 145 18% 11%;
+  --popover-foreground: 120 20% 96%;
+  --primary: 142 71% 45%;
+  --primary-foreground: 145 30% 6%;
+  --secondary: 145 16% 15%;
+  --secondary-foreground: 120 20% 96%;
+  --muted: 145 16% 14%;
+  --muted-foreground: 140 12% 66%;
+  --accent: 45 70% 18%;
+  --accent-foreground: 48 96% 62%;
+  --destructive: 0 75% 58%;
   --destructive-foreground: 0 0% 100%;
-  --border: 266 38% 89%;
-  --input: 266 34% 85%;
-  --ring: 271 81% 56%;
+  --border: 145 18% 20%;
+  --input: 145 18% 23%;
+  --ring: 142 71% 45%;
 
-  --theme-canvas: #F9F6FF;
+  --theme-canvas: #090C0A;
   --theme-canvas-image:
-    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(192, 132, 252, 0.16), transparent),
-    radial-gradient(ellipse 50% 35% at 15% 8%, rgba(232, 121, 249, 0.1), transparent);
-  --theme-surface: #FFFFFF;
-  --theme-surface-muted: #F5F0FF;
-  --theme-surface-track: #ECE2FE;
-  --theme-header: rgba(251, 249, 255, 0.92);
-  --theme-border: #E5D9FB;
-  --theme-ink: #261342;
-  --theme-ink-secondary: #4D3373;
-  --theme-ink-muted: #765B99;
-  --theme-accent: #9333EA;
-  --theme-accent-hover: #7E22CE;
-  --theme-accent-soft: rgba(147, 51, 234, 0.12);
-  --theme-accent-subtle: rgba(192, 132, 252, 0.09);
-  --theme-progress-fill: linear-gradient(90deg, #9333EA 0%, #C084FC 55%, #EC4899 100%);
-  --theme-top1-row: rgba(253, 230, 138, 0.45);
-  --theme-card-shadow: 0 1px 2px rgba(38, 19, 66, 0.04), 0 6px 18px rgba(147, 51, 234, 0.06);
-  --theme-scrollbar: #D5BDF8;
-  --theme-scrollbar-hover: #A855F7;
+    radial-gradient(ellipse 70% 42% at 22% 0%, rgba(34, 197, 94, 0.14), transparent),
+    radial-gradient(ellipse 65% 40% at 84% 0%, rgba(234, 179, 8, 0.14), transparent);
+  --theme-surface: rgba(16, 22, 18, 0.90);
+  --theme-surface-muted: rgba(22, 31, 25, 0.92);
+  --theme-surface-track: #1E2B22;
+  --theme-header: rgba(11, 15, 12, 0.90);
+  --theme-border: #26362B;
+  --theme-ink: #F0FDF4;
+  --theme-ink-secondary: #D1FAE5;
+  --theme-ink-muted: #9CA3AF;
+  --theme-accent: #22C55E;
+  --theme-accent-hover: #16A34A;
+  --theme-accent-soft: rgba(34, 197, 94, 0.17);
+  --theme-accent-subtle: rgba(234, 179, 8, 0.10);
+  --theme-progress-fill: linear-gradient(90deg, #16A34A 0%, #22C55E 48%, #EAB308 100%);
+  --theme-top1-row: rgba(234, 179, 8, 0.14);
+  --theme-card-shadow: 0 6px 24px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(34, 197, 94, 0.10);
+  --theme-scrollbar: #166534;
+  --theme-scrollbar-hover: #22C55E;
+}
+
+/* 8. Meme Mode (Memes category) */
+html[data-theme="meme"] {
+  --background: 223 21% 7%;
+  --foreground: 60 30% 96%;
+  --card: 225 22% 11%;
+  --card-foreground: 60 30% 96%;
+  --popover: 225 22% 13%;
+  --popover-foreground: 60 30% 96%;
+  --primary: 84 81% 44%;
+  --primary-foreground: 223 21% 7%;
+  --secondary: 223 20% 17%;
+  --secondary-foreground: 60 30% 96%;
+  --muted: 223 19% 16%;
+  --muted-foreground: 215 16% 68%;
+  --accent: 48 65% 18%;
+  --accent-foreground: 48 96% 64%;
+  --destructive: 16 100% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 223 18% 23%;
+  --input: 223 18% 26%;
+  --ring: 84 81% 44%;
+
+  --theme-canvas: #0D0F14;
+  --theme-canvas-image:
+    radial-gradient(ellipse 70% 42% at 18% 0%, rgba(132, 204, 22, 0.14), transparent),
+    radial-gradient(ellipse 65% 40% at 86% 0%, rgba(255, 87, 0, 0.14), transparent),
+    radial-gradient(rgba(250, 204, 21, 0.08) 1px, transparent 1px);
+  --theme-canvas-size: auto, auto, 22px 22px;
+  --theme-surface: rgba(22, 25, 34, 0.92);
+  --theme-surface-muted: rgba(30, 35, 48, 0.94);
+  --theme-surface-track: #262C3D;
+  --theme-header: rgba(16, 19, 27, 0.9);
+  --theme-border: #30374A;
+  --theme-ink: #FEFCE8;
+  --theme-ink-secondary: #E2E8F0;
+  --theme-ink-muted: #A1A9BE;
+  --theme-accent: #84CC16;
+  --theme-accent-hover: #65A30D;
+  --theme-accent-soft: rgba(132, 204, 22, 0.17);
+  --theme-accent-subtle: rgba(250, 204, 21, 0.09);
+  --theme-progress-fill: linear-gradient(90deg, #84CC16 0%, #FACC15 52%, #FF5700 100%);
+  --theme-top1-row: rgba(250, 204, 21, 0.14);
+  --theme-card-shadow: 3px 3px 0px rgba(250, 204, 21, 0.22), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --theme-scrollbar: #4D7C0F;
+  --theme-scrollbar-hover: #84CC16;
 }
 
 @layer base {
@@ -518,16 +476,12 @@ html[data-theme="lavender"] {
 /* Harmonize dark-mode & custom-palette utilities across inner admin/profile/dialog tabs */
 @layer utilities {
   html[data-theme-mode="dark"] .bg-white,
-  html[data-theme="nature"] .bg-white,
-  html[data-theme="blush"] .bg-white,
-  html[data-theme="lavender"] .bg-white {
+  html[data-theme="blush"] .bg-white {
     background-color: var(--theme-surface);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#F6F9FC\],
-  html[data-theme="nature"] .bg-\[\#F6F9FC\],
-  html[data-theme="blush"] .bg-\[\#F6F9FC\],
-  html[data-theme="lavender"] .bg-\[\#F6F9FC\] {
+  html[data-theme="blush"] .bg-\[\#F6F9FC\] {
     background-color: var(--theme-canvas);
   }
 
@@ -535,11 +489,8 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .bg-\[\#F8FAFC\],
   html[data-theme-mode="dark"] .bg-slate-50,
   html[data-theme-mode="dark"] .bg-slate-50\/70,
-  html[data-theme="nature"] .bg-\[\#FAFBFD\],
   html[data-theme="blush"] .bg-\[\#FAFBFD\],
-  html[data-theme="blush"] .bg-slate-50,
-  html[data-theme="lavender"] .bg-\[\#FAFBFD\],
-  html[data-theme="lavender"] .bg-slate-50 {
+  html[data-theme="blush"] .bg-slate-50 {
     background-color: var(--theme-surface-muted);
   }
 
@@ -547,9 +498,7 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .bg-\[\#F1F5F9\],
   html[data-theme-mode="dark"] .bg-slate-100,
   html[data-theme="blush"] .bg-\[\#EEF2F6\],
-  html[data-theme="blush"] .bg-slate-100,
-  html[data-theme="lavender"] .bg-\[\#EEF2F6\],
-  html[data-theme="lavender"] .bg-slate-100 {
+  html[data-theme="blush"] .bg-slate-100 {
     background-color: var(--theme-surface-track);
   }
 
@@ -557,25 +506,17 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .hover\:bg-\[\#F8FAFC\]:hover,
   html[data-theme-mode="dark"] .hover\:bg-slate-50:hover,
   html[data-theme-mode="dark"] .hover\:bg-white\/70:hover,
-  html[data-theme="nature"] .hover\:bg-\[\#FAFBFD\]:hover,
   html[data-theme="blush"] .hover\:bg-\[\#FAFBFD\]:hover,
   html[data-theme="blush"] .hover\:bg-\[\#F8FAFC\]:hover,
-  html[data-theme="blush"] .hover\:bg-slate-50:hover,
-  html[data-theme="lavender"] .hover\:bg-\[\#FAFBFD\]:hover,
-  html[data-theme="lavender"] .hover\:bg-\[\#F8FAFC\]:hover,
-  html[data-theme="lavender"] .hover\:bg-slate-50:hover {
+  html[data-theme="blush"] .hover\:bg-slate-50:hover {
     background-color: var(--theme-surface-muted);
   }
 
   html[data-theme-mode="dark"] .text-\[\#0A2540\],
   html[data-theme-mode="dark"] .text-slate-900,
   html[data-theme-mode="dark"] .text-slate-800,
-  html[data-theme="nature"] .text-\[\#0A2540\],
-  html[data-theme="nature"] .text-slate-900,
   html[data-theme="blush"] .text-\[\#0A2540\],
-  html[data-theme="blush"] .text-slate-900,
-  html[data-theme="lavender"] .text-\[\#0A2540\],
-  html[data-theme="lavender"] .text-slate-900 {
+  html[data-theme="blush"] .text-slate-900 {
     color: var(--theme-ink);
   }
 
@@ -584,10 +525,7 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .text-slate-600,
   html[data-theme="blush"] .text-\[\#425466\],
   html[data-theme="blush"] .text-slate-700,
-  html[data-theme="blush"] .text-slate-600,
-  html[data-theme="lavender"] .text-\[\#425466\],
-  html[data-theme="lavender"] .text-slate-700,
-  html[data-theme="lavender"] .text-slate-600 {
+  html[data-theme="blush"] .text-slate-600 {
     color: var(--theme-ink-secondary);
   }
 
@@ -595,9 +533,7 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .text-slate-500,
   html[data-theme-mode="dark"] .text-slate-400,
   html[data-theme="blush"] .text-\[\#64748B\],
-  html[data-theme="blush"] .text-slate-500,
-  html[data-theme="lavender"] .text-\[\#64748B\],
-  html[data-theme="lavender"] .text-slate-500 {
+  html[data-theme="blush"] .text-slate-500 {
     color: var(--theme-ink-muted);
   }
 
@@ -605,49 +541,34 @@ html[data-theme="lavender"] {
   html[data-theme-mode="dark"] .border-slate-200,
   html[data-theme-mode="dark"] .border-slate-100,
   html[data-theme-mode="dark"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
-  html[data-theme="nature"] .border-\[\#E3E8EE\],
-  html[data-theme="nature"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
   html[data-theme="blush"] .border-\[\#E3E8EE\],
   html[data-theme="blush"] .border-slate-200,
-  html[data-theme="blush"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]),
-  html[data-theme="lavender"] .border-\[\#E3E8EE\],
-  html[data-theme="lavender"] .border-slate-200,
-  html[data-theme="lavender"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]) {
+  html[data-theme="blush"] .divide-\[\#E3E8EE\] > :not([hidden]) ~ :not([hidden]) {
     border-color: var(--theme-border);
   }
 
   html[data-theme-mode="dark"] .text-\[\#0077B6\],
-  html[data-theme="nature"] .text-\[\#0077B6\],
-  html[data-theme="blush"] .text-\[\#0077B6\],
-  html[data-theme="lavender"] .text-\[\#0077B6\] {
+  html[data-theme="blush"] .text-\[\#0077B6\] {
     color: var(--theme-accent);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\],
-  html[data-theme="nature"] .bg-\[\#0077B6\],
-  html[data-theme="blush"] .bg-\[\#0077B6\],
-  html[data-theme="lavender"] .bg-\[\#0077B6\] {
+  html[data-theme="blush"] .bg-\[\#0077B6\] {
     background-color: var(--theme-accent);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/10,
-  html[data-theme="nature"] .bg-\[\#0077B6\]\/10,
-  html[data-theme="blush"] .bg-\[\#0077B6\]\/10,
-  html[data-theme="lavender"] .bg-\[\#0077B6\]\/10 {
+  html[data-theme="blush"] .bg-\[\#0077B6\]\/10 {
     background-color: var(--theme-accent-soft);
   }
 
   html[data-theme-mode="dark"] .bg-\[\#0077B6\]\/\[0\.04\],
-  html[data-theme="nature"] .bg-\[\#0077B6\]\/\[0\.04\],
-  html[data-theme="blush"] .bg-\[\#0077B6\]\/\[0\.04\],
-  html[data-theme="lavender"] .bg-\[\#0077B6\]\/\[0\.04\] {
+  html[data-theme="blush"] .bg-\[\#0077B6\]\/\[0\.04\] {
     background-color: var(--theme-accent-subtle);
   }
 
   html[data-theme-mode="dark"] .hover\:bg-\[\#005A8D\]:hover,
-  html[data-theme="nature"] .hover\:bg-\[\#005A8D\]:hover,
-  html[data-theme="blush"] .hover\:bg-\[\#005A8D\]:hover,
-  html[data-theme="lavender"] .hover\:bg-\[\#005A8D\]:hover {
+  html[data-theme="blush"] .hover\:bg-\[\#005A8D\]:hover {
     background-color: var(--theme-accent-hover);
   }
 

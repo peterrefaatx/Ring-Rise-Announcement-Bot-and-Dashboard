@@ -3,14 +3,13 @@
 import React from "react";
 import {
   Check,
+  FlaskConical,
   Flower2,
   Gamepad2,
-  Leaf,
+  Laugh,
   Moon,
   Music2,
-  Orbit,
   Palette,
-  Sparkles,
   Sun,
 } from "lucide-react";
 import { APP_THEMES, type ThemeId } from "@/lib/themes";
@@ -32,14 +31,12 @@ function ThemeCategoryIcon({ id, className }: { id: ThemeId; className?: string 
       return <Music2 className={className} />;
     case "gaming":
       return <Gamepad2 className={className} />;
-    case "space":
-      return <Orbit className={className} />;
-    case "nature":
-      return <Leaf className={className} />;
     case "blush":
       return <Flower2 className={className} />;
-    case "lavender":
-      return <Sparkles className={className} />;
+    case "meme":
+      return <Laugh className={className} />;
+    case "breaking-bad":
+      return <FlaskConical className={className} />;
     case "classic":
     default:
       return <Sun className={className} />;
