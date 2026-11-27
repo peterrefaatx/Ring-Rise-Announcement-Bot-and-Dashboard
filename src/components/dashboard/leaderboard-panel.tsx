@@ -69,8 +69,6 @@ interface LeaderboardPanelProps {
   monthly: LeaderboardEntry[];
   allTime: LeaderboardEntry[];
   currentUserId: string;
-  businessDateEst: string;
-  businessMonthEst: string;
   dailyOnly?: boolean;
   hideTitle?: boolean;
   showTiebreaker?: boolean;

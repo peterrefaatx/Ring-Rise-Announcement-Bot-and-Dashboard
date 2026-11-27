@@ -6,7 +6,6 @@ import { generateSessionToken, hashSessionToken } from "./crypto";
 import { cached, invalidateCacheKey } from "./cache";
 
 export const SESSION_COOKIE_NAME = "rr_session";
-const SESSION_TTL_DAYS = 14;
 
 export interface AuthenticatedUser {
   id: string;

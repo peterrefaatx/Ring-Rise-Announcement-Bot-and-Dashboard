@@ -184,44 +184,41 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
               monthly={snapshot.leaderboards.monthly}
               allTime={snapshot.leaderboards.allTime}
               currentUserId={user.id}
-              businessDateEst={snapshot.businessDateEst}
-              businessMonthEst={snapshot.businessMonthEst}
               dailyOnly
               hideTitle
             />
           </div>
 
           <div className="space-y-3 min-w-0">
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-between gap-2 border-[#E3E8EE] bg-white px-2.5 sm:px-3 py-2.5 h-auto text-[11px] sm:text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
-                disabled={sendingSummary !== null}
-                onClick={() => handleSendTelegramSummary("campaigns")}
-              >
-                <span className="text-left leading-tight whitespace-normal sm:truncate">
-                  {sendingSummary === "campaigns"
-                    ? "Sending Campaigns..."
-                    : "Send Campaigns Progress"}
-                </span>
-                <Send className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-[#0077B6]" />
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-between gap-2 border-[#E3E8EE] bg-white px-2.5 sm:px-3 py-2.5 h-auto text-[11px] sm:text-xs font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
-                disabled={sendingSummary !== null}
-                onClick={() => handleSendTelegramSummary("callers")}
-              >
-                <span className="text-left leading-tight whitespace-normal sm:truncate">
-                  {sendingSummary === "callers"
-                    ? "Sending Callers..."
-                    : "Send Callers Progress"}
-                </span>
-                <Send className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-[#0077B6]" />
-              </Button>
+            <div className="grid grid-cols-2 gap-2.5">
+              {(
+                [
+                  {
+                    type: "campaigns",
+                    label: "Campaigns Progress",
+                    loadingLabel: "Sending Campaigns...",
+                  },
+                  {
+                    type: "callers",
+                    label: "Callers Progress",
+                    loadingLabel: "Sending Callers...",
+                  },
+                ] as const
+              ).map((item) => (
+                <Button
+                  key={item.type}
+                  type="button"
+                  variant="outline"
+                  className="h-auto min-h-[92px] sm:min-h-[104px] w-full flex-col items-center justify-center gap-2.5 rounded-xl border-[#E3E8EE] bg-white px-3 py-4 text-center text-xs sm:text-sm font-semibold text-[#0A2540] shadow-[0_1px_2px_rgba(10,37,64,0.04)] hover:border-[#CBD5E1] hover:bg-[#FAFBFD]"
+                  disabled={sendingSummary !== null}
+                  onClick={() => handleSendTelegramSummary(item.type)}
+                >
+                  <Send className="h-6 w-6 sm:h-7 sm:w-7 shrink-0 text-[#0077B6]" />
+                  <span className="leading-tight whitespace-normal">
+                    {sendingSummary === item.type ? item.loadingLabel : item.label}
+                  </span>
+                </Button>
+              ))}
             </div>
 
             <CampaignProgressPanel campaigns={snapshot.campaigns} hideTitle />

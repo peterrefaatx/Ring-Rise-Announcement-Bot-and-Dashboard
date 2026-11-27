@@ -181,8 +181,6 @@ export function AdminPortal({
                       monthly={snapshot.leaderboards.monthly}
                       allTime={snapshot.leaderboards.allTime}
                       currentUserId={user.id}
-                      businessDateEst={snapshot.businessDateEst}
-                      businessMonthEst={snapshot.businessMonthEst}
                     />
                   </div>
                 </div>
