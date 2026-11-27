@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { CheckCircle2, Megaphone, ArrowLeft, Send } from "lucide-react";
+import { CheckCircle2, Megaphone, ArrowLeft, Search, Send } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { CampaignProgressItem } from "@/lib/dashboard";
 import { renderAnnouncementMessage } from "@/lib/template";
@@ -34,10 +35,17 @@ export function AnnounceLeadDialog({
   onSuccess,
 }: AnnounceLeadDialogProps) {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>("");
+  const [campaignSearch, setCampaignSearch] = useState<string>("");
   const [step, setStep] = useState<"select" | "confirm">("select");
   const [submitting, setSubmitting] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const filteredCampaigns = useMemo(() => {
+    const query = campaignSearch.trim().toLowerCase();
+    if (!query) return campaigns;
+    return campaigns.filter((c) => c.name.toLowerCase().includes(query));
+  }, [campaigns, campaignSearch]);
 
   const selectedCampaign = useMemo(
     () => campaigns.find((c) => c.id === selectedCampaignId) || null,
@@ -57,6 +65,7 @@ export function AnnounceLeadDialog({
     if (!nextOpen && submitting) return;
     setStep("select");
     setSelectedCampaignId("");
+    setCampaignSearch("");
     setIdempotencyKey("");
     setErrorMessage(null);
     onOpenChange(nextOpen);
@@ -102,6 +111,7 @@ export function AnnounceLeadDialog({
       );
       setStep("select");
       setSelectedCampaignId("");
+      setCampaignSearch("");
       setIdempotencyKey("");
       onOpenChange(false);
       onSuccess();
@@ -116,7 +126,7 @@ export function AnnounceLeadDialog({
 
   return (
     <Dialog open={open} onOpenChange={resetDialogState}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Megaphone className="h-5 w-5 text-primary" />
@@ -125,51 +135,73 @@ export function AnnounceLeadDialog({
         </DialogHeader>
 
         {step === "select" ? (
-          <div className="mt-3 space-y-2 max-h-72 overflow-y-auto pr-1">
-            {campaigns.length === 0 ? (
-              <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-                No active campaigns are currently available. Ask an administrator to activate a campaign.
+          <div className="mt-3 space-y-3">
+            {campaigns.length > 0 && (
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  value={campaignSearch}
+                  onChange={(e) => setCampaignSearch(e.target.value)}
+                  placeholder="Search campaigns..."
+                  className="pl-9"
+                />
               </div>
-            ) : (
-              campaigns.map((campaign) => {
-                const isSelected = campaign.id === selectedCampaignId;
-                return (
-                  <button
-                    key={campaign.id}
-                    type="button"
-                    onClick={() => setSelectedCampaignId(campaign.id)}
-                    className={cn(
-                      "w-full rounded-lg border p-3.5 text-left transition-all flex items-center justify-between gap-3",
-                      isSelected
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-border hover:bg-slate-50"
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm text-slate-900 truncate">
-                        {campaign.name}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {campaign.leadsToday} / {campaign.dailyTarget} leads today ({campaign.progressPercent}%)
-                      </p>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-2">
-                      {campaign.targetReached && (
-                        <Badge variant="success">Target Met</Badge>
-                      )}
-                      <div
+            )}
+            <div className="max-h-72 overflow-y-auto pr-1">
+              {campaigns.length === 0 ? (
+                <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                  No active campaigns are currently available. Ask an administrator to activate a campaign.
+                </div>
+              ) : filteredCampaigns.length === 0 ? (
+                <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                  No matching campaigns found.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+                  {filteredCampaigns.map((campaign) => {
+                    const isSelected = campaign.id === selectedCampaignId;
+                    return (
+                      <button
+                        key={campaign.id}
+                        type="button"
+                        onClick={() => setSelectedCampaignId(campaign.id)}
                         className={cn(
-                          "h-4 w-4 rounded-full border flex items-center justify-center",
-                          isSelected ? "border-primary bg-primary" : "border-slate-300"
+                          "w-full rounded-lg border p-3 sm:p-3.5 text-left transition-all flex flex-col justify-between gap-2",
+                          isSelected
+                            ? "border-primary bg-primary/5 ring-1 ring-primary"
+                            : "border-border hover:bg-slate-50"
                         )}
                       >
-                        {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })
-            )}
+                        <div className="flex items-start justify-between gap-2 w-full">
+                          <p className="font-medium text-xs sm:text-sm text-slate-900 line-clamp-2 leading-snug">
+                            {campaign.name}
+                          </p>
+                          <div
+                            className={cn(
+                              "mt-0.5 h-4 w-4 shrink-0 rounded-full border flex items-center justify-center",
+                              isSelected ? "border-primary bg-primary" : "border-slate-300"
+                            )}
+                          >
+                            {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] sm:text-xs text-slate-500 w-full">
+                          <span className="tabular-nums">
+                            {campaign.leadsToday}/{campaign.dailyTarget} ({campaign.progressPercent}%)
+                          </span>
+                          {campaign.targetReached && (
+                            <Badge variant="success" className="px-1.5 py-0 text-[10px]">
+                              Target Met
+                            </Badge>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="mt-3 space-y-4">
