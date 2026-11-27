@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Megaphone, Send } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
@@ -22,9 +23,14 @@ interface CallerDashboardProps {
 export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps) {
   const { snapshot, connectionState, refreshNow } = useRealtimeDashboard(initialSnapshot);
   const [announceOpen, setAnnounceOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [sendingSummary, setSendingSummary] = useState<"campaigns" | "callers" | null>(
     null
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isAdmin = user.role === "ADMIN";
   const leaderToday = snapshot.leaderboards.daily[0];
@@ -58,6 +64,20 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       setSendingSummary(null);
     }
   }
+
+  const floatingAnnounceButton =
+    user.role !== "ADMIN" ? (
+      <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40">
+        <Button
+          size="lg"
+          className="h-12 w-full sm:w-auto rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+          onClick={() => setAnnounceOpen(true)}
+        >
+          <Megaphone className="h-4 w-4" />
+          ANNOUNCE LEAD
+        </Button>
+      </div>
+    ) : null;
 
   return (
     <AppShell
@@ -229,16 +249,9 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
       {/* Floating Bottom-Center Announce Button (Callers Only) */}
       {user.role !== "ADMIN" && (
         <>
-          <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40">
-            <Button
-              size="lg"
-              className="h-12 w-full sm:w-auto rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
-              onClick={() => setAnnounceOpen(true)}
-            >
-              <Megaphone className="h-4 w-4" />
-              ANNOUNCE LEAD
-            </Button>
-          </div>
+          {mounted
+            ? createPortal(floatingAnnounceButton, document.body)
+            : floatingAnnounceButton}
 
           <AnnounceLeadDialog
             open={announceOpen}
