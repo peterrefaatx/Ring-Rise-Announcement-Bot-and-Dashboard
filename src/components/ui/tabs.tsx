@@ -42,7 +42,7 @@ export function TabsContent({
 }: React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>) {
   return (
     <TabsPrimitive.Content
-      className={cn("mt-3 focus-visible:outline-none data-[state=active]:animate-nav-enter", className)}
+      className={cn("mt-3 focus-visible:outline-none", className)}
       {...props}
     />
   );

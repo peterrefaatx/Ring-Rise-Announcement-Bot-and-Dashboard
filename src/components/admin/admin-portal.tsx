@@ -106,7 +106,7 @@ export function AdminPortal({
 
           {/* Section Content (kept mounted after first visit for instant tab switching) */}
           <div className="flex-1 min-w-0 lg:pl-64">
-            <div className={activeSection === "overview" ? "animate-nav-enter" : "hidden"}>
+            <div className={activeSection === "overview" ? undefined : "hidden"}>
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
                   <Card>
@@ -188,7 +188,7 @@ export function AdminPortal({
             </div>
 
             {visitedSections.callers && (
-              <div className={activeSection === "callers" ? "animate-nav-enter" : "hidden"}>
+              <div className={activeSection === "callers" ? undefined : "hidden"}>
                 <AdminCallersTab
                   currentUserId={user.id}
                   isActive={activeSection === "callers"}
@@ -199,7 +199,7 @@ export function AdminPortal({
             )}
 
             {visitedSections.campaigns && (
-              <div className={activeSection === "campaigns" ? "animate-nav-enter" : "hidden"}>
+              <div className={activeSection === "campaigns" ? undefined : "hidden"}>
                 <AdminCampaignsTab
                   isActive={activeSection === "campaigns"}
                   refreshSignal={snapshot.latestEventSeq}
@@ -209,7 +209,7 @@ export function AdminPortal({
             )}
 
             {visitedSections.analytics && (
-              <div className={activeSection === "analytics" ? "animate-nav-enter" : "hidden"}>
+              <div className={activeSection === "analytics" ? undefined : "hidden"}>
                 <AdminAnalyticsTab
                   isActive={activeSection === "analytics"}
                   refreshSignal={snapshot.latestEventSeq}
@@ -224,7 +224,7 @@ export function AdminPortal({
             )}
 
             {visitedSections.settings && (
-              <div className={activeSection === "settings" ? "animate-nav-enter" : "hidden"}>
+              <div className={activeSection === "settings" ? undefined : "hidden"}>
                 <AdminSettingsTab
                   isActive={activeSection === "settings"}
                   refreshSignal={snapshot.latestEventSeq}

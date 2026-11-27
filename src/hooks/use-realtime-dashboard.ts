@@ -214,7 +214,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
           };
           if (
             data.resyncRequired ||
-            data.businessDateEst !== snapshot.businessDateEst ||
+            data.businessDateEst !== businessDateRef.current ||
             data.latestSeq > lastSeqRef.current
           ) {
             scheduleSync(20);
@@ -282,7 +282,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
     };
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
-        scheduleSync(20);
+        scheduleSync(20, { conditional: true });
       }
     };
 
@@ -299,7 +299,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
       window.removeEventListener("offline", handleOffline);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [realtimeMode, fetchAuthoritativeSnapshot, scheduleSync, snapshot.businessDateEst]);
+  }, [realtimeMode, fetchAuthoritativeSnapshot, scheduleSync]);
 
   // Local fixed-EST midnight rollover timer so open browsers always reset at 00:00:00 EST
   useEffect(() => {

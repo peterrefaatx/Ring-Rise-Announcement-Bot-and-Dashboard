@@ -190,10 +190,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
         <PageLoader variant="overlay" logoUrl={brand.brandLogoUrl} />
       )}
 
-      <main
-        key={pathname}
-        className="animate-nav-enter relative z-10 flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto"
-      >
+      <main className="relative z-10 flex-1 px-3 py-4 sm:p-6 pb-24 sm:pb-28 max-w-7xl w-full mx-auto">
         {children}
       </main>
     </div>
