@@ -27,8 +27,8 @@ const SINGLE_BACKDROPS: Record<
 > = {
   "breaking-bad": {
     src: "/backgrounds/breaking-bad.webp",
-    imgClass: "object-cover object-top opacity-[0.34] saturate-110",
-    overlayClass: "bg-gradient-to-b from-[#090C0A]/55 via-[#090C0A]/45 to-[#090C0A]/75",
+    imgClass: "object-cover object-center opacity-[0.40] saturate-110",
+    overlayClass: "bg-gradient-to-b from-[#090C0A]/45 via-[#090C0A]/35 to-[#090C0A]/65",
   },
   gaming: {
     src: "/backgrounds/gta6.webp",
