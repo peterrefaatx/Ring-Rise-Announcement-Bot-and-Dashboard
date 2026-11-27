@@ -426,12 +426,39 @@ html[data-theme="meme"] {
     }
   }
 
+  @keyframes rank-popup-float {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.72);
+    }
+    18% {
+      opacity: 1;
+      transform: translateY(-2px) scale(1.08);
+    }
+    32% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    78% {
+      opacity: 1;
+      transform: translateY(-5px) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.92);
+    }
+  }
+
   .animate-nav-enter {
     animation: nav-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .animate-rank-climb {
     animation: rank-climb-glow 1400ms ease-out forwards;
+  }
+
+  .animate-rank-popup {
+    animation: rank-popup-float 1500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   @keyframes loader-breathe {
@@ -466,6 +493,7 @@ html[data-theme="meme"] {
   @media (prefers-reduced-motion: reduce) {
     .animate-nav-enter,
     .animate-rank-climb,
+    .animate-rank-popup,
     .animate-loader-breathe,
     .animate-loader-slide {
       animation: none;

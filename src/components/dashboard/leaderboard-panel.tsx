@@ -207,6 +207,15 @@ export function LeaderboardList({
               rankDelta > 0 && "animate-rank-climb"
             )}
           >
+            {rankDelta > 0 && (
+              <div
+                aria-live="polite"
+                className="animate-rank-popup pointer-events-none absolute right-4 top-1.5 z-20 inline-flex items-center gap-0.5 rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-md ring-2 ring-white/75 dark:ring-black/30 sm:right-5"
+              >
+                <ArrowUp className="h-3 w-3 stroke-[2.5]" />
+                <span>+{rankDelta}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
               <CrownBadge rank={entry.rank} />
               <div className="min-w-0">
@@ -222,12 +231,6 @@ export function LeaderboardList({
                   {isMe && (
                     <span className="inline-flex items-center rounded-full bg-[#0077B6]/10 px-2 py-0.5 text-[11px] font-semibold text-[#0077B6]">
                       You
-                    </span>
-                  )}
-                  {rankDelta > 0 && (
-                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      <ArrowUp className="h-2.5 w-2.5" />
-                      {rankDelta}
                     </span>
                   )}
                   {isTied && entry.achievedAt && (
