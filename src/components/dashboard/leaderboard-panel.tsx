@@ -356,7 +356,7 @@ export function LeaderboardList({
               }
             }}
             className={cn(
-              "relative flex min-h-[76px] sm:min-h-[84px] items-center justify-between gap-3 px-4 py-5 sm:gap-4 sm:px-5 sm:py-6 transition-colors",
+              "relative flex flex-wrap min-h-[76px] sm:min-h-[84px] items-center justify-between gap-x-3 gap-y-2 px-4 py-5 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:px-5 sm:py-6 transition-colors",
               isTop1 && "bg-amber-50/45",
               !isTop1 && isMe && "bg-[#0077B6]/[0.04]",
               !isTop1 && !isMe && "hover:bg-[#F8FAFC]",
@@ -375,7 +375,7 @@ export function LeaderboardList({
                 <span>+{rankDelta}</span>
               </div>
             )}
-            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 sm:flex-initial sm:justify-self-start">
               <CrownBadge rank={entry.rank} />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -392,20 +392,6 @@ export function LeaderboardList({
                       You
                     </span>
                   )}
-                  {activeBadges.map((badge) => {
-                    const visual = BADGE_VISUALS[badge.id];
-                    const BadgeIcon = visual.Icon;
-                    return (
-                      <span
-                        key={badge.id}
-                        title={badge.tooltip}
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-[#425466] select-none shrink-0"
-                      >
-                        <BadgeIcon className={cn("h-3.5 w-3.5 shrink-0", visual.iconClass)} />
-                        <span>{badge.label}</span>
-                      </span>
-                    );
-                  })}
                   {isTied && entry.achievedAt && (
                     <span
                       title="Tiebreaker timestamp (EST)"
@@ -419,7 +405,35 @@ export function LeaderboardList({
               </div>
             </div>
 
-            <div className="flex items-baseline gap-1.5 shrink-0">
+            {activeBadges.length > 0 ? (
+              <div className="order-3 flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:order-none sm:w-auto sm:justify-self-center">
+                {activeBadges.map((badge, index) => {
+                  const visual = BADGE_VISUALS[badge.id];
+                  const BadgeIcon = visual.Icon;
+                  return (
+                    <React.Fragment key={badge.id}>
+                      {index > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="h-3 w-px shrink-0 bg-border"
+                        />
+                      )}
+                      <span
+                        title={badge.tooltip}
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-[#425466] select-none shrink-0"
+                      >
+                        <BadgeIcon className={cn("h-3.5 w-3.5 shrink-0", visual.iconClass)} />
+                        <span>{badge.label}</span>
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="hidden sm:block" aria-hidden="true" />
+            )}
+
+            <div className="flex items-baseline gap-1.5 shrink-0 sm:justify-self-end">
               <span
                 className={cn(
                   "tabular-nums tracking-tight text-[#0A2540]",
