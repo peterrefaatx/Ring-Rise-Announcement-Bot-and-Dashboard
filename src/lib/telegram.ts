@@ -57,6 +57,11 @@ export const defaultTelegramTransport: TelegramTransport = {
 export async function getTelegramConfig(): Promise<TelegramConfig> {
   const settings = await prisma.systemSettings.findUnique({
     where: { id: "default" },
+    select: {
+      telegramBotTokenEncrypted: true,
+      telegramChatId: true,
+      telegramEnabled: true,
+    },
   });
 
   let dbToken: string | null = null;

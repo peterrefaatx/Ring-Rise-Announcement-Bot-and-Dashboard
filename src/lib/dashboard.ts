@@ -77,6 +77,38 @@ export interface DashboardSnapshot {
   activityFeed: ActivityFeedItem[];
 }
 
+function isMissingSettingsColumnError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const code = (err as { code?: unknown }).code;
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    code === "P2022" ||
+    msg.includes("defaultAnnouncementTemplate") ||
+    msg.includes("42703")
+  );
+}
+
+/**
+ * Ensures `SystemSettings.defaultAnnouncementTemplate` exists on deployments
+ * where schema changes have not been migrated via CLI before serving traffic.
+ */
+export async function withSettingsColumnFallback<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (
+      isMissingSettingsColumnError(err) &&
+      typeof prisma.$executeRawUnsafe === "function"
+    ) {
+      await prisma.$executeRawUnsafe(
+        `ALTER TABLE "SystemSettings" ADD COLUMN IF NOT EXISTS "defaultAnnouncementTemplate" TEXT NOT NULL DEFAULT '{name} got a lead in {campaign}, lets shout out to him!'`
+      );
+      return await fn();
+    }
+    throw err;
+  }
+}
+
 export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
   return cached("brand:public", 60000, async () => {
     let settings: {
@@ -88,9 +120,11 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
     } | null = null;
 
     try {
-      settings = await prisma.systemSettings.findUnique({
-        where: { id: "default" },
-      });
+      settings = await withSettingsColumnFallback(() =>
+        prisma.systemSettings.findUnique({
+          where: { id: "default" },
+        })
+      );
     } catch (err) {
       console.error("getPublicBrandSettings fallback (DB unavailable):", err);
     }
@@ -112,10 +146,12 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
 export async function getDefaultAnnouncementTemplate(): Promise<string> {
   return cached("brand:default-template", 60000, async () => {
     try {
-      const settings = await prisma.systemSettings.findUnique({
-        where: { id: "default" },
-        select: { defaultAnnouncementTemplate: true },
-      });
+      const settings = await withSettingsColumnFallback(() =>
+        prisma.systemSettings.findUnique({
+          where: { id: "default" },
+          select: { defaultAnnouncementTemplate: true },
+        })
+      );
       return settings?.defaultAnnouncementTemplate || DEFAULT_ANNOUNCEMENT_TEMPLATE;
     } catch (err) {
       console.error("getDefaultAnnouncementTemplate fallback (DB unavailable):", err);

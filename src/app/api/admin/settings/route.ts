@@ -5,6 +5,7 @@ import { encryptSecret } from "@/lib/crypto";
 import { updateSettingsSchema } from "@/lib/validation";
 import { getTelegramConfig } from "@/lib/telegram";
 import { DEFAULT_ANNOUNCEMENT_TEMPLATE, sanitizeSingleLineText } from "@/lib/template";
+import { withSettingsColumnFallback } from "@/lib/dashboard";
 import { invalidateCachePrefix } from "@/lib/cache";
 import { recordAuditLog } from "@/lib/audit";
 import { emitActivityEvent } from "@/lib/realtime";
@@ -14,7 +15,9 @@ export const dynamic = "force-dynamic";
 
 async function buildSettingsPayload() {
   const [settings, telegramConfig] = await Promise.all([
-    prisma.systemSettings.findUnique({ where: { id: "default" } }),
+    withSettingsColumnFallback(() =>
+      prisma.systemSettings.findUnique({ where: { id: "default" } })
+    ),
     getTelegramConfig(),
   ]);
 
@@ -98,71 +101,81 @@ export async function PATCH(request: NextRequest) {
 
   const applyToAllUsers = Boolean(parsed.data.applyAnnouncementTemplateToAllUsers);
 
-  const txResult = await prisma.$transaction(async (tx) => {
-    const upserted = await tx.systemSettings.upsert({
-      where: { id: "default" },
-      update: data,
-      create: {
-        id: "default",
-        timezoneLabel: EST_TIMEZONE_LABEL,
-        ...data,
-      },
-    });
+  try {
+    const txResult = await withSettingsColumnFallback(() =>
+      prisma.$transaction(async (tx) => {
+        const upserted = await tx.systemSettings.upsert({
+          where: { id: "default" },
+          update: data,
+          create: {
+            id: "default",
+            timezoneLabel: EST_TIMEZONE_LABEL,
+            ...data,
+          },
+        });
 
-    let appliedUsersCount: number | undefined;
+        let appliedUsersCount: number | undefined;
+        if (applyToAllUsers) {
+          const templateToApply =
+            normalizedDefaultTemplate ||
+            upserted.defaultAnnouncementTemplate ||
+            DEFAULT_ANNOUNCEMENT_TEMPLATE;
+          const updated = await tx.user.updateMany({
+            where: { deletedAt: null },
+            data: { announcementTemplate: templateToApply },
+          });
+          appliedUsersCount = updated.count;
+        }
+
+        return { appliedUsersCount };
+      })
+    );
+
+    invalidateCachePrefix("brand:");
     if (applyToAllUsers) {
-      const templateToApply =
-        normalizedDefaultTemplate ||
-        upserted.defaultAnnouncementTemplate ||
-        DEFAULT_ANNOUNCEMENT_TEMPLATE;
-      const updated = await tx.user.updateMany({
-        where: { deletedAt: null },
-        data: { announcementTemplate: templateToApply },
-      });
-      appliedUsersCount = updated.count;
+      invalidateCachePrefix("session:");
+      invalidateCachePrefix("dashboard:");
     }
 
-    return { appliedUsersCount };
-  });
-
-  invalidateCachePrefix("brand:");
-  if (applyToAllUsers) {
-    invalidateCachePrefix("session:");
-    invalidateCachePrefix("dashboard:");
-  }
-
-  const ip = await getRequestIp();
-  await recordAuditLog({
-    actorUserId: auth.user.id,
-    action: "SETTINGS_UPDATED",
-    targetType: "SystemSettings",
-    targetId: "default",
-    details: {
-      updatedFields: Object.keys(data).filter((k) => k !== "telegramBotTokenEncrypted"),
-      botTokenUpdated: Boolean(data.telegramBotTokenEncrypted),
-      appliedToAllUsers: applyToAllUsers,
-      ...(txResult.appliedUsersCount !== undefined
-        ? { appliedUsersCount: txResult.appliedUsersCount }
-        : {}),
-    },
-    ipAddress: ip,
-  });
-
-  await emitActivityEvent("SETTINGS_CHANGED", { action: "UPDATED" });
-  if (applyToAllUsers) {
-    await emitActivityEvent("CALLER_CHANGED", {
-      action: "ANNOUNCEMENT_TEMPLATE_APPLIED_TO_ALL",
+    const ip = await getRequestIp();
+    await recordAuditLog({
+      actorUserId: auth.user.id,
+      action: "SETTINGS_UPDATED",
+      targetType: "SystemSettings",
+      targetId: "default",
+      details: {
+        updatedFields: Object.keys(data).filter((k) => k !== "telegramBotTokenEncrypted"),
+        botTokenUpdated: Boolean(data.telegramBotTokenEncrypted),
+        appliedToAllUsers: applyToAllUsers,
+        ...(txResult.appliedUsersCount !== undefined
+          ? { appliedUsersCount: txResult.appliedUsersCount }
+          : {}),
+      },
+      ipAddress: ip,
     });
-  }
 
-  const settings = await buildSettingsPayload();
-  return NextResponse.json(
-    {
-      settings,
-      ...(txResult.appliedUsersCount !== undefined
-        ? { appliedUsersCount: txResult.appliedUsersCount }
-        : {}),
-    },
-    { headers: { "Cache-Control": "no-store" } }
-  );
+    await emitActivityEvent("SETTINGS_CHANGED", { action: "UPDATED" });
+    if (applyToAllUsers) {
+      await emitActivityEvent("CALLER_CHANGED", {
+        action: "ANNOUNCEMENT_TEMPLATE_APPLIED_TO_ALL",
+      });
+    }
+
+    const settings = await buildSettingsPayload();
+    return NextResponse.json(
+      {
+        settings,
+        ...(txResult.appliedUsersCount !== undefined
+          ? { appliedUsersCount: txResult.appliedUsersCount }
+          : {}),
+      },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  } catch (err) {
+    console.error("Failed to update admin settings:", err);
+    return NextResponse.json(
+      { error: "Failed to save settings. Please try again." },
+      { status: 500 }
+    );
+  }
 }
