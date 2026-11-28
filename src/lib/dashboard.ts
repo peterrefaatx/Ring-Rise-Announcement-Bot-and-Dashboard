@@ -55,6 +55,8 @@ export interface DashboardSnapshot {
     monthlyRank: number | null;
     allTimeRank: number | null;
     totalCallersRankedToday: number;
+    announcementName?: string;
+    announcementTemplate?: string;
   };
   totals: {
     leadsToday: number;
@@ -249,7 +251,16 @@ export function getRealtimeMode(): "sse" | "poll" {
 }
 
 export async function getDashboardSnapshot(userId: string): Promise<DashboardSnapshot> {
-  const shared = await getSharedDashboardCore();
+  const [shared, callerProfile] = await Promise.all([
+    getSharedDashboardCore(),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        announcementName: true,
+        announcementTemplate: true,
+      },
+    }),
+  ]);
 
   const dailyEntry = shared.leaderboards.daily.find((e) => e.userId === userId);
   const monthlyEntry = shared.leaderboards.monthly.find((e) => e.userId === userId);
@@ -266,6 +277,12 @@ export async function getDashboardSnapshot(userId: string): Promise<DashboardSna
       monthlyRank: monthlyEntry ? monthlyEntry.rank : null,
       allTimeRank: allTimeEntry ? allTimeEntry.rank : null,
       totalCallersRankedToday: shared.leaderboards.daily.length,
+      ...(callerProfile
+        ? {
+            announcementName: callerProfile.announcementName,
+            announcementTemplate: callerProfile.announcementTemplate,
+          }
+        : {}),
     },
   };
 }

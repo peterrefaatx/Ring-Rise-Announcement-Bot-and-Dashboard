@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Users,
   Target,
@@ -40,7 +40,12 @@ export function AdminPortal({
   initialSnapshot: DashboardSnapshot;
   user: AppShellUser;
 }) {
-  const { snapshot, connectionState, refreshNow } = useRealtimeDashboard(initialSnapshot);
+  const { snapshot, connectionState, refreshNow, syncIfChanged } =
+    useRealtimeDashboard(initialSnapshot);
+
+  useEffect(() => {
+    void syncIfChanged();
+  }, [syncIfChanged]);
   const [activeSection, setActiveSection] = useState<AdminSection>("overview");
   const [visitedSections, setVisitedSections] = useState<Record<AdminSection, boolean>>({
     overview: true,

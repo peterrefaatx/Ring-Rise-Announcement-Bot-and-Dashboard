@@ -21,7 +21,8 @@ interface CallerDashboardProps {
 }
 
 export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps) {
-  const { snapshot, connectionState, refreshNow } = useRealtimeDashboard(initialSnapshot);
+  const { snapshot, connectionState, refreshNow, syncIfChanged } =
+    useRealtimeDashboard(initialSnapshot);
   const [announceOpen, setAnnounceOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [sendingSummary, setSendingSummary] = useState<"campaigns" | "callers" | null>(
@@ -30,7 +31,18 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    void syncIfChanged();
+  }, [syncIfChanged]);
+
+  const liveAnnouncementName = snapshot.personal.announcementName ?? user.announcementName;
+  const liveAnnouncementTemplate =
+    snapshot.personal.announcementTemplate ?? user.announcementTemplate;
+  const liveUser = { ...user, announcementName: liveAnnouncementName };
+
+  function handleOpenAnnounce() {
+    setAnnounceOpen(true);
+    void syncIfChanged();
+  }
 
   const isAdmin = user.role === "ADMIN";
   const leaderToday = snapshot.leaderboards.daily[0];
@@ -71,7 +83,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
         <Button
           size="lg"
           className="h-12 w-full sm:w-auto rounded-full bg-primary px-8 text-sm font-semibold tracking-wide text-primary-foreground shadow-lg ring-4 ring-background/90 transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
-          onClick={() => setAnnounceOpen(true)}
+          onClick={handleOpenAnnounce}
         >
           <Megaphone className="h-4 w-4" />
           ANNOUNCE LEAD
@@ -81,7 +93,7 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
 
   return (
     <AppShell
-      user={user}
+      user={liveUser}
       brand={snapshot.brand}
       businessDateEst={snapshot.businessDateEst}
       connectionState={connectionState}
@@ -256,8 +268,8 @@ export function CallerDashboard({ initialSnapshot, user }: CallerDashboardProps)
             open={announceOpen}
             onOpenChange={setAnnounceOpen}
             campaigns={snapshot.campaigns}
-            announcementName={user.announcementName}
-            announcementTemplate={user.announcementTemplate}
+            announcementName={liveAnnouncementName}
+            announcementTemplate={liveAnnouncementTemplate}
             onSuccess={refreshNow}
           />
         </>

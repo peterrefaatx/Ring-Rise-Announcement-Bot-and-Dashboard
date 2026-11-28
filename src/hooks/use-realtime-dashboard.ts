@@ -27,10 +27,20 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
   const lastSeqRef = useRef<number>(initialSnapshot.latestEventSeq);
   const businessDateRef = useRef<string>(initialSnapshot.businessDateEst);
   const lastActivityAtRef = useRef<number>(Date.now());
+  const prevInitialRef = useRef<DashboardSnapshot>(initialSnapshot);
   const seenSeqsRef = useRef<Set<number>>(new Set());
   const syncInFlightRef = useRef<boolean>(false);
   const syncQueuedRef = useRef<boolean>(false);
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (initialSnapshot === prevInitialRef.current) return;
+    prevInitialRef.current = initialSnapshot;
+    if (initialSnapshot.latestEventSeq >= lastSeqRef.current) {
+      lastSeqRef.current = initialSnapshot.latestEventSeq;
+      setSnapshot(initialSnapshot);
+    }
+  }, [initialSnapshot]);
 
   useEffect(() => {
     businessDateRef.current = snapshot.businessDateEst;
@@ -310,6 +320,10 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
     return () => clearTimeout(timer);
   }, [snapshot.businessDateEst, fetchAuthoritativeSnapshot]);
 
+  const syncIfChanged = useCallback(async () => {
+    await fetchAuthoritativeSnapshot({ conditional: true });
+  }, [fetchAuthoritativeSnapshot]);
+
   const refreshNow = useCallback(async () => {
     await fetchAuthoritativeSnapshot({ conditional: false });
   }, [fetchAuthoritativeSnapshot]);
@@ -318,5 +332,6 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
     snapshot,
     connectionState,
     refreshNow,
+    syncIfChanged,
   };
 }

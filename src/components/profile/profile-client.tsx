@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Save, RotateCcw, MessageSquare, History } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, type AppShellUser } from "@/components/app-shell";
@@ -36,9 +37,17 @@ export function ProfileClient({
   businessDateEst,
   history,
 }: ProfileClientProps) {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState(user);
   const [announcementName, setAnnouncementName] = useState(user.announcementName);
   const [announcementTemplate, setAnnouncementTemplate] = useState(user.announcementTemplate);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setCurrentUser(user);
+    setAnnouncementName(user.announcementName);
+    setAnnouncementTemplate(user.announcementTemplate);
+  }, [user]);
 
   const templateCheck = useMemo(
     () => validateAnnouncementTemplate(announcementTemplate),
@@ -48,7 +57,7 @@ export function ProfileClient({
   const sampleCampaign = "Silkroad";
 
   const livePreview = useMemo(() => {
-    const previewName = announcementName.trim() || user.announcementName;
+    const previewName = announcementName.trim() || currentUser.announcementName;
     if (!templateCheck.valid) {
       return renderAnnouncementMessage(
         DEFAULT_ANNOUNCEMENT_TEMPLATE,
@@ -57,7 +66,7 @@ export function ProfileClient({
       );
     }
     return renderAnnouncementMessage(announcementTemplate, previewName, sampleCampaign);
-  }, [announcementName, announcementTemplate, templateCheck.valid, user.announcementName]);
+  }, [announcementName, announcementTemplate, templateCheck.valid, currentUser.announcementName]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -80,11 +89,27 @@ export function ProfileClient({
           announcementTemplate,
         }),
       });
-      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+        profile?: {
+          announcementName: string;
+          announcementTemplate: string;
+        };
+      } | null;
       if (!res.ok) {
         toast.error(data?.error || "Failed to update profile settings.");
         return;
       }
+      if (data?.profile) {
+        setAnnouncementName(data.profile.announcementName);
+        setAnnouncementTemplate(data.profile.announcementTemplate);
+        setCurrentUser((prev) => ({
+          ...prev,
+          announcementName: data.profile!.announcementName,
+          announcementTemplate: data.profile!.announcementTemplate,
+        }));
+      }
+      router.refresh();
       toast.success("Announcement profile saved.");
     } catch {
       toast.error("Network error while saving settings.");
@@ -93,10 +118,10 @@ export function ProfileClient({
     }
   }
 
-  const isAdmin = user.role === "ADMIN";
+  const isAdmin = currentUser.role === "ADMIN";
 
   return (
-    <AppShell user={user} brand={brand} businessDateEst={businessDateEst}>
+    <AppShell user={currentUser} brand={brand} businessDateEst={businessDateEst}>
       <div className="space-y-6">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">

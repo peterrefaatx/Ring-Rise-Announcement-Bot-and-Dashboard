@@ -74,14 +74,6 @@ export function AppShell({ user, brand, children }: AppShellProps) {
       : []),
   ];
 
-  React.useEffect(() => {
-    router.prefetch("/");
-    router.prefetch("/profile");
-    if (user.role === "ADMIN") {
-      router.prefetch("/admin");
-    }
-  }, [router, user.role]);
-
   async function handleLogout() {
     setLoggingOut(true);
     try {
@@ -110,6 +102,7 @@ export function AppShell({ user, brand, children }: AppShellProps) {
           {/* Center: Clean Centered Logo */}
           <Link
             href="/"
+            prefetch={false}
             onClick={() => {
               if (pathname !== "/") setNavigating(true);
             }}
