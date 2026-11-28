@@ -72,33 +72,24 @@ const BADGE_VISUALS: Record<
   LeaderboardBadgeId,
   {
     Icon: React.ComponentType<{ className?: string }>;
-    chipClass: string;
     iconClass: string;
   }
 > = {
   "throne-stealer": {
     Icon: RiVipCrown2Fill,
-    chipClass:
-      "border-purple-300/45 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white shadow-[0_2px_10px_rgba(147,51,234,0.32),inset_0_1px_0_rgba(255,255,255,0.28)]",
-    iconClass: "text-amber-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+    iconClass: "text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.35)]",
   },
   "on-fire": {
     Icon: FaFireFlameCurved,
-    chipClass:
-      "border-orange-300/45 bg-gradient-to-r from-rose-600 via-red-500 to-orange-500 text-white shadow-[0_2px_10px_rgba(239,68,68,0.32),inset_0_1px_0_rgba(255,255,255,0.28)]",
-    iconClass: "text-amber-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+    iconClass: "text-rose-500 drop-shadow-[0_0_6px_rgba(244,63,94,0.35)]",
   },
   "speed-demon": {
     Icon: BsLightningChargeFill,
-    chipClass:
-      "border-sky-300/45 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white shadow-[0_2px_10px_rgba(14,165,233,0.3),inset_0_1px_0_rgba(255,255,255,0.28)]",
-    iconClass: "text-cyan-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+    iconClass: "text-sky-500 drop-shadow-[0_0_6px_rgba(14,165,233,0.35)]",
   },
   "first-blood": {
     Icon: TbTargetArrow,
-    chipClass:
-      "border-emerald-300/45 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.28),inset_0_1px_0_rgba(255,255,255,0.28)]",
-    iconClass: "text-emerald-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+    iconClass: "text-emerald-500 drop-shadow-[0_0_6px_rgba(16,185,129,0.35)]",
   },
 };
 
@@ -408,12 +399,9 @@ export function LeaderboardList({
                       <span
                         key={badge.id}
                         title={badge.tooltip}
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.04em] leading-none select-none shrink-0",
-                          visual.chipClass
-                        )}
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-[#425466] select-none shrink-0"
                       >
-                        <BadgeIcon className={cn("h-3 w-3 shrink-0", visual.iconClass)} />
+                        <BadgeIcon className={cn("h-3.5 w-3.5 shrink-0", visual.iconClass)} />
                         <span>{badge.label}</span>
                       </span>
                     );
