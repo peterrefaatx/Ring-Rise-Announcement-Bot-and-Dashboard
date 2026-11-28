@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
 import { useTheme } from "@/components/theme-provider";
-import type { LeaderboardEntry } from "@/lib/leaderboard";
+import type { LeaderboardBadgeTone, LeaderboardEntry } from "@/lib/leaderboard";
 import type { ThemeId } from "@/lib/themes";
 import { formatEstTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,13 @@ const RANK_POPUP_BY_THEME: Record<
     className:
       "rounded-md border border-yellow-400/80 bg-gradient-to-r from-green-600 to-emerald-500 text-white shadow-[0_6px_18px_rgba(34,197,94,0.4)] ring-1 ring-black/40",
   },
+};
+
+const BADGE_TONE_CLASSES: Record<LeaderboardBadgeTone, string> = {
+  royal: "border-purple-200 bg-purple-50 text-purple-700",
+  hot: "border-red-200 bg-red-50 text-red-700",
+  bolt: "border-sky-200 bg-sky-50 text-sky-700",
+  target: "border-emerald-200 bg-emerald-50 text-emerald-700",
 };
 
 interface LeaderboardPanelProps {
@@ -178,6 +185,27 @@ export function LeaderboardList({
   const prevRanksRef = useRef<Map<string, number>>(new Map());
   const prevOrderRef = useRef<string[]>([]);
   const [climbedIds, setClimbedIds] = useState<Record<string, number>>({});
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+
+  // Automatically clear time-windowed badges (On Fire / Throne Stealer) when they expire
+  useEffect(() => {
+    const current = Date.now();
+    setNowMs(current);
+    let nextExpiry = Number.POSITIVE_INFINITY;
+    for (const entry of entries) {
+      for (const badge of entry.badges ?? []) {
+        if (!badge.expiresAt) continue;
+        const expiryMs = Date.parse(badge.expiresAt);
+        if (Number.isFinite(expiryMs) && expiryMs > current && expiryMs < nextExpiry) {
+          nextExpiry = expiryMs;
+        }
+      }
+    }
+    if (!Number.isFinite(nextExpiry)) return;
+    const delay = Math.max(50, Math.min(nextExpiry - current + 50, 2_147_483_647));
+    const timer = setTimeout(() => setNowMs(Date.now()), delay);
+    return () => clearTimeout(timer);
+  }, [entries]);
 
   useLayoutEffect(() => {
     const nextTops = new Map<string, number>();
@@ -283,6 +311,9 @@ export function LeaderboardList({
         const isTop3 = entry.rank <= 3 && entry.leadCount > 0;
         const rankDelta = climbedIds[entry.userId] ?? 0;
         const isTied = entry.leadCount > 0 && (countFrequency.get(entry.leadCount) ?? 0) > 1;
+        const activeBadges = (entry.badges ?? []).filter(
+          (badge) => !badge.expiresAt || Date.parse(badge.expiresAt) > nowMs
+        );
 
         return (
           <div
@@ -325,7 +356,7 @@ export function LeaderboardList({
             <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
               <CrownBadge rank={entry.rank} />
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <span
                     className={cn(
                       "truncate text-[15px] sm:text-base text-[#0A2540]",
@@ -339,6 +370,19 @@ export function LeaderboardList({
                       You
                     </span>
                   )}
+                  {activeBadges.map((badge) => (
+                    <span
+                      key={badge.id}
+                      title={badge.tooltip}
+                      className={cn(
+                        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold shrink-0",
+                        BADGE_TONE_CLASSES[badge.tone]
+                      )}
+                    >
+                      <span aria-hidden="true">{badge.emoji}</span>
+                      <span>{badge.label}</span>
+                    </span>
+                  ))}
                   {isTied && entry.achievedAt && (
                     <span
                       title="Tiebreaker timestamp (EST)"

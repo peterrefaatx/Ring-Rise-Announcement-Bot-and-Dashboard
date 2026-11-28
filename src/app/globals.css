@@ -632,6 +632,26 @@ html[data-theme="meme"] {
   html[data-theme-mode="dark"] .text-red-700 {
     color: #FCA5A5;
   }
+
+  html[data-theme-mode="dark"] .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.16);
+  }
+  html[data-theme-mode="dark"] .border-purple-200 {
+    border-color: rgba(192, 132, 252, 0.38);
+  }
+  html[data-theme-mode="dark"] .text-purple-700 {
+    color: #D8B4FE;
+  }
+
+  html[data-theme-mode="dark"] .bg-sky-50 {
+    background-color: rgba(56, 189, 248, 0.14);
+  }
+  html[data-theme-mode="dark"] .border-sky-200 {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+  html[data-theme-mode="dark"] .text-sky-700 {
+    color: #7DD3FC;
+  }
 }
 
 /* Theme-aware Sonner toast styling across all 6 palettes */

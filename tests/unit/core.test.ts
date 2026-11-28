@@ -11,7 +11,7 @@ import {
   renderAnnouncementMessage,
   validateAnnouncementTemplate,
 } from "@/lib/template";
-import { rankLeaderboardRows } from "@/lib/leaderboard";
+import { attachDailyLeaderboardBadges, rankLeaderboardRows } from "@/lib/leaderboard";
 import {
   decryptSecret,
   encryptSecret,
@@ -188,6 +188,43 @@ describe("Deterministic Leaderboard Tie-Breaking", () => {
       "Zed",
     ]);
     expect(ranked.map((r) => r.rank)).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("awards and stacks live daily badges (First Blood, On Fire 2+ in 60m, Speed Demon, Throne Stealer)", () => {
+    const baseMs = Date.parse("2026-11-28T15:00:00.000Z");
+    const min = 60 * 1000;
+
+    // A scores First Blood at t=0, B overtakes A at t+10m and t+12m (2 leads in 2m!)
+    const events = [
+      { userId: "uA", createdAt: new Date(baseMs), seq: 1 },
+      { userId: "uB", createdAt: new Date(baseMs + 10 * min), seq: 2 },
+      { userId: "uB", createdAt: new Date(baseMs + 12 * min), seq: 3 },
+      { userId: "uA", createdAt: new Date(baseMs + 20 * min), seq: 4 },
+      { userId: "uA", createdAt: new Date(baseMs + 25 * min), seq: 5 }, // uA takes #1 at t+25m (gap 5m)
+    ];
+
+    const ranked = rankLeaderboardRows([
+      { userId: "uA", announcementName: "A", fullName: "Caller A", status: "ACTIVE", leadCount: 3, achievedAtMs: baseMs + 25 * min, achievedSeq: 5 },
+      { userId: "uB", announcementName: "B", fullName: "Caller B", status: "ACTIVE", leadCount: 2, achievedAtMs: baseMs + 12 * min, achievedSeq: 3 },
+    ]);
+
+    // At t+30m: uA has Throne Stealer (5m ago < 15m), On Fire x3, First Blood!
+    // uB has On Fire x2 + Speed Demon (gap 2m vs uA's 5m)
+    const enrichedAt30 = attachDailyLeaderboardBadges(ranked, events, baseMs + 30 * min);
+    expect(enrichedAt30[0].badges?.map((b) => b.id)).toEqual([
+      "throne-stealer",
+      "on-fire",
+      "first-blood",
+    ]);
+    expect(enrichedAt30[0].badges?.find((b) => b.id === "on-fire")?.label).toBe("On Fire ×3");
+    expect(enrichedAt30[1].badges?.map((b) => b.id)).toEqual(["on-fire", "speed-demon"]);
+    expect(enrichedAt30[1].badges?.find((b) => b.id === "on-fire")?.label).toBe("On Fire ×2");
+
+    // At t+90m: uA's Throne Stealer (expired at t+40m) and uA's On Fire (2nd newest was t+20m -> expires t+80m) cleared,
+    // leaving only First Blood for uA and Speed Demon for uB!
+    const enrichedAt90 = attachDailyLeaderboardBadges(ranked, events, baseMs + 90 * min);
+    expect(enrichedAt90[0].badges?.map((b) => b.id)).toEqual(["first-blood"]);
+    expect(enrichedAt90[1].badges?.map((b) => b.id)).toEqual(["speed-demon"]);
   });
 });
 
