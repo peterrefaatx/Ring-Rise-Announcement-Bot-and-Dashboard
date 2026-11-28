@@ -11,11 +11,15 @@ import {
   Laugh,
   Music2,
 } from "lucide-react";
+import { RiVipCrown2Fill } from "react-icons/ri";
+import { FaFireFlameCurved } from "react-icons/fa6";
+import { BsLightningChargeFill } from "react-icons/bs";
+import { TbTargetArrow } from "react-icons/tb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CrownBadge } from "@/components/crown-badge";
 import { useTheme } from "@/components/theme-provider";
-import type { LeaderboardBadgeTone, LeaderboardEntry } from "@/lib/leaderboard";
+import type { LeaderboardBadgeId, LeaderboardEntry } from "@/lib/leaderboard";
 import type { ThemeId } from "@/lib/themes";
 import { formatEstTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
@@ -64,11 +68,38 @@ const RANK_POPUP_BY_THEME: Record<
   },
 };
 
-const BADGE_TONE_CLASSES: Record<LeaderboardBadgeTone, string> = {
-  royal: "border-purple-200 bg-purple-50 text-purple-700",
-  hot: "border-red-200 bg-red-50 text-red-700",
-  bolt: "border-sky-200 bg-sky-50 text-sky-700",
-  target: "border-emerald-200 bg-emerald-50 text-emerald-700",
+const BADGE_VISUALS: Record<
+  LeaderboardBadgeId,
+  {
+    Icon: React.ComponentType<{ className?: string }>;
+    chipClass: string;
+    iconClass: string;
+  }
+> = {
+  "throne-stealer": {
+    Icon: RiVipCrown2Fill,
+    chipClass:
+      "border-purple-300/45 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white shadow-[0_2px_10px_rgba(147,51,234,0.32),inset_0_1px_0_rgba(255,255,255,0.28)]",
+    iconClass: "text-amber-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+  },
+  "on-fire": {
+    Icon: FaFireFlameCurved,
+    chipClass:
+      "border-orange-300/45 bg-gradient-to-r from-rose-600 via-red-500 to-orange-500 text-white shadow-[0_2px_10px_rgba(239,68,68,0.32),inset_0_1px_0_rgba(255,255,255,0.28)]",
+    iconClass: "text-amber-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+  },
+  "speed-demon": {
+    Icon: BsLightningChargeFill,
+    chipClass:
+      "border-sky-300/45 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white shadow-[0_2px_10px_rgba(14,165,233,0.3),inset_0_1px_0_rgba(255,255,255,0.28)]",
+    iconClass: "text-cyan-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+  },
+  "first-blood": {
+    Icon: TbTargetArrow,
+    chipClass:
+      "border-emerald-300/45 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.28),inset_0_1px_0_rgba(255,255,255,0.28)]",
+    iconClass: "text-emerald-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]",
+  },
 };
 
 interface LeaderboardPanelProps {
@@ -370,19 +401,23 @@ export function LeaderboardList({
                       You
                     </span>
                   )}
-                  {activeBadges.map((badge) => (
-                    <span
-                      key={badge.id}
-                      title={badge.tooltip}
-                      className={cn(
-                        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold shrink-0",
-                        BADGE_TONE_CLASSES[badge.tone]
-                      )}
-                    >
-                      <span aria-hidden="true">{badge.emoji}</span>
-                      <span>{badge.label}</span>
-                    </span>
-                  ))}
+                  {activeBadges.map((badge) => {
+                    const visual = BADGE_VISUALS[badge.id];
+                    const BadgeIcon = visual.Icon;
+                    return (
+                      <span
+                        key={badge.id}
+                        title={badge.tooltip}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.04em] leading-none select-none shrink-0",
+                          visual.chipClass
+                        )}
+                      >
+                        <BadgeIcon className={cn("h-3 w-3 shrink-0", visual.iconClass)} />
+                        <span>{badge.label}</span>
+                      </span>
+                    );
+                  })}
                   {isTied && entry.achievedAt && (
                     <span
                       title="Tiebreaker timestamp (EST)"
