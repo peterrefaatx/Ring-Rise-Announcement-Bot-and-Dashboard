@@ -1,7 +1,6 @@
 import type React from "react";
-import { BsLightningChargeFill } from "react-icons/bs";
+import { BsIncognito, BsLightningChargeFill } from "react-icons/bs";
 import { FaFireFlameCurved } from "react-icons/fa6";
-import { GiRobberMask } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
 import type { LeaderboardBadgeId } from "@/lib/leaderboard";
 
@@ -20,7 +19,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     name: "Throne Stealer",
     shortRule: "New #1 · 15m",
     fullRule: "Throne Stealer — Took #1 within the last 15 minutes",
-    Icon: GiRobberMask,
+    Icon: BsIncognito,
     iconClass: "text-purple-500",
   },
   {
