@@ -13,6 +13,7 @@ import {
 import { ThemeSwitcher } from "./theme-switcher";
 import { PageLoader } from "./page-loader";
 import { ThemeBackdrop } from "./theme-backdrop";
+import { MEDAL_DEFINITIONS } from "./dashboard/leaderboard-medals";
 import { Badge } from "./ui/badge";
 import {
   DropdownMenu,
@@ -94,9 +95,43 @@ export function AppShell({ user, brand, children }: AppShellProps) {
       {/* Symmetric Split Header */}
       <header className="theme-header sticky top-0 z-30 border-b backdrop-blur-xl transition-colors duration-200">
         <div className="mx-auto grid h-[72px] sm:h-20 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:px-6">
-          {/* Left: Theme Switcher */}
-          <div className="flex items-center justify-start min-w-0">
+          {/* Left: Theme Switcher + Medals Legend Dropdown */}
+          <div className="flex items-center justify-start gap-1.5 sm:gap-2 min-w-0">
             <ThemeSwitcher align="start" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Leaderboard medals legend"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-all duration-150 hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span>Medals</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-72 p-2 space-y-1.5">
+                <p className="px-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Daily Leaderboard Medals
+                </p>
+                {MEDAL_DEFINITIONS.map((medal) => {
+                  const MedalIcon = medal.Icon;
+                  return (
+                    <div
+                      key={medal.id}
+                      className="flex items-start gap-2.5 rounded-md px-1.5 py-1.5 text-xs"
+                    >
+                      <MedalIcon className={cn("mt-0.5 h-4 w-4 shrink-0", medal.iconClass)} />
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{medal.name}</p>
+                        <p className="text-[11px] leading-snug text-muted-foreground">
+                          {medal.fullRule.replace(`${medal.name} — `, "")}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Center: Clean Centered Logo */}
