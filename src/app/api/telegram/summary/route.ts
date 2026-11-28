@@ -19,7 +19,7 @@ const summarySchema = z.object({
 
 function formatEstTimestampWithSeconds(date: Date): string {
   const est = toEstWallClock(date);
-  return est.toISOString().slice(0, 19).replace("T", " ") + " EST";
+  return est.toISOString().slice(0, 19).replace("T", " ");
 }
 
 export async function POST(request: NextRequest) {

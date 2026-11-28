@@ -253,11 +253,11 @@ export function ProfileClient({
           <CardContent className="space-y-6">
             <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
               <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
-                <p className="text-[11px] sm:text-xs text-slate-500">Today (EST)</p>
+                <p className="text-[11px] sm:text-xs text-slate-500">Today</p>
                 <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums">{history.totals.today}</p>
               </div>
               <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
-                <p className="text-[11px] sm:text-xs text-slate-500">This Month (EST)</p>
+                <p className="text-[11px] sm:text-xs text-slate-500">This Month</p>
                 <p className="mt-1 text-xl sm:text-2xl font-bold tabular-nums">{history.totals.thisMonth}</p>
               </div>
               <div className="rounded-lg border bg-slate-50 p-3 sm:p-4">
@@ -319,7 +319,7 @@ export function ProfileClient({
                     >
                       <span className="text-slate-800">{item.renderedMessage}</span>
                       <span className="shrink-0 font-mono text-xs text-slate-500">
-                        {item.businessDateEst} {formatEstTime(item.createdAt)} EST
+                        {item.businessDateEst} {formatEstTime(item.createdAt)}
                       </span>
                     </div>
                   ))}

@@ -343,13 +343,13 @@ export function attachDailyLeaderboardBadges(
     });
   }
 
-  // 4. First Blood (first lead of the EST business day)
+  // 4. First Blood (first lead of the business day)
   const firstLead = sortedEvents[0];
   addBadge(firstLead.userId, {
     id: "first-blood",
     emoji: "🎯",
     label: "First Blood",
-    tooltip: "First lead of the EST day",
+    tooltip: "First lead of the day",
     tone: "target",
     expiresAt: null,
   });

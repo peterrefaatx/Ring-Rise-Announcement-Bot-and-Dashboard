@@ -513,7 +513,7 @@ export function AdminAnalyticsTab({
                         <div key={a.id} className="px-4 py-2 text-sm flex justify-between gap-2">
                           <span className="truncate">{a.campaignName}</span>
                           <span className="font-mono text-xs text-slate-500 shrink-0">
-                            {a.businessDateEst} {formatEstTime(a.createdAt)} EST
+                            {a.businessDateEst} {formatEstTime(a.createdAt)}
                           </span>
                         </div>
                       ))}

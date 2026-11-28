@@ -92,7 +92,7 @@ export function AdminSettingsTab({
   const [brandTagline, setBrandTagline] = useState(initialSettings?.brandTagline ?? "");
   const [brandLogoUrl, setBrandLogoUrl] = useState(initialSettings?.brandLogoUrl ?? "");
   const [timezoneLabel, setTimezoneLabel] = useState(
-    initialSettings?.timezoneLabel ?? "EST (UTC-5 Fixed)"
+    initialSettings?.timezoneLabel ?? "UTC-5 (Fixed)"
   );
 
   const [telegramEnabled, setTelegramEnabled] = useState(
@@ -367,7 +367,9 @@ export function AdminSettingsTab({
                 <Clock className="h-4 w-4 text-slate-500" />
                 <span className="font-medium text-slate-800">Business Day Timezone</span>
               </div>
-              <Badge variant="outline">{timezoneLabel}</Badge>
+              <Badge variant="outline">
+                {timezoneLabel.replace(/\bEST\s*\(([^)]+)\)/i, "$1").replace(/\bEST\b/gi, "").trim() || "UTC-5 (Fixed)"}
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -548,7 +550,7 @@ export function AdminSettingsTab({
                 <div key={job.id} className="rounded-lg border bg-card p-3 space-y-2 text-sm">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-xs text-slate-500">
-                      {formatEstTime(job.createdAt)} EST
+                      {formatEstTime(job.createdAt)}
                     </span>
                     <Badge
                       variant={
@@ -589,7 +591,7 @@ export function AdminSettingsTab({
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500 border-b">
                 <tr>
-                  <th className="px-4 py-2.5">Time (EST)</th>
+                  <th className="px-4 py-2.5">Time</th>
                   <th className="px-4 py-2.5">Message</th>
                   <th className="px-4 py-2.5">Status</th>
                   <th className="px-4 py-2.5">Attempts</th>

@@ -43,7 +43,7 @@ export const MEDAL_DEFINITIONS: MedalDefinition[] = [
     id: "first-blood",
     name: "First Blood",
     shortRule: "1st today",
-    fullRule: "First Blood — First lead of the EST business day",
+    fullRule: "First Blood — First lead of the day",
     Icon: TbTargetArrow,
     iconClass: "text-emerald-500",
   },

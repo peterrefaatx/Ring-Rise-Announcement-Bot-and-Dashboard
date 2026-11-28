@@ -99,7 +99,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
         if (next.realtimeMode === "poll") {
           setConnectionState("live");
           if (next.businessDateEst !== prevDate) {
-            toast.info("New EST business day started — daily leaderboard reset.");
+            toast.info("New business day started — daily leaderboard reset.");
           }
           const unseenLeads = next.activityFeed
             .filter((item) => item.seq > prevSeq && !seenSeqsRef.current.has(item.seq))
@@ -260,7 +260,7 @@ export function useRealtimeDashboard(initialSnapshot: DashboardSnapshot) {
       });
 
       es.addEventListener("day_rollover", () => {
-        toast.info("New EST business day started — daily leaderboard reset.");
+        toast.info("New business day started — daily leaderboard reset.");
         scheduleSync(10);
       });
 

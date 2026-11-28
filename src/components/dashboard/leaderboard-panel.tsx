@@ -366,7 +366,7 @@ export function LeaderboardList({
                   )}
                   {isTied && entry.achievedAt && (
                     <span
-                      title="Tiebreaker timestamp (EST)"
+                      title="Tiebreaker timestamp"
                       className="inline-flex items-center gap-1 rounded-full border border-[#E3E8EE] bg-[#FAFBFD] px-2 py-0.5 text-[11px] font-medium tabular-nums text-[#64748B] shrink-0"
                     >
                       <Clock className="h-3 w-3" />

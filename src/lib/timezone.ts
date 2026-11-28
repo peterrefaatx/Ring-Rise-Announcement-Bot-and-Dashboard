@@ -1,6 +1,6 @@
 export const EST_OFFSET_HOURS = -5;
 export const EST_OFFSET_MS = EST_OFFSET_HOURS * 60 * 60 * 1000;
-export const EST_TIMEZONE_LABEL = "EST (UTC-5 Fixed)";
+export const EST_TIMEZONE_LABEL = "UTC-5 (Fixed)";
 
 /**
  * Shifts a UTC instant by -5 hours so its UTC getters represent fixed EST wall clock.
@@ -91,7 +91,7 @@ export function formatEstTime(input: Date | string): string {
 export function formatEstDateTime(input: Date | string): string {
   const date = typeof input === "string" ? new Date(input) : input;
   const est = toEstWallClock(date);
-  return `${est.toISOString().slice(0, 10)} ${formatEstTime(date)} EST`;
+  return `${est.toISOString().slice(0, 10)} ${formatEstTime(date)}`;
 }
 
 /**

@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       const detail = await getDailyDetailAnalytics(dateParam);
       filenameBase = `daily-report-${dateParam}`;
       sheetName = `Daily ${dateParam}`;
-      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Leads", "Achieved At (EST)"];
+      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Leads", "Achieved At"];
       rows = detail.leaderboard.map((e) => [
         e.rank,
         e.announcementName,
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       const detail = await getMonthlyDetailAnalytics(monthParam);
       filenameBase = `monthly-report-${monthParam}`;
       sheetName = `Monthly ${monthParam}`;
-      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Leads", "Achieved At (EST)"];
+      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Leads", "Achieved At"];
       rows = detail.leaderboard.map((e) => [
         e.rank,
         e.announcementName,
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       const board = await getLeaderboardForRange({ includeZeroLeadActiveCallers: false });
       filenameBase = `all-time-performance-${getBusinessDateEst(new Date())}`;
       sheetName = "All-Time";
-      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Lifetime Leads", "Last Lead (EST)"];
+      headers = ["Rank", "Announcement Name", "Full Name", "Status", "Lifetime Leads", "Last Lead"];
       rows = board.map((e) => [
         e.rank,
         e.announcementName,
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       }
       filenameBase = `caller-${detail.caller.username}-${getBusinessDateEst(new Date())}`;
       sheetName = detail.caller.announcementName;
-      headers = ["Business Date (EST)", "Campaign", "Message", "Timestamp (EST)"];
+      headers = ["Business Date", "Campaign", "Message", "Timestamp"];
       rows = detail.recentAnnouncements.map((a) => [
         a.businessDateEst,
         a.campaignName,
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       }
       filenameBase = `campaign-${detail.campaign.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       sheetName = detail.campaign.name;
-      headers = ["Business Date (EST)", "Leads", "Effective Daily Target", "Target Achievement (%)"];
+      headers = ["Business Date", "Leads", "Effective Daily Target", "Target Achievement (%)"];
       rows = detail.dailyHistory.map((d) => [
         d.businessDateEst,
         d.leadCount,
