@@ -11,7 +11,7 @@ import {
   Laugh,
   Music2,
 } from "lucide-react";
-import { RiVipCrown2Fill } from "react-icons/ri";
+import { GiRobberMask } from "react-icons/gi";
 import { FaFireFlameCurved } from "react-icons/fa6";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { TbTargetArrow } from "react-icons/tb";
@@ -68,30 +68,58 @@ const RANK_POPUP_BY_THEME: Record<
   },
 };
 
-const BADGE_VISUALS: Record<
-  LeaderboardBadgeId,
+interface MedalDefinition {
+  id: LeaderboardBadgeId;
+  name: string;
+  shortRule: string;
+  fullRule: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  medalClass: string;
+  iconClass: string;
+}
+
+const MEDAL_DEFINITIONS: MedalDefinition[] = [
   {
-    Icon: React.ComponentType<{ className?: string }>;
-    iconClass: string;
-  }
-> = {
-  "throne-stealer": {
-    Icon: RiVipCrown2Fill,
-    iconClass: "text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.35)]",
+    id: "throne-stealer",
+    name: "Throne Stealer",
+    shortRule: "New #1 (15m)",
+    fullRule: "Throne Stealer — Took #1 within the last 15 minutes",
+    Icon: GiRobberMask,
+    medalClass: "border-purple-400/45 bg-purple-500/10 hover:bg-purple-500/20",
+    iconClass: "text-purple-500 drop-shadow-[0_0_6px_rgba(168,85,247,0.35)]",
   },
-  "on-fire": {
+  {
+    id: "on-fire",
+    name: "On Fire",
+    shortRule: "2+ in 60m",
+    fullRule: "On Fire — 2+ leads within the last 60 minutes",
     Icon: FaFireFlameCurved,
+    medalClass: "border-rose-400/45 bg-rose-500/10 hover:bg-rose-500/20",
     iconClass: "text-rose-500 drop-shadow-[0_0_6px_rgba(244,63,94,0.35)]",
   },
-  "speed-demon": {
+  {
+    id: "speed-demon",
+    name: "Speed Demon",
+    shortRule: "Fastest gap",
+    fullRule: "Speed Demon — Shortest gap between two consecutive leads today",
     Icon: BsLightningChargeFill,
+    medalClass: "border-sky-400/45 bg-sky-500/10 hover:bg-sky-500/20",
     iconClass: "text-sky-500 drop-shadow-[0_0_6px_rgba(14,165,233,0.35)]",
   },
-  "first-blood": {
+  {
+    id: "first-blood",
+    name: "First Blood",
+    shortRule: "1st today",
+    fullRule: "First Blood — First lead of the EST business day",
     Icon: TbTargetArrow,
+    medalClass: "border-emerald-400/45 bg-emerald-500/10 hover:bg-emerald-500/20",
     iconClass: "text-emerald-500 drop-shadow-[0_0_6px_rgba(16,185,129,0.35)]",
   },
-};
+];
+
+const MEDAL_BY_ID = Object.fromEntries(
+  MEDAL_DEFINITIONS.map((m) => [m.id, m])
+) as Record<LeaderboardBadgeId, MedalDefinition>;
 
 interface LeaderboardPanelProps {
   daily: LeaderboardEntry[];
@@ -150,6 +178,29 @@ export function LeaderboardPanel({
                 </div>
               </div>
             )}
+          </div>
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 border-t border-[#E3E8EE]/70 pt-2 text-[11px] text-[#64748B]">
+            {MEDAL_DEFINITIONS.map((medal) => {
+              const MedalIcon = medal.Icon;
+              return (
+                <span
+                  key={medal.id}
+                  title={medal.fullRule}
+                  className="inline-flex items-center gap-1.5"
+                >
+                  <span
+                    className={cn(
+                      "inline-flex h-5 w-5 items-center justify-center rounded-md border",
+                      medal.medalClass
+                    )}
+                  >
+                    <MedalIcon className={cn("h-3 w-3 shrink-0", medal.iconClass)} />
+                  </span>
+                  <span className="font-medium text-[#0A2540]">{medal.name}</span>
+                  <span className="opacity-80">({medal.shortRule})</span>
+                </span>
+              );
+            })}
           </div>
         </CardHeader>
       )}
@@ -406,26 +457,38 @@ export function LeaderboardList({
             </div>
 
             {activeBadges.length > 0 ? (
-              <div className="order-3 flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:order-none sm:w-auto sm:justify-self-center">
-                {activeBadges.map((badge, index) => {
-                  const visual = BADGE_VISUALS[badge.id];
-                  const BadgeIcon = visual.Icon;
+              <div className="order-3 flex w-full flex-wrap items-center justify-center gap-2 sm:order-none sm:w-auto sm:justify-self-center">
+                {activeBadges.map((badge) => {
+                  const medal = MEDAL_BY_ID[badge.id];
+                  const MedalIcon = medal.Icon;
+                  const burstMatch =
+                    badge.id === "on-fire" ? /×(\d+)/.exec(badge.label) : null;
                   return (
-                    <React.Fragment key={badge.id}>
-                      {index > 0 && (
-                        <span
-                          aria-hidden="true"
-                          className="h-3 w-px shrink-0 bg-border"
-                        />
-                      )}
+                    <div key={badge.id} className="group/medal relative">
                       <span
-                        title={badge.tooltip}
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-[#425466] select-none shrink-0"
+                        tabIndex={0}
+                        aria-label={`${medal.name}: ${badge.tooltip}`}
+                        title={`${medal.name} — ${badge.tooltip}`}
+                        className={cn(
+                          "relative inline-flex h-7 w-7 items-center justify-center rounded-lg border shadow-sm transition-transform duration-150 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring select-none",
+                          medal.medalClass
+                        )}
                       >
-                        <BadgeIcon className={cn("h-3.5 w-3.5 shrink-0", visual.iconClass)} />
-                        <span>{badge.label}</span>
+                        <MedalIcon className={cn("h-3.5 w-3.5 shrink-0", medal.iconClass)} />
+                        {burstMatch && (
+                          <span className="absolute -right-1.5 -top-1.5 rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-[14px] text-white shadow-sm ring-1 ring-background">
+                            ×{burstMatch[1]}
+                          </span>
+                        )}
                       </span>
-                    </React.Fragment>
+                      <div
+                        role="tooltip"
+                        className="pointer-events-none absolute left-1/2 top-full z-30 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-2.5 py-1 text-[11px] font-medium text-popover-foreground opacity-0 shadow-md transition-opacity duration-150 group-hover/medal:opacity-100 group-focus-within/medal:opacity-100"
+                      >
+                        <span className="font-semibold text-foreground">{medal.name}:</span>{" "}
+                        {badge.tooltip}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
