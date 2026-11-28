@@ -27,6 +27,7 @@ interface ProfileClientProps {
     announcementTemplate: string;
   };
   brand: BrandSettingsPublic;
+  defaultAnnouncementTemplate?: string;
   businessDateEst: string;
   history: CallerHistoryAnalytics;
 }
@@ -34,6 +35,7 @@ interface ProfileClientProps {
 export function ProfileClient({
   user,
   brand,
+  defaultAnnouncementTemplate = DEFAULT_ANNOUNCEMENT_TEMPLATE,
   businessDateEst,
   history,
 }: ProfileClientProps) {
@@ -227,7 +229,7 @@ export function ProfileClient({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setAnnouncementTemplate(DEFAULT_ANNOUNCEMENT_TEMPLATE)}
+                    onClick={() => setAnnouncementTemplate(defaultAnnouncementTemplate)}
                   >
                     <RotateCcw className="h-4 w-4" />
                     Reset Template

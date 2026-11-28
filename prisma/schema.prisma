@@ -168,16 +168,17 @@ model ActivityEvent {
 }
 
 model SystemSettings {
-  id                        String   @id @default("default")
-  brandName                 String   @default("Daily Dashboard")
-  brandTagline              String   @default("Real-Time Lead & Campaign Tracker")
-  brandPrimaryColor         String   @default("#0077B6")
-  brandLogoUrl              String?  @default("/logo.png")
-  telegramBotTokenEncrypted String?
-  telegramChatId            String?
-  telegramEnabled           Boolean  @default(true)
-  timezoneLabel             String   @default("EST (UTC-5 Fixed)")
-  updatedAt                 DateTime @updatedAt
+  id                          String   @id @default("default")
+  brandName                   String   @default("Daily Dashboard")
+  brandTagline                String   @default("Real-Time Lead & Campaign Tracker")
+  brandPrimaryColor           String   @default("#0077B6")
+  brandLogoUrl                String?  @default("/logo.png")
+  telegramBotTokenEncrypted   String?
+  telegramChatId              String?
+  telegramEnabled             Boolean  @default(true)
+  defaultAnnouncementTemplate String   @default("{name} got a lead in {campaign}, lets shout out to him!")
+  timezoneLabel               String   @default("EST (UTC-5 Fixed)")
+  updatedAt                   DateTime @updatedAt
 }
 
 model AuditLog {

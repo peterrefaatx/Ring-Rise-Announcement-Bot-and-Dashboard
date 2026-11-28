@@ -1,11 +1,23 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { Save, Send, RefreshCw, Bot, Palette, Clock, Trash2, AlertTriangle } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Save,
+  Send,
+  RefreshCw,
+  Bot,
+  Palette,
+  Clock,
+  Trash2,
+  AlertTriangle,
+  MessageSquare,
+  Users,
+  RotateCcw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input, PasswordInput } from "@/components/ui/input";
+import { Input, PasswordInput, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +30,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatEstTime } from "@/lib/timezone";
+import {
+  DEFAULT_ANNOUNCEMENT_TEMPLATE,
+  MAX_TEMPLATE_LENGTH,
+  renderAnnouncementMessage,
+  validateAnnouncementTemplate,
+} from "@/lib/template";
 import {
   fetchAdminCachedJson,
   getAdminCache,
@@ -36,7 +54,9 @@ interface AdminSettingsResponse {
     hasTelegramBotToken: boolean;
     telegramBotTokenMasked: string | null;
     telegramConfigSource: "database" | "env" | "unconfigured";
+    defaultAnnouncementTemplate: string;
   };
+  appliedUsersCount?: number;
 }
 
 interface TelegramQueueResponse {
@@ -89,6 +109,12 @@ export function AdminSettingsTab({
   const [configSource, setConfigSource] = useState<string>(
     initialSettings?.telegramConfigSource ?? "unconfigured"
   );
+  const [defaultTemplate, setDefaultTemplate] = useState(
+    initialSettings?.defaultAnnouncementTemplate ?? DEFAULT_ANNOUNCEMENT_TEMPLATE
+  );
+  const [savingTemplateAction, setSavingTemplateAction] = useState<
+    "default" | "all" | null
+  >(null);
 
   const [queue, setQueue] = useState<TelegramQueueResponse | null>(
     () => getAdminCache<TelegramQueueResponse>("settings:telegram")?.data ?? null
@@ -99,6 +125,16 @@ export function AdminSettingsTab({
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [resetConfirmText, setResetConfirmText] = useState("");
   const [resettingLeads, setResettingLeads] = useState(false);
+
+  const templateCheck = useMemo(
+    () => validateAnnouncementTemplate(defaultTemplate),
+    [defaultTemplate]
+  );
+
+  const templatePreview = useMemo(() => {
+    const active = templateCheck.valid ? defaultTemplate : DEFAULT_ANNOUNCEMENT_TEMPLATE;
+    return renderAnnouncementMessage(active, "Ahmed", "Silkroad");
+  }, [defaultTemplate, templateCheck.valid]);
 
   const loadAll = useCallback(
     async (force = false) => {
@@ -126,6 +162,7 @@ export function AdminSettingsTab({
         setHasToken(sData.settings.hasTelegramBotToken);
         setMaskedToken(sData.settings.telegramBotTokenMasked);
         setConfigSource(sData.settings.telegramConfigSource);
+        setDefaultTemplate(sData.settings.defaultAnnouncementTemplate);
       }
       if (qData) {
         setQueue(qData);
@@ -212,6 +249,49 @@ export function AdminSettingsTab({
       await loadAll(true);
     } finally {
       setRetryingJobId(null);
+    }
+  }
+
+  async function handleSaveAnnouncementTemplate(applyToAllUsers: boolean) {
+    if (!templateCheck.valid) {
+      toast.error(templateCheck.error || "Invalid announcement template.");
+      return;
+    }
+    setSavingTemplateAction(applyToAllUsers ? "all" : "default");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          defaultAnnouncementTemplate: defaultTemplate,
+          applyAnnouncementTemplateToAllUsers: applyToAllUsers,
+        }),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | (AdminSettingsResponse & { error?: string })
+        | null;
+      if (!res.ok) {
+        toast.error(data?.error || "Failed to update announcement template.");
+        return;
+      }
+      if (data?.settings?.defaultAnnouncementTemplate) {
+        setDefaultTemplate(data.settings.defaultAnnouncementTemplate);
+      }
+      invalidateAdminCache("settings:");
+      if (applyToAllUsers) {
+        invalidateAdminCache("callers:");
+        toast.success(
+          `Default saved & applied to ${data?.appliedUsersCount ?? "all"} users.`
+        );
+      } else {
+        toast.success("Default announcement message saved for new users.");
+      }
+      await loadAll(true);
+      onSettingsSaved();
+    } catch {
+      toast.error("Network error while updating announcement message.");
+    } finally {
+      setSavingTemplateAction(null);
     }
   }
 
@@ -356,6 +436,89 @@ export function AdminSettingsTab({
           </CardContent>
         </Card>
       </form>
+
+      {/* Global Custom Announcement Message */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MessageSquare className="h-4 w-4 text-primary" />
+            Default Custom Announcement Message
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Set the default Telegram message used for new accounts, or apply it to all existing users at once.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="admin-default-template">Custom Announcement Message</Label>
+              <span className="text-xs text-slate-400">
+                {defaultTemplate.length} / {MAX_TEMPLATE_LENGTH}
+              </span>
+            </div>
+            <Textarea
+              id="admin-default-template"
+              value={defaultTemplate}
+              maxLength={MAX_TEMPLATE_LENGTH}
+              onChange={(e) => setDefaultTemplate(e.target.value)}
+              placeholder={DEFAULT_ANNOUNCEMENT_TEMPLATE}
+              required
+            />
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>Required placeholders:</span>
+              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
+                {"{name}"}
+              </code>
+              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
+                {"{campaign}"}
+              </code>
+            </div>
+            {!templateCheck.valid && (
+              <p className="text-xs font-medium text-destructive">{templateCheck.error}</p>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-primary/25 bg-primary/10 p-3.5 space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-primary">
+              Live Telegram Preview (sample: Ahmed · Silkroad)
+            </p>
+            <p className="text-sm font-medium text-foreground">{templatePreview}</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <Button
+              type="button"
+              disabled={!templateCheck.valid || savingTemplateAction !== null}
+              onClick={() => handleSaveAnnouncementTemplate(true)}
+            >
+              <Users className="h-4 w-4" />
+              {savingTemplateAction === "all"
+                ? "Applying..."
+                : "Apply to All Users & Set Default"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!templateCheck.valid || savingTemplateAction !== null}
+              onClick={() => handleSaveAnnouncementTemplate(false)}
+            >
+              <Save className="h-4 w-4" />
+              {savingTemplateAction === "default"
+                ? "Saving..."
+                : "Set Default for New Users Only"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={savingTemplateAction !== null}
+              onClick={() => setDefaultTemplate(DEFAULT_ANNOUNCEMENT_TEMPLATE)}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Telegram Notification Delivery Queue */}
       <Card>

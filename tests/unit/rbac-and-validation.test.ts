@@ -32,6 +32,7 @@ import {
   createCampaignSchema,
   loginSchema,
   updateProfileSchema,
+  updateSettingsSchema,
 } from "@/lib/validation";
 
 describe("Server-Side RBAC & Validation Enforcement", () => {
@@ -211,6 +212,19 @@ describe("Server-Side RBAC & Validation Enforcement", () => {
     expect(
       loginSchema.parse({ username: "admin", password: "secret", rememberMe: true })
         .rememberMe
+    ).toBe(true);
+
+    expect(
+      updateSettingsSchema.safeParse({
+        defaultAnnouncementTemplate: "{name} closed a lead in {unknown}!",
+      }).success
+    ).toBe(false);
+
+    expect(
+      updateSettingsSchema.safeParse({
+        defaultAnnouncementTemplate: "{name} closed a lead in {campaign}!",
+        applyAnnouncementTemplateToAllUsers: true,
+      }).success
     ).toBe(true);
   });
 });

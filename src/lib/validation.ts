@@ -34,6 +34,16 @@ export const createCallerSchema = z.object({
     .optional(),
 });
 
+export const announcementTemplateSchema = z.string().superRefine((val, ctx) => {
+  const check = validateAnnouncementTemplate(val);
+  if (!check.valid) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: check.error || "Invalid announcement template",
+    });
+  }
+});
+
 export const updateCallerSchema = z.object({
   fullName: z.string().trim().min(2).max(100).optional(),
   username: z
@@ -47,18 +57,7 @@ export const updateCallerSchema = z.object({
   role: z.enum(["ADMIN", "CALLER"]).optional(),
   status: z.enum(["ACTIVE", "DEACTIVATED"]).optional(),
   announcementName: z.string().trim().min(1).max(MAX_ANNOUNCEMENT_NAME_LENGTH).optional(),
-  announcementTemplate: z
-    .string()
-    .superRefine((val, ctx) => {
-      const check = validateAnnouncementTemplate(val);
-      if (!check.valid) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: check.error || "Invalid announcement template",
-        });
-      }
-    })
-    .optional(),
+  announcementTemplate: announcementTemplateSchema.optional(),
 });
 
 export const resetPasswordSchema = z.object({
@@ -71,15 +70,7 @@ export const updateProfileSchema = z.object({
     .trim()
     .min(1, "Announcement name is required")
     .max(MAX_ANNOUNCEMENT_NAME_LENGTH, `Max ${MAX_ANNOUNCEMENT_NAME_LENGTH} characters`),
-  announcementTemplate: z.string().superRefine((val, ctx) => {
-    const check = validateAnnouncementTemplate(val);
-    if (!check.valid) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: check.error || "Invalid announcement template",
-      });
-    }
-  }),
+  announcementTemplate: announcementTemplateSchema,
 });
 
 export const createCampaignSchema = z.object({
@@ -134,4 +125,6 @@ export const updateSettingsSchema = z.object({
   telegramBotToken: z.string().trim().max(200).optional(),
   clearTelegramBotToken: z.boolean().optional(),
   telegramEnabled: z.boolean().optional(),
+  defaultAnnouncementTemplate: announcementTemplateSchema.optional(),
+  applyAnnouncementTemplateToAllUsers: z.boolean().optional(),
 });

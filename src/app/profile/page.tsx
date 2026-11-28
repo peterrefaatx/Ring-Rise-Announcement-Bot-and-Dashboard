@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "@/lib/auth";
-import { getPublicBrandSettings } from "@/lib/dashboard";
+import {
+  getDefaultAnnouncementTemplate,
+  getPublicBrandSettings,
+} from "@/lib/dashboard";
 import { getCallerHistoryAnalytics } from "@/lib/analytics";
 import { getBusinessDateEst } from "@/lib/timezone";
 import { ProfileClient } from "@/components/profile/profile-client";
@@ -13,8 +16,9 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const [brand, history] = await Promise.all([
+  const [brand, defaultAnnouncementTemplate, history] = await Promise.all([
     getPublicBrandSettings(),
+    getDefaultAnnouncementTemplate(),
     getCallerHistoryAnalytics(session.user.id),
   ]);
 
@@ -34,6 +38,7 @@ export default async function ProfilePage() {
         announcementTemplate: session.user.announcementTemplate,
       }}
       brand={brand}
+      defaultAnnouncementTemplate={defaultAnnouncementTemplate}
       businessDateEst={getBusinessDateEst(new Date())}
       history={history}
     />

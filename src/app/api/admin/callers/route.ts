@@ -4,7 +4,8 @@ import { requireApiAuth, getRequestIp } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/crypto";
 import { createCallerSchema } from "@/lib/validation";
-import { DEFAULT_ANNOUNCEMENT_TEMPLATE, sanitizeSingleLineText } from "@/lib/template";
+import { sanitizeSingleLineText } from "@/lib/template";
+import { getDefaultAnnouncementTemplate } from "@/lib/dashboard";
 import { getBusinessDateEst, getBusinessMonthEst } from "@/lib/timezone";
 import { recordAuditLog } from "@/lib/audit";
 import { emitActivityEvent } from "@/lib/realtime";
@@ -104,6 +105,8 @@ export async function POST(request: NextRequest) {
     parsed.data.announcementName || fullName.split(" ")[0] || fullName
   );
 
+  const defaultAnnouncementTemplate = await getDefaultAnnouncementTemplate();
+
   try {
     const created = await prisma.user.create({
       data: {
@@ -114,7 +117,7 @@ export async function POST(request: NextRequest) {
         role: parsed.data.role,
         status: "ACTIVE",
         announcementName,
-        announcementTemplate: DEFAULT_ANNOUNCEMENT_TEMPLATE,
+        announcementTemplate: defaultAnnouncementTemplate,
       },
       select: {
         id: true,

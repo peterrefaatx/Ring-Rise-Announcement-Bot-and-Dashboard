@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { getCurrentLeaderboards, type LeaderboardEntry } from "./leaderboard";
 import { cached } from "./cache";
+import { DEFAULT_ANNOUNCEMENT_TEMPLATE } from "./template";
 import {
   EST_TIMEZONE_LABEL,
   getBusinessDateEst,
@@ -105,6 +106,21 @@ export async function getPublicBrandSettings(): Promise<BrandSettingsPublic> {
       brandLogoUrl: settings?.brandLogoUrl || "/logo.png",
       timezoneLabel: settings?.timezoneLabel || EST_TIMEZONE_LABEL,
     };
+  });
+}
+
+export async function getDefaultAnnouncementTemplate(): Promise<string> {
+  return cached("brand:default-template", 60000, async () => {
+    try {
+      const settings = await prisma.systemSettings.findUnique({
+        where: { id: "default" },
+        select: { defaultAnnouncementTemplate: true },
+      });
+      return settings?.defaultAnnouncementTemplate || DEFAULT_ANNOUNCEMENT_TEMPLATE;
+    } catch (err) {
+      console.error("getDefaultAnnouncementTemplate fallback (DB unavailable):", err);
+      return DEFAULT_ANNOUNCEMENT_TEMPLATE;
+    }
   });
 }
 
